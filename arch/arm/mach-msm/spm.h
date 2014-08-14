@@ -112,6 +112,10 @@ struct msm_spm_platform_data {
 	uint32_t ver_reg;
 	uint32_t vctl_port;
 	uint32_t phase_port;
+<<<<<<< HEAD
+=======
+	uint32_t pfm_port;
+>>>>>>> cm/cm-11.0
 
 	uint8_t awake_vlevel;
 	uint32_t vctl_timeout_us;
@@ -126,6 +130,7 @@ struct msm_spm_platform_data {
 
 /* Public functions */
 
+<<<<<<< HEAD
 /**
  * msm_spm_set_low_power_mode() - Configure SPM start address for low power mode
  * @mode: SPM LPM mode to enter
@@ -151,10 +156,16 @@ unsigned int msm_spm_get_vdd(unsigned int cpu);
  * msm_spm_turn_on_cpu_rail(): Power on cpu rail before turning on core
  * @cpu: core id
  */
+=======
+int msm_spm_set_low_power_mode(unsigned int mode, bool notify_rpm);
+int msm_spm_set_vdd(unsigned int cpu, unsigned int vlevel);
+unsigned int msm_spm_get_vdd(unsigned int cpu);
+>>>>>>> cm/cm-11.0
 int msm_spm_turn_on_cpu_rail(unsigned int cpu);
 
 /* Internal low power management specific functions */
 
+<<<<<<< HEAD
 /**
  * msm_spm_reinit(): Reinitialize SPM registers
  */
@@ -170,12 +181,17 @@ int msm_spm_init(struct msm_spm_platform_data *data, int nr_devs);
 /**
  * msm_spm_device_init(): Device tree initialization function
  */
+=======
+void msm_spm_reinit(void);
+int msm_spm_init(struct msm_spm_platform_data *data, int nr_devs);
+>>>>>>> cm/cm-11.0
 int msm_spm_device_init(void);
 
 #if defined(CONFIG_MSM_L2_SPM)
 
 /* Public functions */
 
+<<<<<<< HEAD
 /**
  * msm_spm_l2_set_low_power_mode(): Configure L2 SPM start address
  *                                  for low power mode
@@ -207,6 +223,16 @@ int msm_spm_l2_init(struct msm_spm_platform_data *data);
 /**
  * msm_spm_l2_reinit(): Reinitialize L2 SPM registers
  */
+=======
+int msm_spm_l2_set_low_power_mode(unsigned int mode, bool notify_rpm);
+int msm_spm_apcs_set_vdd(unsigned int vlevel);
+int msm_spm_apcs_set_phase(unsigned int phase_cnt);
+int msm_spm_enable_fts_lpm(uint32_t mode);
+
+/* Internal low power management specific functions */
+
+int msm_spm_l2_init(struct msm_spm_platform_data *data);
+>>>>>>> cm/cm-11.0
 void msm_spm_l2_reinit(void);
 
 #else
@@ -234,6 +260,14 @@ static inline int msm_spm_apcs_set_phase(unsigned int phase_cnt)
 {
 	return -ENOSYS;
 }
+<<<<<<< HEAD
+=======
+
+static inline int msm_spm_enable_fts_lpm(uint32_t mode)
+{
+	return -ENOSYS;
+}
+>>>>>>> cm/cm-11.0
 #endif /* defined(CONFIG_MSM_L2_SPM) */
 #else /* defined(CONFIG_MSM_SPM_V1) || defined(CONFIG_MSM_SPM_V2) */
 static inline int msm_spm_set_low_power_mode(unsigned int mode, bool notify_rpm)

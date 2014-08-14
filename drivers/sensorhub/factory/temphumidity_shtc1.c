@@ -22,6 +22,7 @@
 #define VENDOR		"SENSIRION"
 #define CHIP_ID		"SHTC1"
 #define DONE_CAL	3
+<<<<<<< HEAD
 /*
 * this defined value was requested from HW QA
 * if you want to using this driver,
@@ -63,6 +64,12 @@
 	defined(CONFIG_MACH_JF_LGT) || defined(CONFIG_MACH_JF_SKT) || \
 	defined(CONFIG_MACH_JF_KTT) || defined(CONFIG_MACH_JF_DCM) || \
 	defined(CONFIG_MACH_JF_CRI)
+=======
+#define MODEL_NAME	"SGS4"
+
+#define CP_THM_ADC_SAMPLING_CNT 7
+
+>>>>>>> cm/cm-11.0
 /* {adc, temp*10}, -20 to +70 */
 static struct cp_thm_adc_table temp_table_cp[] = {
 	{200, 700}, {207, 690}, {214, 680}, {221, 670}, {248, 660},
@@ -85,7 +92,11 @@ static struct cp_thm_adc_table temp_table_cp[] = {
 	{1446, -110}, {1458, -120}, {1470, -130}, {1483, -140},{1495, -150},
 	{1504, -160}, {1513, -170}, {1522, -180}, {1532, -190}, {1542, -200},
  };
+<<<<<<< HEAD
 #endif
+=======
+
+>>>>>>> cm/cm-11.0
 static int get_cp_thm_value(struct ssp_data *data)
 {
 	int err = 0;
@@ -125,6 +136,7 @@ static int get_cp_thm_value(struct ssp_data *data)
 
 static int convert_adc_to_temp(struct ssp_data *data, unsigned int adc)
 {
+<<<<<<< HEAD
 #if defined(CONFIG_MACH_JF_ATT) || defined(CONFIG_MACH_JF_TMO) || \
 	defined(CONFIG_MACH_JF_EUR) || defined(CONFIG_MACH_JF_SPR) || \
 	defined(CONFIG_MACH_JF_USC) || defined(CONFIG_MACH_JF_VZW) || \
@@ -132,6 +144,8 @@ static int convert_adc_to_temp(struct ssp_data *data, unsigned int adc)
 	defined(CONFIG_MACH_JF_KTT) || defined(CONFIG_MACH_JF_DCM) || \
 	defined(CONFIG_MACH_JF_CRI)
 
+=======
+>>>>>>> cm/cm-11.0
 	int low = 0;
 	int high = 0;
 	int mid = 0;
@@ -154,10 +168,13 @@ static int convert_adc_to_temp(struct ssp_data *data, unsigned int adc)
 			break;
 	}
 	return temp_table_cp[mid].temperature;
+<<<<<<< HEAD
 #else
 	/* No voltage vs temperature table, using fake temp */
 	return -990;
 #endif
+=======
+>>>>>>> cm/cm-11.0
 }
 
 static ssize_t temphumidity_vendor_show(struct device *dev,

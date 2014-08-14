@@ -1,5 +1,9 @@
 /*
    RFCOMM implementation for Linux Bluetooth stack (BlueZ).
+<<<<<<< HEAD
+=======
+   Copyright (c) 2013 The Linux Foundation.  All rights reserved.
+>>>>>>> cm/cm-11.0
    Copyright (C) 2002 Maxim Krasnyansky <maxk@qualcomm.com>
    Copyright (C) 2002 Marcel Holtmann <marcel@holtmann.org>
 
@@ -707,12 +711,20 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname, c
 			break;
 		}
 
+<<<<<<< HEAD
 		if (sec.level > BT_SECURITY_HIGH) {
+=======
+		if (sec.level > BT_SECURITY_VERY_HIGH) {
+>>>>>>> cm/cm-11.0
 			err = -EINVAL;
 			break;
 		}
 
 		rfcomm_pi(sk)->sec_level = sec.level;
+<<<<<<< HEAD
+=======
+		BT_DBG("set to %d", sec.level);
+>>>>>>> cm/cm-11.0
 		break;
 
 	case BT_DEFER_SETUP:
@@ -763,6 +775,10 @@ static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname, char __u
 			opt = RFCOMM_LM_AUTH | RFCOMM_LM_ENCRYPT;
 			break;
 		case BT_SECURITY_HIGH:
+<<<<<<< HEAD
+=======
+		case BT_SECURITY_VERY_HIGH:
+>>>>>>> cm/cm-11.0
 			opt = RFCOMM_LM_AUTH | RFCOMM_LM_ENCRYPT |
 							RFCOMM_LM_SECURE;
 			break;

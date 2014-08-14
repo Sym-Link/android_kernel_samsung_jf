@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -66,7 +70,13 @@ enum {
 	MSM_FRONTEND_DAI_AFE_TX,
 	MSM_FRONTEND_DAI_VOICE_STUB,
 	MSM_FRONTEND_DAI_VOLTE,
+<<<<<<< HEAD
 	MSM_FRONTEND_DAI_SGLTE,
+=======
+	MSM_FRONTEND_DAI_VOICE2,
+	MSM_FRONTEND_DAI_VOLTE_STUB,
+	MSM_FRONTEND_DAI_VOICE2_STUB,
+>>>>>>> cm/cm-11.0
 	MSM_FRONTEND_DAI_MAX,
 };
 
@@ -109,6 +119,10 @@ enum {
 
 enum msm_pcm_routing_event {
 	MSM_PCM_RT_EVT_BUF_RECFG,
+<<<<<<< HEAD
+=======
+	MSM_PCM_RT_EVT_DEVSWITCH,
+>>>>>>> cm/cm-11.0
 	MSM_PCM_RT_EVT_MAX,
 };
 /* dai_id: front-end ID,

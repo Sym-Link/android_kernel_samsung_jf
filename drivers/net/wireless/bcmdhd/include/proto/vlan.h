@@ -2,7 +2,11 @@
  * 802.1Q VLAN protocol definitions
  *
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -35,6 +39,7 @@
 #include <packed_section_start.h>
 
 #ifndef	 VLAN_VID_MASK
+<<<<<<< HEAD
 #define VLAN_VID_MASK		0xfff	
 #endif
 
@@ -54,17 +59,43 @@
 struct vlan_header {
 	uint16	vlan_type;		
 	uint16	vlan_tag;		
+=======
+#define VLAN_VID_MASK		0xfff
+#endif
+
+#define	VLAN_CFI_SHIFT		12
+#define VLAN_PRI_SHIFT		13
+
+#define VLAN_PRI_MASK		7
+
+#define	VLAN_TPID_OFFSET	12
+#define	VLAN_TCI_OFFSET		14
+
+#define	VLAN_TAG_LEN		4
+#define	VLAN_TAG_OFFSET		(2 * ETHER_ADDR_LEN)
+
+#define VLAN_TPID		0x8100
+
+struct vlan_header {
+	uint16	vlan_type;
+	uint16	vlan_tag;
+>>>>>>> cm/cm-11.0
 };
 
 struct ethervlan_header {
 	uint8	ether_dhost[ETHER_ADDR_LEN];
 	uint8	ether_shost[ETHER_ADDR_LEN];
+<<<<<<< HEAD
 	uint16	vlan_type;		
+=======
+	uint16	vlan_type;
+>>>>>>> cm/cm-11.0
 	uint16	vlan_tag;		
 	uint16	ether_type;
 };
 
 struct dot3_mac_llc_snapvlan_header {
+<<<<<<< HEAD
 	uint8	ether_dhost[ETHER_ADDR_LEN];	
 	uint8	ether_shost[ETHER_ADDR_LEN];	
 	uint16	length;				
@@ -75,6 +106,18 @@ struct dot3_mac_llc_snapvlan_header {
 	uint16	vlan_type;			
 	uint16	vlan_tag;			
 	uint16	ether_type;			
+=======
+	uint8	ether_dhost[ETHER_ADDR_LEN];
+	uint8	ether_shost[ETHER_ADDR_LEN];
+	uint16	length;
+	uint8	dsap;
+	uint8	ssap;
+	uint8	ctl;
+	uint8	oui[3];
+	uint16	vlan_type;
+	uint16	vlan_tag;
+	uint16	ether_type;
+>>>>>>> cm/cm-11.0
 };
 
 #define	ETHERVLAN_HDR_LEN	(ETHER_HDR_LEN + VLAN_TAG_LEN)

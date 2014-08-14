@@ -125,7 +125,10 @@ static inline void prefetch(const void *ptr)
 #define spin_lock_prefetch(x) do { } while (0)
 
 #endif
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 #define HAVE_ARCH_PICK_MMAP_LAYOUT
 
 #endif

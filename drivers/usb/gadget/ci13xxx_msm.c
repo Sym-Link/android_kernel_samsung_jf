@@ -233,10 +233,22 @@ int ci13xxx_msm_remove(struct platform_device *pdev)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+void ci13xxx_msm_shutdown(struct platform_device *pdev)
+{
+	ci13xxx_pullup(&_udc->gadget, 0);
+}
+
+>>>>>>> cm/cm-11.0
 static struct platform_driver ci13xxx_msm_driver = {
 	.probe = ci13xxx_msm_probe,
 	.driver = { .name = "msm_hsusb", },
 	.remove = ci13xxx_msm_remove,
+<<<<<<< HEAD
+=======
+	.shutdown = ci13xxx_msm_shutdown,
+>>>>>>> cm/cm-11.0
 };
 MODULE_ALIAS("platform:msm_hsusb");
 

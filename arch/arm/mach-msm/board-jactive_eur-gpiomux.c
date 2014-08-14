@@ -429,6 +429,20 @@ static struct gpiomux_setting gsbi3_active_cfg = {
 	.pull = GPIOMUX_PULL_NONE,
 };
 
+<<<<<<< HEAD
+=======
+static struct gpiomux_setting gsbi2_suspend_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_8MA,
+	.pull = GPIOMUX_PULL_NONE,
+};
+
+static struct gpiomux_setting mcu_chg_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_8MA,
+	.pull = GPIOMUX_PULL_NONE,
+};
+>>>>>>> cm/cm-11.0
 static struct gpiomux_setting gsbi2 = {
 	.func = GPIOMUX_FUNC_1,
 	.drv = GPIOMUX_DRV_8MA,
@@ -441,11 +455,19 @@ static struct gpiomux_setting hdmi_suspend_cfg = {
 	.pull = GPIOMUX_PULL_DOWN,
 };
 
+<<<<<<< HEAD
+=======
+#if 0
+>>>>>>> cm/cm-11.0
 static struct gpiomux_setting hdmi_active_1_cfg = {
 	.func = GPIOMUX_FUNC_1,
 	.drv = GPIOMUX_DRV_2MA,
 	.pull = GPIOMUX_PULL_UP,
 };
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 static struct gpiomux_setting hdmi_active_2_cfg = {
 	.func = GPIOMUX_FUNC_1,
@@ -478,6 +500,7 @@ static struct gpiomux_setting sx150x_active_cfg = {
 };
 
 #ifdef CONFIG_USB_EHCI_MSM_HSIC
+<<<<<<< HEAD
 static struct gpiomux_setting cyts_sleep_sus_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
 	.drv = GPIOMUX_DRV_6MA,
@@ -535,6 +558,8 @@ static struct msm_gpiomux_config cyts_gpio_alt_config[] __initdata = {
 	},
 };
 
+=======
+>>>>>>> cm/cm-11.0
 static struct gpiomux_setting hsic_act_cfg = {
 	.func = GPIOMUX_FUNC_1,
 	.drv = GPIOMUX_DRV_8MA,
@@ -667,14 +692,23 @@ static struct msm_gpiomux_config msm8960_mhl_configs[] __initdata = {
 };
 #endif
 static struct msm_gpiomux_config apq8064_hdmi_configs[] __initdata = {
+<<<<<<< HEAD
 	{
+=======
+	/*{
+>>>>>>> cm/cm-11.0
 		.gpio = 69,
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &hdmi_active_1_cfg,
 			[GPIOMUX_SUSPENDED] = &hdmi_suspend_cfg,
 		},
+<<<<<<< HEAD
 	},
 	{
+=======
+	},*/
+	/*{
+>>>>>>> cm/cm-11.0
 		.gpio = 70,
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &hdmi_active_1_cfg,
@@ -687,7 +721,11 @@ static struct msm_gpiomux_config apq8064_hdmi_configs[] __initdata = {
 			[GPIOMUX_ACTIVE]    = &hdmi_active_1_cfg,
 			[GPIOMUX_SUSPENDED] = &hdmi_suspend_cfg,
 		},
+<<<<<<< HEAD
 	},
+=======
+	},*/
+>>>>>>> cm/cm-11.0
 	{
 		.gpio = 72,
 		.settings = {
@@ -697,6 +735,19 @@ static struct msm_gpiomux_config apq8064_hdmi_configs[] __initdata = {
 	},
 };
 
+<<<<<<< HEAD
+=======
+static struct msm_gpiomux_config sensorhub_configs[] __initdata = {
+	{
+		.gpio      = 69,
+		.settings = {
+			[GPIOMUX_SUSPENDED] = &mcu_chg_cfg,
+			[GPIOMUX_ACTIVE] = &mcu_chg_cfg,
+		},
+	},
+};
+
+>>>>>>> cm/cm-11.0
 static struct msm_gpiomux_config apq8064_gsbi_configs[] __initdata = {
 	{
 		.gpio      = 8,			/* GSBI3 I2C QUP SDA */
@@ -725,49 +776,100 @@ static struct msm_gpiomux_config apq8064_gsbi_configs[] __initdata = {
 		},
 	},
 	{
+<<<<<<< HEAD
 		.gpio      = 24,	/* GSBI2 I2C QUP SDA */
 		.settings = {
 			[GPIOMUX_SUSPENDED] = &gsbi2,
+=======
+		.gpio      = 21,		/* GSBI1 QUP I2C_CLK */
+		.settings = {
+			[GPIOMUX_SUSPENDED] = &gpio_i2c_config_sus,
+			[GPIOMUX_ACTIVE] = &gpio_i2c_config,
+		},
+	},
+	{
+		.gpio      = 20,		/* GSBI1 QUP I2C_DATA */
+		.settings = {
+			[GPIOMUX_SUSPENDED] = &gpio_i2c_config_sus,
+			[GPIOMUX_ACTIVE] = &gpio_i2c_config,
+		},
+	},
+	{
+		.gpio      = 24,	/* GSBI2 I2C QUP SDA */
+		.settings = {
+			[GPIOMUX_SUSPENDED] = &gsbi2_suspend_cfg,
+>>>>>>> cm/cm-11.0
 			[GPIOMUX_ACTIVE] = &gsbi2,
 		},
 	},
 	{
 		.gpio      = 25,	/* GSBI2 I2C QUP SCL */
 		.settings = {
+<<<<<<< HEAD
 			[GPIOMUX_SUSPENDED] = &gsbi2,
+=======
+			[GPIOMUX_SUSPENDED] = &gsbi2_suspend_cfg,
+>>>>>>> cm/cm-11.0
 			[GPIOMUX_ACTIVE] = &gsbi2,
 		},
 	},
 	{
 		.gpio      = 51,		/* GSBI5 QUP SPI_DATA_MOSI */
 		.settings = {
+<<<<<<< HEAD
 			[GPIOMUX_SUSPENDED] = &gpio_spi_config,
+=======
+			[GPIOMUX_SUSPENDED] = &gsbi5_suspended_cfg,
+			[GPIOMUX_ACTIVE] = &gsbi5_active_cfg,
+>>>>>>> cm/cm-11.0
 		},
 	},
 	{
 		.gpio      = 52,		/* GSBI5 QUP SPI_DATA_MISO */
 		.settings = {
+<<<<<<< HEAD
 			[GPIOMUX_SUSPENDED] = &gpio_spi_config,
+=======
+			[GPIOMUX_SUSPENDED] = &gsbi5_suspended_cfg,
+			[GPIOMUX_ACTIVE] = &gsbi5_active_cfg,
+>>>>>>> cm/cm-11.0
 		},
 	},
 	{
 		.gpio      = 53,		/* Funny CS0 */
 		.settings = {
+<<<<<<< HEAD
 			[GPIOMUX_SUSPENDED] = &gpio_spi_config,
+=======
+			[GPIOMUX_SUSPENDED] = &gsbi5_suspended_cfg,
+			[GPIOMUX_ACTIVE] = &gsbi5_active_cfg,
+>>>>>>> cm/cm-11.0
 		},
 	},
 	{
 		.gpio      = 54,		/* GSBI5 QUP SPI_CLK */
 		.settings = {
+<<<<<<< HEAD
 			[GPIOMUX_SUSPENDED] = &gpio_spi_config,
 		},
 	},
+=======
+			[GPIOMUX_SUSPENDED] = &gsbi5_suspended_cfg,
+			[GPIOMUX_ACTIVE] = &gsbi5_active_cfg,
+		},
+	},
+#if !defined(CONFIG_USB_EHCI_MSM_HSIC)
+>>>>>>> cm/cm-11.0
 	{
 		.gpio      = 30,		/* FP CS */
 		.settings = {
 			[GPIOMUX_SUSPENDED] = &gpio_spi_cs_config,
 		},
 	},
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> cm/cm-11.0
 	{
 		.gpio      = 32,		/* EPM CS */
 		.settings = {
@@ -775,12 +877,15 @@ static struct msm_gpiomux_config apq8064_gsbi_configs[] __initdata = {
 		},
 	},
 	{
+<<<<<<< HEAD
 		.gpio      = 53,		/* NOR CS */
 		.settings = {
 			[GPIOMUX_SUSPENDED] = &gpio_spi_cs_config,
 		},
 	},
 	{
+=======
+>>>>>>> cm/cm-11.0
 		.gpio      = 82,	/* GSBI7 UART2 TX */
 		.settings = {
 			[GPIOMUX_SUSPENDED] = &gsbi7_func2_cfg,
@@ -792,6 +897,7 @@ static struct msm_gpiomux_config apq8064_gsbi_configs[] __initdata = {
 			[GPIOMUX_SUSPENDED] = &gsbi7_func1_cfg,
 		},
 	},
+<<<<<<< HEAD
 	{
 		.gpio      = 21,		/* GSBI1 QUP I2C_CLK */
 		.settings = {
@@ -806,6 +912,8 @@ static struct msm_gpiomux_config apq8064_gsbi_configs[] __initdata = {
 			[GPIOMUX_ACTIVE] = &gpio_i2c_config,
 		},
 	},
+=======
+>>>>>>> cm/cm-11.0
 };
 
 static struct msm_gpiomux_config apq8064_slimbus_config[] __initdata = {
@@ -1447,6 +1555,11 @@ void __init apq8064_init_gpiomux(void)
 				ARRAY_SIZE(apq8064_gsbi_configs));
 	}
 
+<<<<<<< HEAD
+=======
+	msm_gpiomux_install(sensorhub_configs,
+			ARRAY_SIZE(sensorhub_configs));
+>>>>>>> cm/cm-11.0
 	msm_gpiomux_install(apq8064_slimbus_config,
 			ARRAY_SIZE(apq8064_slimbus_config));
 
@@ -1477,6 +1590,7 @@ void __init apq8064_init_gpiomux(void)
 					ARRAY_SIZE(mdm_configs));
 	}
 
+<<<<<<< HEAD
 	if (machine_is_apq8064_mtp()|| machine_is_JF()) {
 		if (SOCINFO_VERSION_MINOR(platform_version) == 1) {
 			msm_gpiomux_install(cyts_gpio_alt_config,
@@ -1487,6 +1601,8 @@ void __init apq8064_init_gpiomux(void)
 		}
 	}
 
+=======
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_USB_EHCI_MSM_HSIC
 	if (machine_is_apq8064_mtp()|| machine_is_JF())
 		msm_gpiomux_install(apq8064_hsic_configs,

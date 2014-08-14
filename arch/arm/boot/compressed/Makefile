@@ -22,6 +22,14 @@ OBJS		+= sdhi-sh7372.o
 endif
 
 AFLAGS_head.o += -DTEXT_OFFSET=$(TEXT_OFFSET)
+<<<<<<< HEAD
+=======
+# change@wtl.rsengott
+# FIPS_KERNEL_RAM_BASE is start of kernel text in RAM
+ifeq ($(CONFIG_CRYPTO_FIPS),y)
+AFLAGS_head.o += -DFIPS_KERNEL_RAM_BASE=0x80208000
+endif
+>>>>>>> cm/cm-11.0
 HEAD	= head.o
 OBJS	+= misc.o decompress.o
 FONTC	= $(srctree)/drivers/video/console/font_acorn_8x8.c
@@ -126,7 +134,11 @@ KBUILD_CFLAGS = $(subst -pg, , $(ORIG_CFLAGS))
 endif
 
 ccflags-y := -fpic -fno-builtin -I$(obj)
+<<<<<<< HEAD
 asflags-y := -Wa,-march=all
+=======
+asflags-y :=
+>>>>>>> cm/cm-11.0
 
 # Supply kernel BSS size to the decompressor via a linker symbol.
 KBSS_SZ = $(shell $(CROSS_COMPILE)size $(obj)/../../../../vmlinux | \

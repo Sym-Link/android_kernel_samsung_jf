@@ -269,6 +269,10 @@ static int msm_pcm_restart(struct snd_pcm_substream *substream)
 	struct output_meta_data_st output_meta_data;
 
 	pr_err("%s\n", __func__);
+<<<<<<< HEAD
+=======
+	memset(&output_meta_data, 0x0, sizeof(struct output_meta_data_st));
+>>>>>>> cm/cm-11.0
 	if (runtime->render_flag & SNDRV_RENDER_STOPPED) {
 		buf = prtd->audio_client->port[IN].buf;
 

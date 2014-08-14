@@ -113,7 +113,16 @@ armpmu_map_cache_event(unsigned (*cache_map)
 static int
 armpmu_map_event(const unsigned (*event_map)[PERF_COUNT_HW_MAX], u64 config)
 {
+<<<<<<< HEAD
 	int mapping = (*event_map)[config];
+=======
+	int mapping;
+
+	if (config >= PERF_COUNT_HW_MAX)
+		return -EINVAL;
+
+	mapping = (*event_map)[config];
+>>>>>>> cm/cm-11.0
 	return mapping == HW_OP_UNSUPPORTED ? -ENOENT : mapping;
 }
 
@@ -338,6 +347,12 @@ validate_event(struct pmu_hw_events *hw_events,
 	struct hw_perf_event fake_event = event->hw;
 	struct pmu *leader_pmu = event->group_leader->pmu;
 
+<<<<<<< HEAD
+=======
+	if (is_software_event(event))
+		return 1;
+
+>>>>>>> cm/cm-11.0
 	if (event->pmu != leader_pmu || event->state <= PERF_EVENT_STATE_OFF)
 		return 1;
 
@@ -739,15 +754,23 @@ static void __init cpu_pmu_init(struct arm_pmu *armpmu)
 	armpmu->type = ARM_PMU_DEVICE_CPU;
 }
 
+<<<<<<< HEAD
 static int cpu_has_active_perf(void)
+=======
+static int cpu_has_active_perf(int cpu)
+>>>>>>> cm/cm-11.0
 {
 	struct pmu_hw_events *hw_events;
 	int enabled;
 
 	if (!cpu_pmu)
 		return 0;
+<<<<<<< HEAD
 
 	hw_events = cpu_pmu->get_hw_events();
+=======
+	hw_events = &per_cpu(cpu_hw_events, cpu);
+>>>>>>> cm/cm-11.0
 	enabled = bitmap_weight(hw_events->used_mask, cpu_pmu->num_events);
 
 	if (enabled)
@@ -780,7 +803,11 @@ static int __cpuinit pmu_cpu_notify(struct notifier_block *b,
 {
 	int irq;
 
+<<<<<<< HEAD
 	if (cpu_has_active_perf()) {
+=======
+	if (cpu_has_active_perf((int)hcpu)) {
+>>>>>>> cm/cm-11.0
 		switch ((action & ~CPU_TASKS_FROZEN)) {
 
 		case CPU_DOWN_PREPARE:
@@ -853,24 +880,43 @@ static struct notifier_block __cpuinitdata pmu_cpu_notifier = {
 static int perf_cpu_pm_notifier(struct notifier_block *self, unsigned long cmd,
 		void *v)
 {
+<<<<<<< HEAD
 	switch (cmd) {
 	case CPU_PM_ENTER:
 		if (cpu_has_active_perf()) {
 			armpmu_update_counters();
 			perf_pmu_disable(&cpu_pmu->pmu);
+=======
+	struct pmu *pmu;
+	switch (cmd) {
+	case CPU_PM_ENTER:
+		if (cpu_has_active_perf((int)v)) {
+			armpmu_update_counters();
+			pmu = &cpu_pmu->pmu;
+			pmu->pmu_disable(pmu);
+>>>>>>> cm/cm-11.0
 		}
 		break;
 
 	case CPU_PM_ENTER_FAILED:
 	case CPU_PM_EXIT:
+<<<<<<< HEAD
 		if (cpu_has_active_perf() && cpu_pmu->reset) {
+=======
+		if (cpu_has_active_perf((int)v) && cpu_pmu->reset) {
+>>>>>>> cm/cm-11.0
 			/*
 			 * Flip this bit so armpmu_enable knows it needs
 			 * to re-enable active counters.
 			 */
 			__get_cpu_var(from_idle) = 1;
 			cpu_pmu->reset(NULL);
+<<<<<<< HEAD
 			perf_pmu_enable(&cpu_pmu->pmu);
+=======
+			pmu = &cpu_pmu->pmu;
+			pmu->pmu_enable(pmu);
+>>>>>>> cm/cm-11.0
 		}
 		break;
 	}

@@ -251,6 +251,7 @@ struct pm8xxx_adc_map_pt {
 };
 
 /**
+<<<<<<< HEAD
  * struct pm8xxx_adc_map - container of pm8xxx_adc_map_pt
  * @pt: pointer of pm8xxx_adc_map_pt
  * @size: size of pm8xxx_adc_map_pt
@@ -261,6 +262,8 @@ struct pm8xxx_adc_map {
 };
 
 /**
+=======
+>>>>>>> cm/cm-11.0
  * struct pm8xxx_adc_scaling_ratio - Represent scaling ratio for adc input
  * @num: Numerator scaling parameter
  * @den: Denominator scaling parameter
@@ -617,6 +620,7 @@ uint32_t pm8xxx_adc_btm_end(void);
  *			events are triggered.
  */
 uint32_t pm8xxx_adc_btm_configure(struct pm8xxx_adc_arb_btm_param *);
+<<<<<<< HEAD
 
 /**
  * pm8xxx_set_adcmap_btm_threshold()
@@ -632,6 +636,8 @@ void pm8xxx_set_adcmap_pa_therm(void *pts, int size);
  * pm8xxx_st_adcmap_ntcg_104ef_104fb()
  */
 void pm8xxx_set_adcmap_ntcg_104ef_104fb(void *pts, int size);
+=======
+>>>>>>> cm/cm-11.0
 #else
 static inline uint32_t pm8xxx_adc_read(uint32_t channel,
 				struct pm8xxx_adc_chan_result *result)
@@ -647,9 +653,12 @@ static inline uint32_t pm8xxx_adc_btm_end(void)
 static inline uint32_t pm8xxx_adc_btm_configure(
 		struct pm8xxx_adc_arb_btm_param *param)
 { return -ENXIO; }
+<<<<<<< HEAD
 static inline void pm8xxx_set_adcmap_btm_threshold(void) { }
 static inline void pm8xxx_set_adcmap_pa_therm(void) { }
 static inline void pm8xxx_set_adcmap_ntcg_104ef_104fb(void) { }
+=======
+>>>>>>> cm/cm-11.0
 #endif
 
 #endif /* PM8XXX_ADC_H */

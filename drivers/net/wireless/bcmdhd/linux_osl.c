@@ -2,7 +2,11 @@
  * Linux OS Independent Layer
  *
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -69,7 +73,11 @@ static bcm_static_buf_t *bcm_static_buf = 0;
 #else
 #define STATIC_PKT_4PAGE_NUM	0
 #define DHD_SKB_MAX_BUFSIZE DHD_SKB_2PAGE_BUFSIZE
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 typedef struct bcm_static_pkt {
 	struct sk_buff *skb_4k[STATIC_PKT_MAX_NUM];
@@ -82,7 +90,11 @@ typedef struct bcm_static_pkt {
 } bcm_static_pkt_t;
 
 static bcm_static_pkt_t *bcm_static_skb = 0;
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 typedef struct bcm_mem_link {
 	struct bcm_mem_link *prev;
@@ -101,7 +113,11 @@ struct osl_info {
 	uint magic;
 	void *pdev;
 	atomic_t malloced;
+<<<<<<< HEAD
 	atomic_t pktalloced; 	
+=======
+	atomic_t pktalloced;
+>>>>>>> cm/cm-11.0
 	uint failed;
 	uint bustype;
 	bcm_mem_link_t *dbgmem_list;
@@ -166,12 +182,21 @@ static int16 linuxbcmerrormap[] =
 	-EIO,			
 	-EIO,			
 	-ENODEV,		
+<<<<<<< HEAD
 	-EINVAL,		
 	-ENODATA,		
 	-EINVAL,		
 	-EINVAL,		
 	-EIO,     		
 	-EIO,			
+=======
+	-EINVAL,
+	-ENODATA,
+	-EINVAL,
+	-EINVAL,
+	-EIO,
+	-EIO,
+>>>>>>> cm/cm-11.0
 
 
 };
@@ -279,7 +304,11 @@ osl_attach(void *pdev, uint bustype, bool pkttag)
 
 		sema_init(&bcm_static_skb->osl_pkt_sem, 1);
 	}
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 
 	spin_lock_init(&(osh->pktalloc_lock));
@@ -315,7 +344,11 @@ static struct sk_buff *osl_alloc_skb(osl_t *osh, unsigned int len)
 	skb = __dev_alloc_skb(len, flags);
 #else
 	skb = dev_alloc_skb(len);
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 	return skb;
 }
 
@@ -349,7 +382,11 @@ osl_ctfpool_add(osl_t *osh)
 		return NULL;
 	}
 
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	skb = osl_alloc_skb(osh, osh->ctfpool->obj_size);
 	if (skb == NULL) {
 		printf("%s: skb alloc of len %d failed\n", __FUNCTION__,
@@ -508,7 +545,11 @@ osl_pktfastget(osl_t *osh, uint len)
 	ASSERT(CTFPOOLHEAD(osh, skb) == (struct sock *)osh->ctfpool->head);
 	CTFPOOL_UNLOCK(osh->ctfpool, flags);
 
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	skb->next = skb->prev = NULL;
 #if defined(__ARM_ARCH_7A__)
 	skb->data = skb->head + NET_SKB_PAD;
@@ -516,7 +557,11 @@ osl_pktfastget(osl_t *osh, uint len)
 #else
 	skb->data = skb->head + 16;
 	skb->tail = skb->head + 16;
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 	skb->len = 0;
 	skb->cloned = 0;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 14)
@@ -529,7 +574,11 @@ osl_pktfastget(osl_t *osh, uint len)
 
 	return skb;
 }
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 struct sk_buff * BCMFASTPATH
 osl_pkt_tonative(osl_t *osh, void *pkt)
@@ -539,7 +588,11 @@ osl_pkt_tonative(osl_t *osh, void *pkt)
 	if (osh->pub.pkttag)
 		OSL_PKTTAG_CLEAR(pkt);
 
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	for (nskb = (struct sk_buff *)pkt; nskb; nskb = nskb->next) {
 		atomic_sub(PKTISCHAINED(nskb) ? PKTCCNT(nskb) : 1, &osh->pktalloced);
 
@@ -556,7 +609,11 @@ osl_pkt_frmnative(osl_t *osh, void *pkt)
 	if (osh->pub.pkttag)
 		OSL_PKTTAG_CLEAR(pkt);
 
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	for (nskb = (struct sk_buff *)pkt; nskb; nskb = nskb->next) {
 		atomic_add(PKTISCHAINED(nskb) ? PKTCCNT(nskb) : 1, &osh->pktalloced);
 
@@ -571,12 +628,21 @@ osl_pktget(osl_t *osh, uint len)
 	struct sk_buff *skb;
 
 #ifdef CTFPOOL
+<<<<<<< HEAD
 	
 	skb = osl_pktfastget(osh, len);
 	if ((skb != NULL) || ((skb = osl_alloc_skb(osh, len)) != NULL)) {
 #else 
 	if ((skb = osl_alloc_skb(osh, len))) {
 #endif 
+=======
+
+	skb = osl_pktfastget(osh, len);
+	if ((skb != NULL) || ((skb = osl_alloc_skb(osh, len)) != NULL)) {
+#else
+	if ((skb = osl_alloc_skb(osh, len))) {
+#endif
+>>>>>>> cm/cm-11.0
 		skb->tail += len;
 		skb->len  += len;
 		skb->priority = 0;
@@ -602,7 +668,11 @@ osl_pktfastfree(osl_t *osh, struct sk_buff *skb)
 	skb->stamp.tv_sec = 0;
 #endif
 
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	skb->dev = NULL;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 36)
 	skb->dst = NULL;
@@ -669,7 +739,11 @@ osl_pktfree(osl_t *osh, void *p, bool send)
 #endif
 		{
 			if (skb->destructor)
+<<<<<<< HEAD
 				
+=======
+
+>>>>>>> cm/cm-11.0
 				dev_kfree_skb_any(skb);
 			else
 				
@@ -786,7 +860,11 @@ osl_pktfree_static(osl_t *osh, void *p, bool send)
 	up(&bcm_static_skb->osl_pkt_sem);
 	osl_pktfree(osh, p, send);
 }
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 int osh_pktpadtailroom(osl_t *osh, void* p, int pad)
 {
@@ -906,7 +984,11 @@ osl_malloc(osl_t *osh, uint size)
 	void *addr;
 	gfp_t flags;
 
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	if (osh)
 		ASSERT(osh->magic == OS_HANDLE_MAGIC);
 
@@ -942,7 +1024,11 @@ osl_malloc(osl_t *osh, uint size)
 		}
 	}
 original:
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 	flags = (in_atomic() || irqs_disabled()) ? GFP_ATOMIC : GFP_KERNEL;
@@ -1083,7 +1169,11 @@ osl_dma_map(osl_t *osh, void *va, uint size, int direction, void *p, hnddma_seg_
 		}
 		return dmah->segs[0].addr;
 	}
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 	return (pci_map_single(osh->pdev, va, size, dir));
 }
@@ -1117,7 +1207,11 @@ osl_assert(const char *exp, const char *file, int line)
 	snprintf(tempbuf, 64, "\"%s\": file \"%s\", line %d\n",
 		exp, basename, line);
 	printk("%s", tempbuf);
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 
 }
@@ -1147,8 +1241,11 @@ osl_sleep(uint ms)
 }
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> cm/cm-11.0
 void *
 osl_pktdup(osl_t *osh, void *skb)
 {
@@ -1156,7 +1253,11 @@ osl_pktdup(osl_t *osh, void *skb)
 
 	ASSERT(!PKTISCHAINED(skb));
 
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	PKTCTFMAP(osh, skb);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 36)
@@ -1179,17 +1280,29 @@ osl_pktdup(osl_t *osh, void *skb)
 	}
 #endif 
 
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	PKTSETCLINK(p, NULL);
 	PKTCCLRFLAGS(p);
 	PKTCSETCNT(p, 1);
 	PKTCSETLEN(p, PKTLEN(osh, skb));
 
+<<<<<<< HEAD
 	
 	if (osh->pub.pkttag)
 		OSL_PKTTAG_CLEAR(p);
 
 	
+=======
+
+	if (osh->pub.pkttag)
+		OSL_PKTTAG_CLEAR(p);
+
+
+>>>>>>> cm/cm-11.0
 	atomic_inc(&osh->pktalloced);
 	return (p);
 }
@@ -1249,11 +1362,19 @@ osl_os_image_size(void *image)
 	int len = 0, curroffset;
 
 	if (image) {
+<<<<<<< HEAD
 		
 		curroffset = generic_file_llseek(image, 0, 1);
 		
 		len = generic_file_llseek(image, 0, 2);
 		
+=======
+
+		curroffset = generic_file_llseek(image, 0, 1);
+
+		len = generic_file_llseek(image, 0, 2);
+
+>>>>>>> cm/cm-11.0
 		generic_file_llseek(image, curroffset, 0);
 	}
 	return len;

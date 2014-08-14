@@ -37,6 +37,13 @@ struct acdb_atomic_cal_block {
 	atomic_t		cal_paddr;
 };
 
+<<<<<<< HEAD
+=======
+struct hw_delay_entry {
+	uint32_t sample_rate;
+	uint32_t delay_usec;
+};
+>>>>>>> cm/cm-11.0
 struct acdb_cal_data {
 	uint32_t			num_cal_blocks;
 	struct acdb_atomic_cal_block	*cal_blocks;
@@ -61,5 +68,9 @@ void get_vocproc_cal(struct acdb_cal_data *cal_data);
 void get_vocstrm_cal(struct acdb_cal_data *cal_data);
 void get_vocvol_cal(struct acdb_cal_data *cal_data);
 void get_sidetone_cal(struct sidetone_cal *cal_data);
+<<<<<<< HEAD
+=======
+int get_hw_delay(int32_t path, struct hw_delay_entry *delay_info);
+>>>>>>> cm/cm-11.0
 
 #endif

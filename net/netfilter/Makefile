@@ -121,3 +121,10 @@ obj-$(CONFIG_IP_SET) += ipset/
 
 # IPVS
 obj-$(CONFIG_IP_VS) += ipvs/
+<<<<<<< HEAD
+=======
+
+# Inside Secure VPN
+obj-$(CONFIG_INSIDESECURE_VPNCLIENT) += interceptor/
+
+>>>>>>> cm/cm-11.0

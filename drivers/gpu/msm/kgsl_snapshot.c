@@ -144,9 +144,15 @@ static int snapshot_os(struct kgsl_device *device,
 	/* Figure out how many active contexts there are - these will
 	 * be appended on the end of the structure */
 
+<<<<<<< HEAD
 	rcu_read_lock();
 	idr_for_each(&device->context_idr, snapshot_context_count, &ctxtcount);
 	rcu_read_unlock();
+=======
+	read_lock(&device->context_lock);
+	idr_for_each(&device->context_idr, snapshot_context_count, &ctxtcount);
+	read_unlock(&device->context_lock);
+>>>>>>> cm/cm-11.0
 
 	/* Increment ctxcount for the global memstore */
 	ctxtcount++;
@@ -202,9 +208,17 @@ static int snapshot_os(struct kgsl_device *device,
 	snapshot_context_info(KGSL_MEMSTORE_GLOBAL, NULL, device);
 
 	/* append information for each context */
+<<<<<<< HEAD
 	rcu_read_lock();
 	idr_for_each(&device->context_idr, snapshot_context_info, NULL);
 	rcu_read_unlock();
+=======
+
+	read_lock(&device->context_lock);
+	idr_for_each(&device->context_idr, snapshot_context_info, NULL);
+	read_unlock(&device->context_lock);
+
+>>>>>>> cm/cm-11.0
 	/* Return the size of the data segment */
 	return size;
 }
@@ -540,6 +554,19 @@ int kgsl_device_snapshot(struct kgsl_device *device, int hang)
 	int remain = device->snapshot_maxsize - sizeof(*header);
 	void *snapshot;
 	struct timespec boot;
+<<<<<<< HEAD
+=======
+	int ret = 0;
+
+	/*
+	 * Bail if failed to get active count for GPU,
+	 * try again
+	 */
+	if (kgsl_active_count_get(device)) {
+		KGSL_DRV_ERR(device, "Failed to get GPU active count");
+		return -EINVAL;
+	}
+>>>>>>> cm/cm-11.0
 
 	/*
 	 * The first hang is always the one we are interested in. To
@@ -550,19 +577,36 @@ int kgsl_device_snapshot(struct kgsl_device *device, int hang)
 	 * of the state and never frozen.
 	 */
 
+<<<<<<< HEAD
 	if (hang && device->snapshot_frozen == 1)
 		return 0;
+=======
+	if (hang && device->snapshot_frozen == 1) {
+		ret = 0;
+		goto done;
+	}
+>>>>>>> cm/cm-11.0
 
 	if (device->snapshot == NULL) {
 		KGSL_DRV_ERR(device,
 			"snapshot: No snapshot memory available\n");
+<<<<<<< HEAD
 		return -ENOMEM;
+=======
+		ret = -ENOMEM;
+		goto done;
+>>>>>>> cm/cm-11.0
 	}
 
 	if (remain < sizeof(*header)) {
 		KGSL_DRV_ERR(device,
 			"snapshot: Not enough memory for the header\n");
+<<<<<<< HEAD
 		return -ENOMEM;
+=======
+		ret = -ENOMEM;
+		goto done;
+>>>>>>> cm/cm-11.0
 	}
 
 	header->magic = SNAPSHOT_MAGIC;
@@ -598,7 +642,14 @@ int kgsl_device_snapshot(struct kgsl_device *device, int hang)
 			__pa(device->snapshot),	device->snapshot_size);
 	if (hang)
 		sysfs_notify(&device->snapshot_kobj, NULL, "timestamp");
+<<<<<<< HEAD
 	return 0;
+=======
+
+done:
+	kgsl_active_count_put(device);
+	return ret;
+>>>>>>> cm/cm-11.0
 }
 EXPORT_SYMBOL(kgsl_device_snapshot);
 

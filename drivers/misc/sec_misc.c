@@ -34,7 +34,10 @@
 #include <linux/sec_param.h>
 #include <mach/sec_debug.h>
 #include <linux/sec_class.h>
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 #define MOVINAND_CHECKSUM
 #define RORY_CONTROL
 

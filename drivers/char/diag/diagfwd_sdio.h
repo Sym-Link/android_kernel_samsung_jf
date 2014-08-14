@@ -14,8 +14,13 @@
 #define DIAGFWD_SDIO_H
 
 #include <mach/sdio_al.h>
+<<<<<<< HEAD
 #define N_MDM_WRITE	1 /* Upgrade to 2 with ping pong buffer */
 #define N_MDM_READ	1
+=======
+#define N_MDM_SDIO_WRITE	1 /* Upgrade to 2 with ping pong buffer */
+#define N_MDM_SDIO_READ	1
+>>>>>>> cm/cm-11.0
 
 void diagfwd_sdio_init(void);
 void diagfwd_sdio_exit(void);

@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Guest Communications
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -46,6 +50,7 @@ static CommOSAtomic commOpCalls;
 #define COMM_CHANNEL_ACTIVE      0x4
 #define COMM_CHANNEL_ZOMBIE      0x8
 
+<<<<<<< HEAD
 #define CommIsFree(chan)        \
    ((chan)->lifecycleState == COMM_CHANNEL_FREE)
 #define CommIsInitialized(chan) \
@@ -67,6 +72,21 @@ static CommOSAtomic commOpCalls;
    SetLifecycleState(chan, COMM_CHANNEL_ACTIVE)
 #define CommSetZombie(chan)      \
    SetLifecycleState(chan, COMM_CHANNEL_ZOMBIE)
+=======
+#define CommIsFree(chan)        ((chan)->lifecycleState == COMM_CHANNEL_FREE)
+#define CommIsInitialized(chan) \
+		((chan)->lifecycleState == COMM_CHANNEL_INITIALIZED)
+#define CommIsOpened(chan)      ((chan)->lifecycleState == COMM_CHANNEL_OPENED)
+#define CommIsActive(chan)      ((chan)->lifecycleState == COMM_CHANNEL_ACTIVE)
+#define CommIsZombie(chan)      ((chan)->lifecycleState == COMM_CHANNEL_ZOMBIE)
+
+#define CommSetFree(chan)        SetLifecycleState(chan, COMM_CHANNEL_FREE)
+#define CommSetInitialized(chan) \
+		SetLifecycleState(chan, COMM_CHANNEL_INITIALIZED)
+#define CommSetOpened(chan)      SetLifecycleState(chan, COMM_CHANNEL_OPENED)
+#define CommSetActive(chan)      SetLifecycleState(chan, COMM_CHANNEL_ACTIVE)
+#define CommSetZombie(chan)      SetLifecycleState(chan, COMM_CHANNEL_ZOMBIE)
+>>>>>>> cm/cm-11.0
 
 #define CommGlobalLock() CommOS_SpinLock(&commGlobalLock)
 #define CommGlobalUnlock() CommOS_SpinUnlock(&commGlobalLock)
@@ -90,7 +110,11 @@ static CommOSAtomic commOpCalls;
 #define CommIsHeld(chan) (CommOS_ReadAtomic(&(chan)->holds) > 0)
 
 #define PacketLenOverLimit(chan, len) \
+<<<<<<< HEAD
    (((len) - sizeof (CommPacket)) > ((chan)->transpArgs.capacity / 4))
+=======
+	(((len) - sizeof(CommPacket)) > ((chan)->transpArgs.capacity / 4))
+>>>>>>> cm/cm-11.0
 
 
 /*
@@ -99,6 +123,7 @@ static CommOSAtomic commOpCalls;
  */
 
 struct CommChannelPriv {
+<<<<<<< HEAD
    CommOSAtomic holds;                 // Active readers and writers
    CommTranspInitArgs transpArgs;      // Transport initialization arguments
    CommTransp transp;                  // Transport handle
@@ -125,6 +150,34 @@ static unsigned int commChannelCapacity;     // Maximum number of channels.
 static unsigned int commChannelSize;         // Current size of channel array.
 static unsigned int commChannelAllocated;    // Nmb. entries currently in use.
 static struct CommChannelPriv *commChannels; // Allocated channel array.
+=======
+	CommOSAtomic holds;             /* Active readers and writers */
+	CommTranspInitArgs transpArgs;  /* Transport initialization arguments */
+	CommTransp transp;              /* Transport handle */
+	CommOSMutex dispatchMutex;      /* Dispatch mutex */
+	CommOSMutex writeMutex;         /* Non-BH write mutex */
+	CommOSMutex stateMutex;         /* Upper-layer state mutex */
+	CommOSWaitQueue availableWaitQ; /* Available write space wait data */
+	unsigned int desiredWriteSpace; /* Size of write space needed */
+	const CommImpl *impl;           /* Implementation */
+	unsigned int implNmbOps;        /* # of implementation operations */
+	unsigned int lifecycleState;    /* Lifecycle state */
+	void *state;                    /* Upper layer-specific state */
+};
+
+
+static int running;                     /* Initialized and running */
+static CommOSWaitQueue exitWaitQ;       /* Exit wait queue */
+static CommOSSpinlock commGlobalLock;   /* Global lock */
+
+
+/* Communication channel slots */
+
+static unsigned int commChannelCapacity;     /* Maximum number of channels */
+static unsigned int commChannelSize;         /* Current size of channel array */
+static unsigned int commChannelAllocated;    /* Nmb. entries currently in use */
+static struct CommChannelPriv *commChannels; /* Allocated channel array */
+>>>>>>> cm/cm-11.0
 
 
 /**
@@ -138,6 +191,7 @@ static struct CommChannelPriv *commChannels; // Allocated channel array.
 
 static int
 DefaultTranspListener(CommTranspInitArgs *transpArgs,
+<<<<<<< HEAD
                       void *probeData)
 {
    int rc = -1;
@@ -171,6 +225,44 @@ DefaultTranspListener(CommTranspInitArgs *transpArgs,
 
 out:
    return rc;
+=======
+		      void *probeData)
+{
+	int rc = -1;
+	const int inBH = 1;
+	const CommImpl *impl;
+
+	if (!transpArgs || !probeData) {
+		CommOS_Debug(("%s: NULL args [0x%p, 0x%p].\n",
+			      __func__, transpArgs, probeData));
+		goto out;
+	}
+
+	impl = probeData;
+	CommOS_Debug(("%s: Received attach info [%u,%u,%u:%u].\n",
+		      __func__,
+		      transpArgs->capacity, transpArgs->type,
+		      transpArgs->id.d32[0], transpArgs->id.d32[1]));
+
+	if (impl->checkArgs(transpArgs))
+		goto out;
+
+	transpArgs->mode = COMM_TRANSP_INIT_ATTACH; /* Ensure we attach */
+
+	/*
+	 * We recognized it, so don't let others waste any time.
+	 * Even if we fail.
+	 */
+
+	rc = 0;
+	if (Comm_Alloc(transpArgs, impl, inBH, NULL)) {
+		impl->closeNtf(impl->closeNtfData, transpArgs, inBH);
+		CommOS_Log(("%s: Can't allocate new channel!\n", __func__));
+	}
+
+out:
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -182,6 +274,7 @@ out:
 
 static inline void
 SetLifecycleState(CommChannel channel,
+<<<<<<< HEAD
                   unsigned int newState)
 {
 
@@ -190,6 +283,16 @@ SetLifecycleState(CommChannel channel,
 
 
 /* Wait conditions: functions returning 1: true, 0: false, < 0: error. */
+=======
+		  unsigned int newState)
+{
+
+	channel->lifecycleState = newState;
+}
+
+
+/* Wait conditions: functions returning 1: true, 0: false, < 0: error */
+>>>>>>> cm/cm-11.0
 
 /**
  * @brief Wait condition function to check whether module can be unloaded.
@@ -200,6 +303,7 @@ SetLifecycleState(CommChannel channel,
 
 static int
 ExitCondition(void *arg1,
+<<<<<<< HEAD
               void *arg2)
 {
    unsigned int i;
@@ -218,6 +322,28 @@ ExitCondition(void *arg1,
       }
    }
    return rc;
+=======
+	      void *arg2)
+{
+	unsigned int i;
+	int rc;
+
+	(void)arg1;
+	(void)arg2;
+	CommOS_Debug(("%s: running [%d] commChannelAllocated [%u] " \
+		      "commChannelSize [%u].\n",
+		      __func__, running,
+		      commChannelAllocated, commChannelSize));
+
+	rc = !running && (commChannelAllocated == 0);
+	if (!rc) {
+		for (i = 0; i < commChannelCapacity; i++)
+			CommOS_Debug(("%s: channel[%u] state [0x%x].\n",
+				      __func__, i,
+				      commChannels[i].lifecycleState));
+	}
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -230,6 +356,7 @@ ExitCondition(void *arg1,
 
 static int
 WriteSpaceCondition(void *arg1,
+<<<<<<< HEAD
                     void *arg2)
 {
    CommChannel channel = arg1;
@@ -238,6 +365,17 @@ WriteSpaceCondition(void *arg1,
       return -ENOMEM;
    }
    return channel->desiredWriteSpace < CommTransp_EnqueueSpace(channel->transp);
+=======
+		    void *arg2)
+{
+	CommChannel channel = arg1;
+
+	if (!CommIsActive(channel))
+		return -ENOMEM;
+
+	return channel->desiredWriteSpace <
+	       CommTransp_EnqueueSpace(channel->transp);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -251,12 +389,21 @@ WriteSpaceCondition(void *arg1,
 int
 Comm_RegisterImpl(const CommImpl *impl)
 {
+<<<<<<< HEAD
    CommTranspListener listener = {
       .probe = DefaultTranspListener,
       .probeData = (void *)impl
    };
 
    return CommTransp_Register(&listener);
+=======
+	CommTranspListener listener = {
+		.probe = DefaultTranspListener,
+		.probeData = (void *)impl
+	};
+
+	return CommTransp_Register(&listener);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -269,12 +416,21 @@ Comm_RegisterImpl(const CommImpl *impl)
 void
 Comm_UnregisterImpl(const CommImpl *impl)
 {
+<<<<<<< HEAD
    CommTranspListener listener = {
       .probe = DefaultTranspListener,
       .probeData = (void *)impl
    };
 
    CommTransp_Unregister(&listener);
+=======
+	CommTranspListener listener = {
+		.probe = DefaultTranspListener,
+		.probeData = (void *)impl
+	};
+
+	CommTransp_Unregister(&listener);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -287,6 +443,7 @@ Comm_UnregisterImpl(const CommImpl *impl)
 int
 Comm_Init(unsigned int maxChannels)
 {
+<<<<<<< HEAD
    int rc = -1;
    unsigned int i;
 
@@ -338,6 +495,58 @@ Comm_Init(unsigned int maxChannels)
 
 out:
    return rc;
+=======
+	int rc = -1;
+	unsigned int i;
+
+	if (running || commChannels ||
+	    (maxChannels == 0) || (maxChannels > COMM_CHANNEL_MAX_CAPACITY))
+		goto out;
+
+#if defined(COMM_INSTRUMENT)
+	CommOS_WriteAtomic(&commMaxCoalesceSize, 0);
+	CommOS_WriteAtomic(&commPacketsReceived, 0);
+	CommOS_WriteAtomic(&commCommittedPacketsReceived, 0);
+	CommOS_WriteAtomic(&commOpCalls, 0);
+#endif
+
+	CommOS_WaitQueueInit(&exitWaitQ);
+	CommOS_SpinlockInit(&commGlobalLock);
+	commChannelCapacity = maxChannels;
+	commChannelAllocated = 0;
+	commChannels =
+		CommOS_Kmalloc((sizeof(*commChannels)) * commChannelCapacity);
+	if (!commChannels)
+		goto out;
+
+	memset(commChannels, 0, (sizeof(*commChannels)) * commChannelCapacity);
+	for (i = 0; i < commChannelCapacity; i++) {
+		CommChannel channel;
+
+		channel = &commChannels[i];
+		CommHoldInit(channel);
+		channel->transp = NULL;
+		CommOS_MutexInit(&channel->dispatchMutex);
+		CommOS_MutexInit(&channel->writeMutex);
+		CommOS_MutexInit(&channel->stateMutex);
+		CommOS_WaitQueueInit(&channel->availableWaitQ);
+		channel->desiredWriteSpace = -1U;
+		channel->state = NULL;
+		CommSetFree(channel);
+	}
+
+	rc = CommTransp_Init();
+	if (!rc) {
+		commChannelSize = 0;
+		running = 1;
+		rc = 0;
+	} else {
+		CommOS_Kfree(commChannels);
+	}
+
+out:
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -350,6 +559,7 @@ out:
 int
 Comm_Finish(unsigned long long *timeoutMillis)
 {
+<<<<<<< HEAD
    int rc;
    unsigned int i;
    unsigned long long timeout;
@@ -390,6 +600,47 @@ Comm_Finish(unsigned long long *timeoutMillis)
       rc = -1;
    }
    return rc;
+=======
+	int rc;
+	unsigned int i;
+	unsigned long long timeout;
+
+	for (i = 0; i < commChannelSize; i++)
+		Comm_Zombify(&commChannels[i], 0);
+
+	running = 0;
+	timeout = timeoutMillis ? *timeoutMillis : 0;
+	/* coverity[var_deref_model] */
+	rc = CommOS_Wait(&exitWaitQ, ExitCondition, NULL, NULL, &timeout);
+	if (rc == 1) {
+		/*
+		 * Didn't time out, task wasn't interrupted, we can wrap it up.
+		 */
+
+		CommTransp_Exit();
+		CommOS_Kfree(commChannels);
+		commChannels = NULL;
+		commChannelSize = 0;
+#if defined(COMM_INSTRUMENT)
+		CommOS_Log(("%s: commMaxCoalesceSize = %lu.\n",
+			    __func__,
+			    CommOS_ReadAtomic(&commMaxCoalesceSize)));
+		CommOS_Log(("%s: commPacketsReceived = %lu.\n",
+			    __func__,
+			    CommOS_ReadAtomic(&commPacketsReceived)));
+		CommOS_Log(("%s: commCommittedPacketsReceived = %lu.\n",
+			    __func__,
+			    CommOS_ReadAtomic(&commCommittedPacketsReceived)));
+		CommOS_Log(("%s: commOpCalls = %lu.\n",
+			    __func__,
+			    CommOS_ReadAtomic)(&commOpCalls)));
+#endif
+		rc = 0;
+	} else {
+		rc = -1;
+	}
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -412,6 +663,7 @@ Comm_Finish(unsigned long long *timeoutMillis)
 
 int
 Comm_Alloc(const CommTranspInitArgs *transpArgs,
+<<<<<<< HEAD
            const CommImpl *impl,
            int inBH,
            CommChannel *newChannel)
@@ -494,6 +746,87 @@ out:
       CommOS_ModulePut(impl->owner);
    }
    return rc;
+=======
+	   const CommImpl *impl,
+	   int inBH,
+	   CommChannel *newChannel)
+{
+	unsigned int i;
+	CommChannel channel = NULL;
+	int restoreSize = 0;
+	int modHeld = 0;
+	int rc = -1;
+
+	if (inBH)
+		CommGlobalLock();
+	else
+		CommGlobalLockBH();
+
+	if (!running || !transpArgs || !impl)
+		goto out;
+
+	if (CommOS_ModuleGet(impl->owner))
+		goto out;
+
+	modHeld = 1;
+
+	for (i = 0; i < commChannelSize; i++) {
+		/*
+		 * Check if this channel is already allocated. We don't match
+		 * against ANY because those channels are in the process of
+		 * being opened; after that happens, they'll get proper IDs.
+		 */
+
+		if (!CommIsFree(&commChannels[i]) &&
+		    (transpArgs->id.d64 != COMM_TRANSP_ID_64_ANY) &&
+		    (transpArgs->id.d64 == commChannels[i].transpArgs.id.d64))
+			goto out;
+
+		if (!channel && CommIsFree(&commChannels[i]))
+			channel = &commChannels[i];
+	}
+
+	if (!channel) {
+		if (commChannelSize == commChannelCapacity)
+			goto out;
+
+		channel = &commChannels[commChannelSize];
+		commChannelSize++;
+		restoreSize = 1;
+	}
+
+	if (channel->transp) { /* Inconsistency! */
+		if (restoreSize)
+			commChannelSize--;
+		goto out;
+	}
+
+	channel->transpArgs = *transpArgs;
+	channel->impl = impl;
+	for (i = 0; impl->operations[i]; i++)
+		;
+	channel->implNmbOps = i;
+	channel->desiredWriteSpace = -1U;
+	commChannelAllocated++;
+	CommSetInitialized(channel);
+
+	if (newChannel)
+		*newChannel = channel;
+
+	rc = 0;
+	CommOS_ScheduleDisp();
+
+out:
+	if (inBH)
+		CommGlobalUnlock();
+	else
+		CommGlobalUnlockBH();
+
+	if (rc && modHeld)
+		CommOS_ModulePut(impl->owner);
+
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -506,6 +839,7 @@ out:
 
 int
 Comm_Zombify(CommChannel channel,
+<<<<<<< HEAD
              int inBH)
 {
    int rc = -1;
@@ -533,6 +867,34 @@ out:
       CommOS_ScheduleDisp();
    }
    return rc;
+=======
+	     int inBH)
+{
+	int rc = -1;
+
+	if (!running)
+		goto out;
+
+	if (inBH)
+		CommGlobalLock();
+	else
+		CommGlobalLockBH();
+
+	if (CommIsActive(channel) || CommIsOpened(channel)) {
+		CommSetZombie(channel);
+		rc = 0;
+	}
+
+	if (inBH)
+		CommGlobalUnlock();
+	else
+		CommGlobalUnlockBH();
+
+out:
+	if (!rc)
+		CommOS_ScheduleDisp();
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -545,7 +907,11 @@ out:
 int
 Comm_IsActive(CommChannel channel)
 {
+<<<<<<< HEAD
    return channel ? CommIsActive(channel) : 0;
+=======
+	return channel ? CommIsActive(channel) : 0;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -559,9 +925,14 @@ Comm_IsActive(CommChannel channel)
 static inline void
 WakeUpWriter(CommChannel channel)
 {
+<<<<<<< HEAD
    if (WriteSpaceCondition(channel, NULL)) {
       CommOS_WakeUp(&channel->availableWaitQ);
    }
+=======
+	if (WriteSpaceCondition(channel, NULL))
+		CommOS_WakeUp(&channel->availableWaitQ);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -575,6 +946,7 @@ WakeUpWriter(CommChannel channel)
 
 static void
 TranspEventHandler(CommTransp transp,
+<<<<<<< HEAD
                    CommTranspIOEvent event,
                    void *data)
 {
@@ -623,6 +995,58 @@ TranspEventHandler(CommTransp transp,
       CommOS_Debug(("%s: Unhandled event [%u, %p, %p].\n",
                     __FUNCTION__, event, transp, data));
    }
+=======
+		   CommTranspIOEvent event,
+		   void *data)
+{
+	CommChannel channel = (CommChannel)data;
+
+	switch (event) {
+	case COMM_TRANSP_IO_DETACH:
+		CommOS_Debug(("%s: Detach event. Zombifying channel.\n",
+			      __func__));
+		Comm_Zombify(channel, 1);
+		break;
+
+	case COMM_TRANSP_IO_IN:
+	case COMM_TRANSP_IO_INOUT:
+		/*
+		 * The dispatch threads may not have been started because:
+		 * a) we're not running in the CommSvc service, or
+		 * b) the Comm client didn't create them explicitly, by
+		 *    calling CommOS_StartIO().
+		 *
+		 * If so, the CommOS_ScheduleDisp() call is ineffective.
+		 * This is the intended behavior: the client obviously wants
+		 * to call the Comm dispatch function(s) directly.
+		 */
+
+		CommOS_ScheduleDisp();
+		break;
+
+	case COMM_TRANSP_IO_OUT:
+		CommHold(channel);
+		if (CommIsActive(channel))
+			WakeUpWriter(channel);
+
+		CommRelease(channel);
+
+		/*
+		 * After releasing the hold on the channel, we must
+		 * check if it was set to zombie and the dispatcher
+		 * was supposed to nuke it. If the dispatcher had made
+		 * its run while we were holding the channel, it gave
+		 * up. So schedule it.
+		 */
+		if (CommIsZombie(channel))
+			CommOS_ScheduleDisp();
+		break;
+
+	default:
+		CommOS_Debug(("%s: Unhandled event [%u, %p, %p].\n",
+			      __func__, event, transp, data));
+	}
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -635,6 +1059,7 @@ TranspEventHandler(CommTransp transp,
 static void
 CommClose(CommChannel channel)
 {
+<<<<<<< HEAD
    const CommImpl *impl = channel->impl;
 
    StateLock(channel);
@@ -661,6 +1086,33 @@ CommClose(CommChannel channel)
    if (!running && (commChannelAllocated == 0)) {
       CommOS_WakeUp(&exitWaitQ);
    }
+=======
+	const CommImpl *impl = channel->impl;
+
+	StateLock(channel);
+	if (impl->stateDtor && channel->state)
+		impl->stateDtor(channel->state);
+
+	channel->state = NULL;
+	StateUnlock(channel);
+
+	CommOS_ModulePut(impl->owner);
+
+	if (channel->transp) {
+		CommTransp_Close(channel->transp);
+		channel->transp = NULL;
+	}
+
+	CommGlobalLockBH();
+	CommSetFree(channel);
+	commChannelAllocated--;
+	if (channel == &commChannels[commChannelSize - 1])
+		commChannelSize--;
+
+	CommGlobalUnlockBH();
+	if (!running && (commChannelAllocated == 0))
+		CommOS_WakeUp(&exitWaitQ);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -676,6 +1128,7 @@ CommClose(CommChannel channel)
 static int
 CommOpen(CommChannel channel)
 {
+<<<<<<< HEAD
    int rc = -1;
    CommTranspEvent transpEvent = {
       .ioEvent = TranspEventHandler,
@@ -712,6 +1165,41 @@ out:
       CommClose(channel);
    }
    return rc;
+=======
+	int rc = -1;
+	CommTranspEvent transpEvent = {
+		.ioEvent = TranspEventHandler,
+		.ioEventData = channel
+	};
+	const CommImpl *impl;
+
+	if (!channel || !CommIsInitialized(channel))
+		return rc;
+
+	if (!running) /* Ok, toggle it back to FREE */
+		goto out;
+
+	impl = channel->impl;
+	if (impl->stateCtor) {
+		channel->state = impl->stateCtor(channel);
+		if (!channel->state)
+			goto out;
+	}
+
+	if (!CommTransp_Open(&channel->transp,
+			     &channel->transpArgs, &transpEvent))
+		rc = 0;
+	else
+		channel->transp = NULL;
+
+out:
+	if (!rc)
+		CommSetOpened(channel);
+	else
+		CommClose(channel);
+
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -725,12 +1213,21 @@ out:
 CommTranspInitArgs
 Comm_GetTranspInitArgs(CommChannel channel)
 {
+<<<<<<< HEAD
    if (!channel) {
       CommTranspInitArgs res = { .capacity = 0 };
 
       return res;
    }
    return channel->transpArgs;
+=======
+	if (!channel) {
+		CommTranspInitArgs res = { .capacity = 0 };
+
+		return res;
+	}
+	return channel->transpArgs;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -744,10 +1241,17 @@ Comm_GetTranspInitArgs(CommChannel channel)
 void *
 Comm_GetState(CommChannel channel)
 {
+<<<<<<< HEAD
    if (!channel) {
       return NULL;
    }
    return channel->state;
+=======
+	if (!channel)
+		return NULL;
+
+	return channel->state;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -762,11 +1266,19 @@ Comm_GetState(CommChannel channel)
 
 static int
 CopyFromChannel(CommChannel channel,
+<<<<<<< HEAD
                 void *dest,
                 unsigned int size,
                 int kern)
 {
    return CommTransp_DequeueSegment(channel->transp, dest, size, kern);
+=======
+		void *dest,
+		unsigned int size,
+		int kern)
+{
+	return CommTransp_DequeueSegment(channel->transp, dest, size, kern);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -782,6 +1294,7 @@ CopyFromChannel(CommChannel channel,
 int
 Comm_Dispatch(CommChannel channel)
 {
+<<<<<<< HEAD
    int rc = 0;
    int zombify = 0;
    CommPacket packet;
@@ -1104,6 +1617,364 @@ outUnlockAndFreeIovec:
       vec[vecLen].iov_len = 0;
    }
    goto out;
+=======
+	int rc = 0;
+	int zombify = 0;
+	CommPacket packet;
+	CommPacket firstPacket;
+	unsigned int dataLen;
+#define VEC_SIZE 32
+	struct kvec vec[VEC_SIZE];
+	unsigned int vecLen;
+
+	/*
+	 * Taking the reader mutex is safe in all cases: entries, including
+	 * free ones, are guaranteed to have initialized mutexes and locks.
+	 * Locking empty entries may seem wasteful, but those entries are rare.
+	 */
+
+	if (DispatchTrylock(channel))
+		return 0;
+
+	/* Process input and writer wake-up */
+
+	if (CommIsActive(channel)) {
+		/*
+		 * The entry may have transitioned to ZOMBIE, somehow. That's OK
+		 * since it can't be freed just yet (it's currently locked).
+		 */
+
+		/* Wake up any waiting writers, if necessary */
+
+		WakeUpWriter(channel);
+
+		/* Read packets, payloads */
+		CommTransp_DequeueReset(channel->transp);
+
+		for (vecLen = 0; vecLen < VEC_SIZE; vecLen++) {
+			if (!running)
+				break;
+
+			/* Read header */
+
+			rc = CommTransp_DequeueSegment(channel->transp, &packet,
+						       sizeof(packet), 1);
+			if (rc <= 0) {
+				/* No packet (header) */
+
+				rc = vecLen == 0 ? 0 : 1;
+				break;
+			}
+#if defined(COMM_INSTRUMENT)
+			CommOS_AddReturnAtomic(commPacketsReceived, 1);
+#endif
+			if ((rc != sizeof(packet)) ||
+			    (packet.len < sizeof(packet))) {
+				rc = -1; /* Protocol error, close down comm */
+				break;
+			}
+
+			rc = 1;
+
+			/* Read payload, if any */
+
+			dataLen = packet.len - sizeof(packet);
+			if (vecLen == 0) {
+				/* Save header of first packet */
+
+				firstPacket = packet;
+				if (dataLen == 0) {
+					/*
+					 * Commit no-payload packet read and
+					 * we're done.
+					 */
+
+					CommTransp_DequeueCommit(
+						channel->transp);
+#if defined(COMM_INSTRUMENT)
+					CommOS_AddReturnAtomic(
+						&commCommittedPacketsReceived,
+						1);
+#endif
+					break;
+				}
+			} else {
+				/*
+				 * Check if non-equivalent packet or above
+				 * coalescing limit. If so, don't commit.
+				 */
+
+				if (memcmp(&packet.opCode, &firstPacket.opCode,
+					   (sizeof(packet) -
+					    offsetof(CommPacket, opCode))) ||
+				    PacketLenOverLimit(
+						channel,
+						firstPacket.len + dataLen))
+					break;
+			}
+
+			if (dataLen == 0) {
+				/*
+				 * Received equivalent packet with zero-sized
+				 * payload. This may happen in certain cases,
+				 * such as pvtcp forwarding zero-sized
+				 * datagrams. So don't break the loop, but
+				 * keep going for as along as we can.
+				 */
+
+				vec[vecLen].iov_base = NULL;
+				goto dequeueCommit;
+			}
+
+			/*
+			 * The packet has a payload (dataLen > 0).
+			 * Allocate and read it.
+			 */
+
+			vec[vecLen].iov_base =
+				channel->impl->dataAlloc(dataLen, channel,
+							 &packet,
+							 CopyFromChannel);
+			if (!vec[vecLen].iov_base) {
+				CommOS_Log(("%s: BOOG -- COULD NOT " \
+					    "DEQUEUE PAYLOAD! [%d != %u]",
+					    __func__, rc, dataLen));
+				rc = -1; /* Protocol error, close down comm. */
+				break;
+			}
+			rc = 1;
+
+dequeueCommit:
+			CommTransp_DequeueCommit(channel->transp);
+#if defined(COMM_INSTRUMENT)
+			CommOS_AddReturnAtomic(&commCommittedPacketsReceived,
+					       1);
+#endif
+			vec[vecLen].iov_len = dataLen;
+			if (vecLen > 0) {
+				firstPacket.len += dataLen;
+
+				/*
+				 * Update to latest flags _iff_
+				 * latter non-zero.
+				 */
+				if (packet.flags)
+					firstPacket.flags = packet.flags;
+			}
+#if defined(COMM_INSTRUMENT)
+			if (firstPacket.len >
+			    CommOS_ReadAtomic(&commMaxCoalesceSize))
+				CommOS_WriteAtomic(&commMaxCoalesceSize,
+						   firstPacket.len);
+#endif
+			if (COMM_OPF_TEST_ERR(packet.flags)) {
+				/*
+				 * If error bit is set, we're done;
+				 * no more coalescing.
+				 */
+
+				vecLen++;
+				break;
+			}
+		}
+
+		if (rc <= 0) {
+			if (rc < 0) {
+				zombify = 1;
+				rc = 1;
+			}
+			goto outUnlockAndFreeIovec;
+		}
+
+#if defined(COMM_DISPATCH_EXTRA_WRITER_WAKEUP)
+		/* Check again if we need to wake up any writers */
+
+		WakeUpWriter(channel);
+#endif
+
+		if (firstPacket.opCode >= channel->implNmbOps) {
+			CommOS_Debug(("%s: Ignoring illegal opCode [%u]!\n",
+				      __func__,
+				      (unsigned int)firstPacket.opCode));
+			CommOS_Debug(("%s: Max opCode: %u\n",
+				      __func__, channel->implNmbOps));
+			goto outUnlockAndFreeIovec;
+		}
+
+		/*
+		 * NOTE:
+		 * DispatchUnlock() must be called from the operation callback.
+		 * The reason for doing so is that, for better scalability,
+		 * we want it released as soon as possible, BUT:
+		 * - releasing it here, before calling into the operation,
+		 *   doesn't let the latter coordinate its own lock acquisition,
+		 *   such as potential socket or state locks.
+		 * - alternatively, always releasing the dispatch lock after the
+		 *   operation completes, ties up the channel and imposes too
+		 *   much serialization between sockets.
+		 * - to prevent the channel from being torn down while an
+		 *   operation is in flight (and potentially having released
+		 *   the dispatch lock), we increment the ref count on the
+		 *   channel and then release it after the function returns.
+		 */
+
+#if defined(COMM_INSTRUMENT)
+		CommOS_AddReturnAtomic(&commOpCalls, 1);
+#endif
+
+		CommHold(channel);
+		channel->impl->operations[firstPacket.opCode](
+			channel, channel->state, &firstPacket, vec, vecLen);
+		CommRelease(channel);
+		goto out; /* No unlocking, see comment above */
+	}
+
+	/* Process state changes */
+
+	if (CommIsZombie(channel) && !CommIsHeld(channel)) {
+		CommTranspInitArgs transpArgs = channel->transpArgs;
+		void (*closeNtf)(void *,
+				 const CommTranspInitArgs *,
+				 int inBH) = channel->impl->closeNtf;
+		void *closeNtfData = channel->impl->closeNtfData;
+
+		while (WriteTrylock(channel)) {
+			/* Take the write lock; kick writers out if necessary */
+
+			CommOS_Debug(("%s: Kicking writers out.\n", __func__));
+			CommOS_WakeUp(&channel->availableWaitQ);
+		}
+		WriteUnlock(channel);
+
+		CommOS_Debug(("%s: Nuking zombie channel.\n", __func__));
+		CommClose(channel);
+		if (closeNtf)
+			closeNtf(closeNtfData, &transpArgs, 0);
+
+		rc = -1;
+	} else if (CommIsInitialized(channel) &&
+		   (channel->impl->openAtMillis <= CommOS_GetCurrentMillis())) {
+		if (!CommOpen(channel)) {
+			if (channel->transpArgs.mode ==
+			    COMM_TRANSP_INIT_CREATE) {
+				/*
+				 * If the attach side doesn't get notified, the
+				 * entry will time out in OPENED and will be
+				 * collected.
+				 * Note that during the CommOpen(Transp_Open)
+				 * call, the IDs in the transpArgs may have
+				 * changed. Use those.
+				 */
+
+				CommTransp_Notify(&channel->impl->ntfCenterID,
+						  &channel->transpArgs);
+			} else { /* Attach mode */
+				packet.len = sizeof(packet);
+				packet.opCode = 0xff;
+				packet.flags = 0x00;
+
+				/*
+				 * Send out control packet, attach ack, and
+				 * transition straight to ACTIVE.
+				 */
+
+				CommTransp_EnqueueReset(channel->transp);
+				rc = CommTransp_EnqueueSegment(
+					channel->transp,
+					&packet, sizeof(packet), 1);
+				if ((rc == sizeof(packet)) &&
+				   !CommTransp_EnqueueCommit(channel->transp)) {
+					/* Guard against concurrent zombify. */
+
+					CommGlobalLockBH();
+					if (CommIsOpened(channel)) {
+						CommOS_Debug((
+							"%s: Sent ack. "\
+							"Activating channel.\n",
+							__func__));
+						CommSetActive(channel);
+					}
+					CommGlobalUnlockBH();
+				}
+			}
+			rc = 1;
+		}
+	} else if (CommIsOpened(channel) &&
+		   (channel->transpArgs.mode == COMM_TRANSP_INIT_CREATE)) {
+		/*
+		 * Get control packet (opCode == 0xff), attach ack
+		 * (flags == 0x0), or check whether the channel timed out
+		 * in OPENED.
+		 */
+
+		rc = CommTransp_DequeueSegment(channel->transp,
+					       &packet, sizeof(packet), 1);
+		if ((rc == sizeof(packet)) &&
+		    !CommTransp_DequeueCommit(channel->transp)) {
+			void (*activateNtf)(void *, CommChannel) = NULL;
+			void *activateNtfData = NULL;
+
+			/* Guard against potentially concurrent zombify */
+
+			CommGlobalLockBH();
+
+			if (CommIsOpened(channel) &&
+			    (packet.opCode == 0xff) && (packet.flags == 0x0)) {
+				activateNtf = channel->impl->activateNtf;
+				activateNtfData =
+					channel->impl->activateNtfData;
+
+				CommSetActive(channel);
+				CommOS_Debug(("%s: Received attach ack. " \
+					      "Activating channel.\n",
+					      __func__));
+			}
+
+			CommHold(channel);
+			CommGlobalUnlockBH();
+
+			if (activateNtf)
+				/*
+				 * The callback must be short and 'put'
+				 * the channel when done.
+				 */
+				activateNtf(activateNtfData, channel);
+			else
+				/*
+				 * Don't forget to put back the channel if
+				 * no activate callback.
+				 */
+				CommRelease(channel);
+
+		} else if ((channel->impl->openTimeoutAtMillis <=
+			    CommOS_GetCurrentMillis()) ||
+			   !running) {
+			zombify = 1;
+			CommOS_Debug(("%s: Zombifying expired open channel.\n",
+				      __func__));
+		}
+		rc = 1;
+	}
+
+	DispatchUnlock(channel);
+
+out:
+	if (zombify)
+		Comm_Zombify(channel, 0);
+
+	return rc;
+
+outUnlockAndFreeIovec:
+	DispatchUnlock(channel);
+	while (vecLen) {
+		if (vec[--vecLen].iov_base) {
+			channel->impl->dataFree(vec[vecLen].iov_base);
+			vec[vecLen].iov_base = NULL;
+		}
+		vec[vecLen].iov_len = 0;
+	}
+	goto out;
+>>>>>>> cm/cm-11.0
 #undef VEC_SIZE
 }
 
@@ -1119,6 +1990,7 @@ outUnlockAndFreeIovec:
 unsigned int
 Comm_DispatchAll(void)
 {
+<<<<<<< HEAD
    unsigned int i;
    unsigned int hits;
 
@@ -1126,6 +1998,15 @@ Comm_DispatchAll(void)
       hits += !!Comm_Dispatch(&commChannels[i]);
    }
    return hits;
+=======
+	unsigned int i;
+	unsigned int hits;
+
+	for (hits = 0, i = 0; running && (i < commChannelSize); i++)
+		hits += !!Comm_Dispatch(&commChannels[i]);
+
+	return hits;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -1147,6 +2028,7 @@ Comm_DispatchAll(void)
 
 int
 Comm_Write(CommChannel channel,
+<<<<<<< HEAD
            const CommPacket *packet,
            unsigned long long *timeoutMillis)
 {
@@ -1190,6 +2072,52 @@ out:
       Comm_Zombify(channel, 0);
    }
    return rc;
+=======
+	   const CommPacket *packet,
+	   unsigned long long *timeoutMillis)
+{
+	int rc = -1;
+	int zombify;
+
+	if (!channel || !timeoutMillis ||
+	    !packet || (packet->len < sizeof(*packet)))
+		return rc;
+
+
+	zombify = (*timeoutMillis >= COMM_MAX_TO);
+
+	WriteLock(channel);
+	if (!CommIsActive(channel))
+		goto out;
+
+
+	CommTransp_EnqueueReset(channel->transp);
+	channel->desiredWriteSpace = packet->len;
+	rc = CommOS_DoWait(&channel->availableWaitQ, WriteSpaceCondition,
+			   channel, NULL, timeoutMillis,
+			   (*timeoutMillis != COMM_MAX_TO_UNINT));
+	channel->desiredWriteSpace = -1U;
+
+	if (rc) /* Don't zombify, if it didn't time out */
+		zombify = 0;
+
+	if (rc == 1) { /* Enough write space, enqueue the packet */
+		rc = CommTransp_EnqueueSegment(channel->transp, packet,
+					       packet->len, 1);
+		if ((rc != packet->len) ||
+		    CommTransp_EnqueueCommit(channel->transp)) {
+			zombify = 1;
+			rc = -1; /* Fatal protocol error */
+		}
+	}
+
+out:
+	WriteUnlock(channel);
+	if (zombify)
+		Comm_Zombify(channel, 0);
+
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -1221,6 +2149,7 @@ out:
 
 int
 Comm_WriteVec(CommChannel channel,
+<<<<<<< HEAD
               const CommPacket *packet,
               struct kvec **vec,
               unsigned int *vecLen,
@@ -1370,6 +2299,166 @@ out:
       Comm_Zombify(channel, 0);
    }
    return rc;
+=======
+	      const CommPacket *packet,
+	      struct kvec **vec,
+	      unsigned int *vecLen,
+	      unsigned long long *timeoutMillis,
+	      unsigned int *iovOffset,
+	      int kern)
+{
+	int rc;
+	int zombify;
+	unsigned int dataLen;
+	unsigned int vecDataLen;
+	unsigned int vecNdx;
+	unsigned int iovLen;
+	void *iovBase;
+
+	if (!channel || !timeoutMillis || !iovOffset ||
+	    !packet || (packet->len < sizeof(*packet)) ||
+	    ((packet->len > sizeof(*packet)) &&
+	    (!*vec || !*vecLen)))
+		return -1;
+
+	dataLen = packet->len - sizeof(*packet);
+
+	zombify = (*timeoutMillis >= COMM_MAX_TO);
+
+	WriteLock(channel);
+	if (!CommIsActive(channel)) {
+		rc = -1;
+		goto out;
+	}
+
+	CommTransp_EnqueueReset(channel->transp);
+	channel->desiredWriteSpace = packet->len;
+	rc = CommOS_DoWait(&channel->availableWaitQ, WriteSpaceCondition,
+			   channel, NULL, timeoutMillis,
+			   (*timeoutMillis != COMM_MAX_TO_UNINT));
+	channel->desiredWriteSpace = -1U;
+
+	if (rc) /* Don't zombify, if it didn't time out */
+		zombify = 0;
+
+	if (rc == 1) { /* Enough write space, enqueue the packet */
+		iovLen = 0;
+		rc = CommTransp_EnqueueSegment(channel->transp,
+					       packet, sizeof(*packet), 1);
+		if (rc != sizeof(*packet)) {
+			zombify = 1;
+			rc = -1; /* Fatal protocol error */
+			goto out;
+		}
+
+		if (dataLen > 0) {
+			int done = 0;
+
+			for (vecDataLen = 0, vecNdx = 0;
+			     vecNdx < *vecLen;
+			     vecNdx++) {
+				if (vecNdx)
+					*iovOffset = 0;
+
+				iovLen = (*vec)[vecNdx].iov_len - *iovOffset;
+				iovBase = (*vec)[vecNdx].iov_base + *iovOffset;
+
+				if (!iovLen)
+					continue;
+
+				vecDataLen += iovLen;
+				if (vecDataLen >= dataLen) {
+					iovLen -= (vecDataLen - dataLen);
+					done = 1;
+				}
+
+				rc = CommTransp_EnqueueSegment(channel->transp,
+							       iovBase, iovLen,
+							       kern);
+				if (rc != iovLen) {
+					if (kern) {
+						/* Protocol error, close it. */
+
+						zombify = 1;
+						rc = -1;
+					} else {
+						/* Bad passed user address */
+
+						rc = -EFAULT;
+					}
+					goto out;
+				}
+
+				if (done) {
+					CommTransp_EnqueueCommit(
+						channel->transp);
+					if (vecDataLen == dataLen) {
+						vecNdx++;
+						*iovOffset = 0;
+					} else {
+						*iovOffset += iovLen;
+					}
+					*vecLen -= vecNdx;
+					*vec += vecNdx;
+					break;
+				}
+			}
+
+			if (!done) {
+				/*
+				 * We exhausted all the bytes in the vector,
+				 * but total length in the packet header is
+				 * more than we sent (was available). If so,
+				 * we pad by sending zero bytes up to length.
+				 */
+
+				static char pad[1024];
+				unsigned int delta;
+				unsigned int toSend;
+
+				while (vecDataLen < dataLen) {
+					delta = dataLen - vecDataLen;
+					toSend = delta <= sizeof(pad) ?
+							delta : sizeof(pad);
+					if (toSend == delta)
+						done = 1;
+
+					vecDataLen += toSend;
+
+					rc = CommTransp_EnqueueSegment(
+						channel->transp, pad,
+						toSend, 1);
+					if (rc != toSend) {
+						zombify = 1;
+						rc = -1; /* Error, close it. */
+						goto out;
+					}
+
+					if (done) {
+						CommTransp_EnqueueCommit(
+							channel->transp);
+						*vec = NULL;
+						*vecLen = 0;
+						*iovOffset = 0;
+						break;
+					}
+				}
+			}
+		} else {
+			CommTransp_EnqueueCommit(channel->transp);
+		}
+		rc = (int)packet->len;
+	} else {
+		CommOS_Debug(("%s: timed out...\n", __func__));
+	}
+
+out:
+	WriteUnlock(channel);
+	if (zombify)
+		Comm_Zombify(channel, 0);
+
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -1384,9 +2473,14 @@ out:
 void
 Comm_Put(CommChannel channel)
 {
+<<<<<<< HEAD
    if (channel) {
       CommRelease(channel);
    }
+=======
+	if (channel)
+		CommRelease(channel);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -1400,9 +2494,14 @@ Comm_Put(CommChannel channel)
 void
 Comm_DispatchUnlock(CommChannel channel)
 {
+<<<<<<< HEAD
    if (channel) {
       DispatchUnlock(channel);
    }
+=======
+	if (channel)
+		DispatchUnlock(channel);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -1419,6 +2518,7 @@ Comm_DispatchUnlock(CommChannel channel)
 int
 Comm_Lock(CommChannel channel)
 {
+<<<<<<< HEAD
    if (!channel) {
       return -1;
    }
@@ -1428,6 +2528,17 @@ Comm_Lock(CommChannel channel)
       return -1;
    }
    return 0;
+=======
+	if (!channel)
+		return -1;
+
+	StateLock(channel);
+	if (!CommIsActive(channel) && !CommIsZombie(channel)) {
+		StateUnlock(channel);
+		return -1;
+	}
+	return 0;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -1441,9 +2552,14 @@ Comm_Lock(CommChannel channel)
 void
 Comm_Unlock(CommChannel channel)
 {
+<<<<<<< HEAD
    if (channel) {
       StateUnlock(channel);
    }
+=======
+	if (channel)
+		StateUnlock(channel);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -1456,11 +2572,18 @@ Comm_Unlock(CommChannel channel)
 unsigned int
 Comm_RequestInlineEvents(CommChannel channel)
 {
+<<<<<<< HEAD
    if (channel->transp) {
       return CommTransp_RequestInlineEvents(channel->transp);
    } else {
       return (unsigned int)-1;
    }
+=======
+	if (channel->transp)
+		return CommTransp_RequestInlineEvents(channel->transp);
+	else
+		return (unsigned int)-1;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -1473,10 +2596,17 @@ Comm_RequestInlineEvents(CommChannel channel)
 unsigned int
 Comm_ReleaseInlineEvents(CommChannel channel)
 {
+<<<<<<< HEAD
    if (channel->transp) {
       return CommTransp_ReleaseInlineEvents(channel->transp);
    } else {
       return (unsigned int)-1;
    }
+=======
+	if (channel->transp)
+		return CommTransp_ReleaseInlineEvents(channel->transp);
+	else
+		return (unsigned int)-1;
+>>>>>>> cm/cm-11.0
 }
 

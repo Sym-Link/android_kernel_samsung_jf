@@ -326,6 +326,7 @@ const struct mem_type *get_mem_type(unsigned int type)
 }
 EXPORT_SYMBOL(get_mem_type);
 
+<<<<<<< HEAD
 #define PTE_SET_FN(_name, pteop) \
 static int pte_set_##_name(pte_t *ptep, pgtable_t token, unsigned long addr, \
 			void *data) \
@@ -368,6 +369,8 @@ EXPORT_SYMBOL(set_memory_x);
 SET_MEMORY_FN(nx, pte_set_nx)
 EXPORT_SYMBOL(set_memory_nx);
 
+=======
+>>>>>>> cm/cm-11.0
 /*
  * Adjust the PMD section entries according to the CPU in use.
  */
@@ -667,6 +670,7 @@ static void __init alloc_init_pte(pmd_t *pmd, unsigned long addr,
 	} while (pte++, addr += PAGE_SIZE, addr != end);
 }
 
+<<<<<<< HEAD
 static void __init map_init_section(pmd_t *pmd, unsigned long addr,
 			unsigned long end, phys_addr_t phys,
 			const struct mem_type *type)
@@ -693,10 +697,14 @@ static void __init map_init_section(pmd_t *pmd, unsigned long addr,
 }
 
 static void __init alloc_init_pmd(pud_t *pud, unsigned long addr,
+=======
+static void __init alloc_init_section(pud_t *pud, unsigned long addr,
+>>>>>>> cm/cm-11.0
 				      unsigned long end, phys_addr_t phys,
 				      const struct mem_type *type)
 {
 	pmd_t *pmd = pmd_offset(pud, addr);
+<<<<<<< HEAD
 	unsigned long next;
 
 	do {
@@ -721,6 +729,36 @@ static void __init alloc_init_pmd(pud_t *pud, unsigned long addr,
 		phys += next - addr;
 
 	} while (pmd++, addr = next, addr != end);
+=======
+
+	/*
+	 * Try a section mapping - end, addr and phys must all be aligned
+	 * to a section boundary.  Note that PMDs refer to the individual
+	 * L1 entries, whereas PGDs refer to a group of L1 entries making
+	 * up one logical pointer to an L2 table.
+	 */
+	if (type->prot_sect && ((addr | end | phys) & ~SECTION_MASK) == 0) {
+		pmd_t *p = pmd;
+
+#ifndef CONFIG_ARM_LPAE
+		if (addr & SECTION_SIZE)
+			pmd++;
+#endif
+
+		do {
+			*pmd = __pmd(phys | type->prot_sect);
+			phys += SECTION_SIZE;
+		} while (pmd++, addr += SECTION_SIZE, addr != end);
+
+		flush_pmd_entry(p);
+	} else {
+		/*
+		 * No need to loop; pte's aren't interested in the
+		 * individual L1 entries.
+		 */
+		alloc_init_pte(pmd, addr, end, __phys_to_pfn(phys), type);
+	}
+>>>>>>> cm/cm-11.0
 }
 
 static void __init alloc_init_pud(pgd_t *pgd, unsigned long addr,
@@ -731,7 +769,11 @@ static void __init alloc_init_pud(pgd_t *pgd, unsigned long addr,
 
 	do {
 		next = pud_addr_end(addr, end);
+<<<<<<< HEAD
 		alloc_init_pmd(pud, addr, next, phys, type);
+=======
+		alloc_init_section(pud, addr, next, phys, type);
+>>>>>>> cm/cm-11.0
 		phys += next - addr;
 	} while (pud++, addr = next, addr != end);
 }
@@ -914,7 +956,11 @@ static void __init pmd_empty_section_gap(unsigned long addr)
 	vm = early_alloc_aligned(sizeof(*vm), __alignof__(*vm));
 	vm->addr = (void *)addr;
 	vm->size = SECTION_SIZE;
+<<<<<<< HEAD
 	vm->flags = VM_IOREMAP | VM_ARM_EMPTY_MAPPING;
+=======
+	vm->flags = VM_IOREMAP | VM_ARM_STATIC_MAPPING;
+>>>>>>> cm/cm-11.0
 	vm->caller = pmd_empty_section_gap;
 	vm_area_add_early(vm);
 }
@@ -927,7 +973,11 @@ static void __init fill_pmd_gaps(void)
 
 	/* we're still single threaded hence no lock needed here */
 	for (vm = vmlist; vm; vm = vm->next) {
+<<<<<<< HEAD
 		if (!(vm->flags & (VM_ARM_STATIC_MAPPING | VM_ARM_EMPTY_MAPPING)))
+=======
+		if (!(vm->flags & VM_ARM_STATIC_MAPPING))
+>>>>>>> cm/cm-11.0
 			continue;
 		addr = (unsigned long)vm->addr;
 		if (addr < next)
@@ -1002,6 +1052,7 @@ void __init sanity_check_meminfo(void)
 {
 	int i, j, highmem = 0;
 
+<<<<<<< HEAD
 #ifdef CONFIG_ENABLE_VMALLOC_SAVING
 	unsigned long hole_start;
 	for (i = 0; i < (meminfo.nr_banks - 1); i++) {
@@ -1016,6 +1067,10 @@ void __init sanity_check_meminfo(void)
 #endif
 #ifdef CONFIG_DONT_MAP_HOLE_AFTER_MEMBANK0
 	find_memory_hole();
+=======
+#ifdef CONFIG_DONT_MAP_HOLE_AFTER_MEMBANK0
+	find_membank0_hole();
+>>>>>>> cm/cm-11.0
 #endif
 
 	for (i = 0, j = 0; i < meminfo.nr_banks; i++) {
@@ -1203,7 +1258,11 @@ static void __init devicemaps_init(struct machine_desc *mdesc)
 	/*
 	 * Allocate the vector page early.
 	 */
+<<<<<<< HEAD
 	vectors = early_alloc(PAGE_SIZE);
+=======
+	vectors = early_alloc(PAGE_SIZE * 2);
+>>>>>>> cm/cm-11.0
 
 	early_trap_init(vectors);
 
@@ -1248,15 +1307,37 @@ static void __init devicemaps_init(struct machine_desc *mdesc)
 	map.pfn = __phys_to_pfn(virt_to_phys(vectors));
 	map.virtual = 0xffff0000;
 	map.length = PAGE_SIZE;
+<<<<<<< HEAD
 	map.type = MT_HIGH_VECTORS;
+=======
+#ifdef CONFIG_KUSER_HELPERS
+	map.type = MT_HIGH_VECTORS;
+#else
+	map.type = MT_LOW_VECTORS;
+#endif
+>>>>>>> cm/cm-11.0
 	create_mapping(&map);
 
 	if (!vectors_high()) {
 		map.virtual = 0;
+<<<<<<< HEAD
+=======
+		map.length = PAGE_SIZE * 2;
+>>>>>>> cm/cm-11.0
 		map.type = MT_LOW_VECTORS;
 		create_mapping(&map);
 	}
 
+<<<<<<< HEAD
+=======
+	/* Now create a kernel read-only mapping */
+	map.pfn += 1;
+	map.virtual = 0xffff0000 + PAGE_SIZE;
+	map.length = PAGE_SIZE;
+	map.type = MT_LOW_VECTORS;
+	create_mapping(&map);
+
+>>>>>>> cm/cm-11.0
 	/*
 	 * Ask the machine support to map in the statically mapped devices.
 	 */
@@ -1485,7 +1566,11 @@ static void __init map_lowmem(void)
 		vm->addr = (void *)(vaddr & PAGE_MASK);
 		vm->size = PAGE_ALIGN(length + (vaddr & ~PAGE_MASK));
 		vm->phys_addr = __pfn_to_phys(pfn);
+<<<<<<< HEAD
 		vm->flags = VM_IOREMAP | VM_ARM_STATIC_MAPPING;
+=======
+		vm->flags = VM_LOWMEM | VM_ARM_STATIC_MAPPING;
+>>>>>>> cm/cm-11.0
 		vm->flags |= VM_ARM_MTYPE(type);
 		vm->caller = map_lowmem;
 		vm_area_add_early(vm++);
@@ -1514,6 +1599,20 @@ void __init paging_init(struct machine_desc *mdesc)
 	/* allocate the zero page. */
 	zero_page = early_alloc(PAGE_SIZE);
 
+<<<<<<< HEAD
+=======
+#ifdef TIMA_ENABLED
+	{
+	        /**TIMA_MAGIC*/
+	        void *mem_alloc_ptr;
+		unsigned int phy_addr;
+		mem_alloc_ptr = early_alloc(0x200000);
+		phy_addr = __pa(mem_alloc_ptr);
+		printk(KERN_ERR"===TIMA===NEW=== -> mem_alloc_ptr= %p pa = %x\n", mem_alloc_ptr, phy_addr);
+	}
+#endif
+
+>>>>>>> cm/cm-11.0
 	bootmem_init();
 
 	empty_zero_page = virt_to_page(zero_page);

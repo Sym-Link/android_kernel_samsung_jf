@@ -1987,9 +1987,13 @@ static ssize_t n_tty_write(struct tty_struct *tty, struct file *file,
 				tty->ops->flush_chars(tty);
 		} else {
 			while (nr > 0) {
+<<<<<<< HEAD
 				mutex_lock(&tty->output_lock);
 				c = tty->ops->write(tty, b, nr);
 				mutex_unlock(&tty->output_lock);
+=======
+				c = tty->ops->write(tty, b, nr);
+>>>>>>> cm/cm-11.0
 				if (c < 0) {
 					retval = c;
 					goto break_out;

@@ -31,6 +31,10 @@
 #include <linux/math64.h>
 #include <linux/crypto.h>
 #include <linux/string.h>
+<<<<<<< HEAD
+=======
+#include <linux/idr.h>
+>>>>>>> cm/cm-11.0
 #include "tmem.h"
 
 #include "../zsmalloc/zsmalloc.h"
@@ -53,15 +57,22 @@
 	(__GFP_FS | __GFP_NORETRY | __GFP_NOWARN | __GFP_NOMEMALLOC)
 #endif
 
+<<<<<<< HEAD
 #define MAX_POOLS_PER_CLIENT 16
 
+=======
+>>>>>>> cm/cm-11.0
 #define MAX_CLIENTS 16
 #define LOCAL_CLIENT ((uint16_t)-1)
 
 MODULE_LICENSE("GPL");
 
 struct zcache_client {
+<<<<<<< HEAD
 	struct tmem_pool *tmem_pools[MAX_POOLS_PER_CLIENT];
+=======
+	struct idr tmem_pools;
+>>>>>>> cm/cm-11.0
 	struct zs_pool *zspool;
 	bool allocated;
 	atomic_t refcount;
@@ -78,6 +89,20 @@ static inline uint16_t get_client_id_from_client(struct zcache_client *cli)
 	return cli - &zcache_clients[0];
 }
 
+<<<<<<< HEAD
+=======
+static struct zcache_client *get_zcache_client(uint16_t cli_id)
+{
+	if (cli_id == LOCAL_CLIENT)
+		return &zcache_host;
+
+	if ((unsigned int)cli_id < MAX_CLIENTS)
+		return &zcache_clients[cli_id];
+
+	return NULL;
+}
+
+>>>>>>> cm/cm-11.0
 static inline bool is_local_client(struct zcache_client *cli)
 {
 	return cli == &zcache_host;
@@ -110,6 +135,11 @@ static inline int zcache_comp_op(enum comp_op op,
 	case ZCACHE_COMPOP_DECOMPRESS:
 		ret = crypto_comp_decompress(tfm, src, slen, dst, dlen);
 		break;
+<<<<<<< HEAD
+=======
+	default:
+		ret = -EINVAL;
+>>>>>>> cm/cm-11.0
 	}
 	put_cpu();
 	return ret;
@@ -602,16 +632,26 @@ out:
 	return;
 }
 
+<<<<<<< HEAD
 static void zbud_init(void)
+=======
+static void __init zbud_init(void)
+>>>>>>> cm/cm-11.0
 {
 	int i;
 
 	INIT_LIST_HEAD(&zbud_buddied_list);
+<<<<<<< HEAD
 	zcache_zbud_buddied_count = 0;
 	for (i = 0; i < NCHUNKS; i++) {
 		INIT_LIST_HEAD(&zbud_unbuddied[i].list);
 		zbud_unbuddied[i].count = 0;
 	}
+=======
+
+	for (i = 0; i < NCHUNKS; i++)
+		INIT_LIST_HEAD(&zbud_unbuddied[i].list);
+>>>>>>> cm/cm-11.0
 }
 
 #ifdef CONFIG_SYSFS
@@ -939,6 +979,7 @@ static struct tmem_pool *zcache_get_pool_by_id(uint16_t cli_id, uint16_t poolid)
 	struct tmem_pool *pool = NULL;
 	struct zcache_client *cli = NULL;
 
+<<<<<<< HEAD
 	if (cli_id == LOCAL_CLIENT)
 		cli = &zcache_host;
 	else {
@@ -954,6 +995,16 @@ static struct tmem_pool *zcache_get_pool_by_id(uint16_t cli_id, uint16_t poolid)
 		if (pool != NULL)
 			atomic_inc(&pool->refcount);
 	}
+=======
+	cli = get_zcache_client(cli_id);
+	if (!cli)
+		goto out;
+
+	atomic_inc(&cli->refcount);
+	pool = idr_find(&cli->tmem_pools, poolid);
+	if (pool != NULL)
+		atomic_inc(&pool->refcount);
+>>>>>>> cm/cm-11.0
 out:
 	return pool;
 }
@@ -971,6 +1022,7 @@ static void zcache_put_pool(struct tmem_pool *pool)
 
 int zcache_new_client(uint16_t cli_id)
 {
+<<<<<<< HEAD
 	struct zcache_client *cli = NULL;
 	int ret = -1;
 
@@ -978,6 +1030,13 @@ int zcache_new_client(uint16_t cli_id)
 		cli = &zcache_host;
 	else if ((unsigned int)cli_id < MAX_CLIENTS)
 		cli = &zcache_clients[cli_id];
+=======
+	struct zcache_client *cli;
+	int ret = -1;
+
+	cli = get_zcache_client(cli_id);
+
+>>>>>>> cm/cm-11.0
 	if (cli == NULL)
 		goto out;
 	if (cli->allocated)
@@ -987,6 +1046,10 @@ int zcache_new_client(uint16_t cli_id)
 	cli->zspool = zs_create_pool("zcache", ZCACHE_GFP_MASK);
 	if (cli->zspool == NULL)
 		goto out;
+<<<<<<< HEAD
+=======
+	idr_init(&cli->tmem_pools);
+>>>>>>> cm/cm-11.0
 #endif
 	ret = 0;
 out:
@@ -1035,16 +1098,24 @@ static int zcache_do_preload(struct tmem_pool *pool)
 		goto out;
 	if (unlikely(zcache_obj_cache == NULL))
 		goto out;
+<<<<<<< HEAD
 	preempt_disable();
 	kp = &__get_cpu_var(zcache_preloads);
 	while (kp->nr < ARRAY_SIZE(kp->objnodes)) {
 		preempt_enable_no_resched();
+=======
+
+	/* IRQ has already been disabled. */
+	kp = &__get_cpu_var(zcache_preloads);
+	while (kp->nr < ARRAY_SIZE(kp->objnodes)) {
+>>>>>>> cm/cm-11.0
 		objnode = kmem_cache_alloc(zcache_objnode_cache,
 				ZCACHE_GFP_MASK);
 		if (unlikely(objnode == NULL)) {
 			zcache_failed_alloc++;
 			goto out;
 		}
+<<<<<<< HEAD
 		preempt_disable();
 		kp = &__get_cpu_var(zcache_preloads);
 		if (kp->nr < ARRAY_SIZE(kp->objnodes))
@@ -1074,6 +1145,30 @@ static int zcache_do_preload(struct tmem_pool *pool)
 		kp->page = page;
 	else
 		free_page((unsigned long)page);
+=======
+
+		kp->objnodes[kp->nr++] = objnode;
+	}
+
+	if (!kp->obj) {
+		obj = kmem_cache_alloc(zcache_obj_cache, ZCACHE_GFP_MASK);
+		if (unlikely(obj == NULL)) {
+			zcache_failed_alloc++;
+			goto out;
+		}
+		kp->obj = obj;
+	}
+
+	if (!kp->page) {
+		page = (void *)__get_free_page(ZCACHE_GFP_MASK);
+		if (unlikely(page == NULL)) {
+			zcache_failed_get_free_pages++;
+			goto out;
+		}
+		kp->page =  page;
+	}
+
+>>>>>>> cm/cm-11.0
 	ret = 0;
 out:
 	return ret;
@@ -1259,6 +1354,7 @@ static int zcache_pampd_get_data_and_free(char *data, size_t *bufsize, bool raw,
 					void *pampd, struct tmem_pool *pool,
 					struct tmem_oid *oid, uint32_t index)
 {
+<<<<<<< HEAD
 	int ret = 0;
 
 	BUG_ON(!is_ephemeral(pool));
@@ -1266,6 +1362,14 @@ static int zcache_pampd_get_data_and_free(char *data, size_t *bufsize, bool raw,
 	zbud_free_and_delist((struct zbud_hdr *)pampd);
 	atomic_dec(&zcache_curr_eph_pampd_count);
 	return ret;
+=======
+	BUG_ON(!is_ephemeral(pool));
+	if (zbud_decompress((struct page *)(data), pampd) < 0)
+		return -EINVAL;
+	zbud_free_and_delist((struct zbud_hdr *)pampd);
+	atomic_dec(&zcache_curr_eph_pampd_count);
+	return 0;
+>>>>>>> cm/cm-11.0
 }
 
 /*
@@ -1583,15 +1687,24 @@ static int zcache_put_page(int cli_id, int pool_id, struct tmem_oid *oidp,
 			else
 				zcache_failed_pers_puts++;
 		}
+<<<<<<< HEAD
 		zcache_put_pool(pool);
 		preempt_enable_no_resched();
+=======
+>>>>>>> cm/cm-11.0
 	} else {
 		zcache_put_to_flush++;
 		if (atomic_read(&pool->obj_count) > 0)
 			/* the put fails whether the flush succeeds or not */
 			(void)tmem_flush_page(pool, oidp, index);
+<<<<<<< HEAD
 		zcache_put_pool(pool);
 	}
+=======
+	}
+
+	zcache_put_pool(pool);
+>>>>>>> cm/cm-11.0
 out:
 	return ret;
 }
@@ -1661,11 +1774,16 @@ static int zcache_flush_object(int cli_id, int pool_id,
 static int zcache_destroy_pool(int cli_id, int pool_id)
 {
 	struct tmem_pool *pool = NULL;
+<<<<<<< HEAD
 	struct zcache_client *cli = NULL;
+=======
+	struct zcache_client *cli;
+>>>>>>> cm/cm-11.0
 	int ret = -1;
 
 	if (pool_id < 0)
 		goto out;
+<<<<<<< HEAD
 	if (cli_id == LOCAL_CLIENT)
 		cli = &zcache_host;
 	else if ((unsigned int)cli_id < MAX_CLIENTS)
@@ -1677,6 +1795,18 @@ static int zcache_destroy_pool(int cli_id, int pool_id)
 	if (pool == NULL)
 		goto out;
 	cli->tmem_pools[pool_id] = NULL;
+=======
+
+	cli = get_zcache_client(cli_id);
+	if (cli == NULL)
+		goto out;
+
+	atomic_inc(&cli->refcount);
+	pool = idr_find(&cli->tmem_pools, pool_id);
+	if (pool == NULL)
+		goto out;
+	idr_remove(&cli->tmem_pools, pool_id);
+>>>>>>> cm/cm-11.0
 	/* wait for pool activity on other cpus to quiesce */
 	while (atomic_read(&pool->refcount) != 0)
 		;
@@ -1696,6 +1826,7 @@ static int zcache_new_pool(uint16_t cli_id, uint32_t flags)
 	int poolid = -1;
 	struct tmem_pool *pool;
 	struct zcache_client *cli = NULL;
+<<<<<<< HEAD
 
 	if (cli_id == LOCAL_CLIENT)
 		cli = &zcache_host;
@@ -1703,6 +1834,14 @@ static int zcache_new_pool(uint16_t cli_id, uint32_t flags)
 		cli = &zcache_clients[cli_id];
 	if (cli == NULL)
 		goto out;
+=======
+	int r;
+
+	cli = get_zcache_client(cli_id);
+	if (cli == NULL)
+		goto out;
+
+>>>>>>> cm/cm-11.0
 	atomic_inc(&cli->refcount);
 	pool = kmalloc(sizeof(struct tmem_pool), GFP_ATOMIC);
 	if (pool == NULL) {
@@ -1710,6 +1849,7 @@ static int zcache_new_pool(uint16_t cli_id, uint32_t flags)
 		goto out;
 	}
 
+<<<<<<< HEAD
 	for (poolid = 0; poolid < MAX_POOLS_PER_CLIENT; poolid++)
 		if (cli->tmem_pools[poolid] == NULL)
 			break;
@@ -1719,11 +1859,31 @@ static int zcache_new_pool(uint16_t cli_id, uint32_t flags)
 		poolid = -1;
 		goto out;
 	}
+=======
+	do {
+		r = idr_pre_get(&cli->tmem_pools, GFP_ATOMIC);
+		if (r != 1) {
+			kfree(pool);
+			pr_info("zcache: pool creation failed: out of memory\n");
+			goto out;
+		}
+		r = idr_get_new(&cli->tmem_pools, pool, &poolid);
+	} while (r == -EAGAIN);
+	if (r) {
+		pr_info("zcache: pool creation failed: error %d\n", r);
+		kfree(pool);
+		goto out;
+	}
+
+>>>>>>> cm/cm-11.0
 	atomic_set(&pool->refcount, 0);
 	pool->client = cli;
 	pool->pool_id = poolid;
 	tmem_new_pool(pool, flags);
+<<<<<<< HEAD
 	cli->tmem_pools[poolid] = pool;
+=======
+>>>>>>> cm/cm-11.0
 	pr_info("zcache: created %s tmem pool, id=%d, client=%d\n",
 		flags & TMEM_POOL_PERSIST ? "persistent" : "ephemeral",
 		poolid, cli_id);
@@ -1981,7 +2141,11 @@ static int __init enable_zcache_compressor(char *s)
 __setup("zcache=", enable_zcache_compressor);
 
 
+<<<<<<< HEAD
 static int zcache_comp_init(void)
+=======
+static int __init zcache_comp_init(void)
+>>>>>>> cm/cm-11.0
 {
 	int ret = 0;
 

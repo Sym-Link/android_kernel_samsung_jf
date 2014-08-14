@@ -4,7 +4,11 @@
  * Copyright (C) 2000-2001 Marcus Metzler & Ralph Metzler
  *                         for convergence integrated media GmbH
  *
+<<<<<<< HEAD
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -93,6 +97,10 @@ struct dvb_demux_feed {
 	u8 *buffer;
 	int buffer_size;
 	enum dmx_tsp_format_t tsp_out_format;
+<<<<<<< HEAD
+=======
+	struct dmx_secure_mode secure_mode;
+>>>>>>> cm/cm-11.0
 
 	struct timespec timeout;
 	struct dvb_demux_filter *filter;
@@ -105,6 +113,12 @@ struct dvb_demux_feed {
 	int pusi_seen;		/* prevents feeding of garbage from previous section */
 
 	u32 peslen;
+<<<<<<< HEAD
+=======
+	u32 pes_tei_counter;
+	u32 pes_cont_err_counter;
+	u32 pes_ts_packets_num;
+>>>>>>> cm/cm-11.0
 
 	struct list_head list_head;
 	unsigned int index;	/* a unique index for each feed (can be used as hardware pid filter index) */
@@ -129,6 +143,11 @@ struct dvb_demux {
 				struct dmx_buffer_status *dmx_buffer_status);
 	int (*reuse_decoder_buffer)(struct dvb_demux_feed *feed,
 				int cookie);
+<<<<<<< HEAD
+=======
+	int (*set_secure_mode)(struct dvb_demux_feed *feed,
+				struct dmx_secure_mode *secure_mode);
+>>>>>>> cm/cm-11.0
 	u32 (*check_crc32)(struct dvb_demux_feed *feed,
 			    const u8 *buf, size_t len);
 	void (*memcopy)(struct dvb_demux_feed *feed, u8 *dst,
@@ -160,6 +179,10 @@ struct dvb_demux {
 	uint32_t speed_pkts_cnt; /* for TS speed check */
 
 	enum dmx_tsp_format_t tsp_format;
+<<<<<<< HEAD
+=======
+	size_t ts_packet_size;
+>>>>>>> cm/cm-11.0
 
 	enum dmx_playback_mode_t playback_mode;
 	int sw_filter_abort;
@@ -196,5 +219,88 @@ void dvb_dmx_swfilter_format(
 void dvb_dmx_swfilter_packet(struct dvb_demux *demux, const u8 *buf,
 				const u8 timestamp[TIMESTAMP_LEN]);
 
+<<<<<<< HEAD
+=======
+/**
+ * dvb_dmx_is_video_feed - Returns whether the PES feed
+ * is video one.
+ *
+ * @feed: The feed to be checked.
+ *
+ * Return     1 if feed is video feed, 0 otherwise.
+ */
+static inline int dvb_dmx_is_video_feed(struct dvb_demux_feed *feed)
+{
+	if (feed->type != DMX_TYPE_TS)
+		return 0;
+
+	if (feed->ts_type & (~TS_DECODER))
+		return 0;
+
+	if ((feed->pes_type == DMX_TS_PES_VIDEO0) ||
+		(feed->pes_type == DMX_TS_PES_VIDEO1) ||
+		(feed->pes_type == DMX_TS_PES_VIDEO2) ||
+		(feed->pes_type == DMX_TS_PES_VIDEO3))
+		return 1;
+
+	return 0;
+}
+
+/**
+ * dvb_dmx_is_pcr_feed - Returns whether the PES feed
+ * is PCR one.
+ *
+ * @feed: The feed to be checked.
+ *
+ * Return     1 if feed is PCR feed, 0 otherwise.
+ */
+static inline int dvb_dmx_is_pcr_feed(struct dvb_demux_feed *feed)
+{
+	if (feed->type != DMX_TYPE_TS)
+		return 0;
+
+	if (feed->ts_type & (~TS_DECODER))
+		return 0;
+
+	if ((feed->pes_type == DMX_TS_PES_PCR0) ||
+		(feed->pes_type == DMX_TS_PES_PCR1) ||
+		(feed->pes_type == DMX_TS_PES_PCR2) ||
+		(feed->pes_type == DMX_TS_PES_PCR3))
+		return 1;
+
+	return 0;
+}
+
+/**
+ * dvb_dmx_is_sec_feed - Returns whether this is a section feed
+ *
+ * @feed: The feed to be checked.
+ *
+ * Return 1 if feed is a section feed, 0 otherwise.
+ */
+static inline int dvb_dmx_is_sec_feed(struct dvb_demux_feed *feed)
+{
+	return (feed->type == DMX_TYPE_SEC);
+}
+
+/**
+ * dvb_dmx_is_rec_feed - Returns whether this is a recording feed
+ *
+ * @feed: The feed to be checked.
+ *
+ * Return 1 if feed is recording feed, 0 otherwise.
+ */
+static inline int dvb_dmx_is_rec_feed(struct dvb_demux_feed *feed)
+{
+	if (feed->type != DMX_TYPE_TS)
+		return 0;
+
+	if (feed->ts_type & (TS_DECODER | TS_PAYLOAD_ONLY))
+		return 0;
+
+	return 1;
+}
+
+>>>>>>> cm/cm-11.0
 
 #endif /* _DVB_DEMUX_H_ */

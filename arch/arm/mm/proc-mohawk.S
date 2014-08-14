@@ -302,6 +302,12 @@ ENTRY(mohawk_dma_unmap_area)
 	mov	pc, lr
 ENDPROC(mohawk_dma_unmap_area)
 
+<<<<<<< HEAD
+=======
+	.globl	mohawk_flush_kern_cache_louis
+	.equ	mohawk_flush_kern_cache_louis, mohawk_flush_kern_cache_all
+
+>>>>>>> cm/cm-11.0
 	@ define struct cpu_cache_fns (see <asm/cacheflush.h> and proc-macros.S)
 	define_cache_functions mohawk
 

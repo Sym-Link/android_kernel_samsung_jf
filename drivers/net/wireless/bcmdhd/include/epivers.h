@@ -1,6 +1,10 @@
 /*
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -30,12 +34,17 @@
 
 #define	EPI_MINOR_VERSION	88
 
+<<<<<<< HEAD
 #define	EPI_RC_NUMBER		51
+=======
+#define	EPI_RC_NUMBER		54
+>>>>>>> cm/cm-11.0
 
 #define	EPI_INCREMENTAL_NUMBER	0
 
 #define	EPI_BUILD_NUMBER	0
 
+<<<<<<< HEAD
 #define	EPI_VERSION		1, 88, 51, 0
 
 #define	EPI_VERSION_NUM		0x01583300
@@ -50,6 +59,22 @@
 #define	EPI_VERSION_STR		"1.88.51 (r WLTEST)"
 #else
 #define	EPI_VERSION_STR		"1.88.51 (r)"
+=======
+#define	EPI_VERSION		1, 88, 54, 0
+
+#define	EPI_VERSION_NUM		0x01583600
+
+#define EPI_VERSION_DEV		1.88.54
+
+/* Driver Version String, ASCII, 32 chars max */
+#ifdef BCMINTERNAL
+#define	EPI_VERSION_STR		"1.88.54 (r BCMINT)"
+#else
+#ifdef WLTEST
+#define	EPI_VERSION_STR		"1.88.54 (r WLTEST)"
+#else
+#define	EPI_VERSION_STR		"1.88.54 (RC2_1223)"
+>>>>>>> cm/cm-11.0
 #endif
 #endif /* BCMINTERNAL */
 

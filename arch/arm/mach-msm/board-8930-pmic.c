@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -180,6 +184,13 @@ static struct pm8xxx_gpio_init pm8917_gpios[] __initdata = {
 
 /* Initial PM8917 MPP configurations */
 static struct pm8xxx_mpp_init pm8917_mpps[] __initdata = {
+<<<<<<< HEAD
+=======
+	PM8917_MPP_INIT(PM8XXX_AMUX_MPP_3, A_INPUT,
+				PM8XXX_MPP_AIN_AMUX_CH8, DIN_TO_INT),
+	/* Configure MPP01 for USB ID detection */
+	PM8917_MPP_INIT(1, D_INPUT, PM8921_MPP_DIG_LEVEL_S4, DIN_TO_INT),
+>>>>>>> cm/cm-11.0
 };
 
 void __init msm8930_pm8038_gpio_mpp_init(void)
@@ -263,6 +274,16 @@ static struct pm8xxx_adc_amux pm8038_adc_channels_data[] = {
 		ADC_DECIMATION_TYPE2, ADC_SCALE_XOTHERM},
 	{"pa_therm0", ADC_MPP_1_AMUX3, CHAN_PATH_SCALING1, AMUX_RSV1,
 		ADC_DECIMATION_TYPE2, ADC_SCALE_PA_THERM},
+<<<<<<< HEAD
+=======
+	{"dev_mpp_7", ADC_MPP_1_AMUX6, CHAN_PATH_SCALING1, AMUX_RSV1,
+		ADC_DECIMATION_TYPE2, ADC_SCALE_SEC_BOARD_THERM},  /*main_thm */
+#ifdef CONFIG_SAMSUNG_JACK
+	{"earjack", ADC_MPP_1_AMUX6_SCALE_DEFAULT,
+		CHAN_PATH_SCALING1, AMUX_RSV1,
+		ADC_DECIMATION_TYPE2, ADC_SCALE_DEFAULT},
+#endif
+>>>>>>> cm/cm-11.0
 };
 
 static struct pm8xxx_adc_properties pm8038_adc_data = {
@@ -313,16 +334,29 @@ static int pm8921_therm_mitigation[] = {
 #define MAX_VOLTAGE_MV		4200
 #define CHG_TERM_MA		100
 static struct pm8921_charger_platform_data pm8921_chg_pdata __devinitdata = {
+<<<<<<< HEAD
 	.safety_time		= 180,
+=======
+>>>>>>> cm/cm-11.0
 	.update_time		= 60000,
 	.max_voltage		= MAX_VOLTAGE_MV,
 	.min_voltage		= 3200,
 	.uvd_thresh_voltage	= 4050,
+<<<<<<< HEAD
 	.alarm_voltage          = 3400,
 	.resume_voltage_delta	= 100,
 	.term_current		= CHG_TERM_MA,
 	.cool_temp		= 10,
 	.warm_temp		= 40,
+=======
+	.alarm_low_mv		= 3400,
+	.alarm_high_mv		= 4000,
+	.resume_voltage_delta	= 60,
+	.resume_charge_percent	= 99,
+	.term_current		= CHG_TERM_MA,
+	.cool_temp		= 10,
+	.warm_temp		= 45,
+>>>>>>> cm/cm-11.0
 	.temp_check_period	= 1,
 	.max_bat_chg_current	= 1100,
 	.cool_bat_chg_current	= 350,
@@ -335,6 +369,15 @@ static struct pm8921_charger_platform_data pm8921_chg_pdata __devinitdata = {
 	.rconn_mohm		= 18,
 };
 
+<<<<<<< HEAD
+=======
+static struct pm8xxx_vibrator_platform_data pm8038_vib_pdata = {
+	.initial_vibrate_ms = 500,
+	.level_mV = 3000,
+	.max_timeout_ms = 15000,
+};
+
+>>>>>>> cm/cm-11.0
 #define PM8038_WLED_MAX_CURRENT		25
 #define PM8XXX_LED_PWM_PERIOD		1000
 #define PM8XXX_LED_PWM_DUTY_MS		20
@@ -367,7 +410,11 @@ static struct wled_config_data wled_cfg = {
 	.cs_out_en = true,
 	.ctrl_delay_us = 0,
 	.op_fdbck = true,
+<<<<<<< HEAD
 	.ovp_val = WLED_OVP_32V,
+=======
+	.ovp_val = WLED_OVP_35V,
+>>>>>>> cm/cm-11.0
 	.boost_curr_lim = WLED_CURR_LIMIT_525mA,
 	.num_strings = 1,
 };
@@ -434,7 +481,11 @@ static struct pm8xxx_led_platform_data pm8xxx_leds_pdata = {
 };
 
 static struct pm8xxx_ccadc_platform_data pm8xxx_ccadc_pdata = {
+<<<<<<< HEAD
 	.r_sense		= 10,
+=======
+	.r_sense_uohm		= 10000,
+>>>>>>> cm/cm-11.0
 	.calib_delay_ms		= 600000,
 };
 
@@ -450,7 +501,11 @@ static struct pm8xxx_misc_platform_data pm8xxx_misc_pdata = {
 
 static struct pm8xxx_spk_platform_data pm8xxx_spk_pdata = {
 	.spk_add_enable		= false,
+<<<<<<< HEAD
 	.cd_ng_threshold	= 0x6,
+=======
+	.cd_ng_threshold	= 0x0,
+>>>>>>> cm/cm-11.0
 	.cd_nf_preamp_bias	= 0x1,
 	.cd_ng_hold		= 0x6,
 	.cd_ng_max_atten	= 0x0,
@@ -462,13 +517,31 @@ static struct pm8xxx_spk_platform_data pm8xxx_spk_pdata = {
 
 static struct pm8921_bms_platform_data pm8921_bms_pdata __devinitdata = {
 	.battery_type			= BATT_UNKNOWN,
+<<<<<<< HEAD
 	.r_sense			= 10,
+=======
+	.r_sense_uohm			= 10000,
+>>>>>>> cm/cm-11.0
 	.v_cutoff			= 3400,
 	.max_voltage_uv			= MAX_VOLTAGE_MV * 1000,
 	.shutdown_soc_valid_limit	= 20,
 	.adjust_soc_low_threshold	= 25,
 	.chg_term_ua			= CHG_TERM_MA * 1000,
 	.rconn_mohm			= 18,
+<<<<<<< HEAD
+=======
+	.normal_voltage_calc_ms		= 20000,
+	.low_voltage_calc_ms		= 1000,
+	.alarm_low_mv			= 3400,
+	.alarm_high_mv			= 4000,
+	.high_ocv_correction_limit_uv	= 50,
+	.low_ocv_correction_limit_uv	= 100,
+	.hold_soc_est			= 3,
+	.enable_fcc_learning		= 1,
+	.min_fcc_learning_soc		= 20,
+	.min_fcc_ocv_pc			= 30,
+	.min_fcc_learning_samples	= 5,
+>>>>>>> cm/cm-11.0
 };
 
 static struct pm8038_platform_data pm8038_platform_data __devinitdata = {
@@ -524,10 +597,33 @@ static struct pm8xxx_adc_amux pm8917_adc_channels_data[] = {
 		ADC_DECIMATION_TYPE2, ADC_SCALE_DEFAULT},
 	{"chg_temp", CHANNEL_CHG_TEMP, CHAN_PATH_SCALING1, AMUX_RSV1,
 		ADC_DECIMATION_TYPE2, ADC_SCALE_DEFAULT},
+<<<<<<< HEAD
+=======
+	{"pa_therm1", ADC_MPP_1_AMUX8, CHAN_PATH_SCALING1, AMUX_RSV1,
+		ADC_DECIMATION_TYPE2, ADC_SCALE_PA_THERM},	/* mpp_08 */
+>>>>>>> cm/cm-11.0
 	{"xo_therm", CHANNEL_MUXOFF, CHAN_PATH_SCALING1, AMUX_RSV0,
 		ADC_DECIMATION_TYPE2, ADC_SCALE_XOTHERM},
 	{"pa_therm0", ADC_MPP_1_AMUX3, CHAN_PATH_SCALING1, AMUX_RSV1,
 		ADC_DECIMATION_TYPE2, ADC_SCALE_PA_THERM},
+<<<<<<< HEAD
+=======
+	{"dev_mpp_3", ADC_MPP_1_AMUX6, CHAN_PATH_SCALING1, AMUX_RSV1,
+		ADC_DECIMATION_TYPE2, ADC_SCALE_SEC_BOARD_THERM},  /*main_thm */
+#if defined(CONFIG_MACH_MELIUS)
+	{"dev_mpp_8", ADC_MPP_2_AMUX6, CHAN_PATH_SCALING1, AMUX_RSV1,
+		ADC_DECIMATION_TYPE2, ADC_SCALE_DEFAULT},  /*vf_adc*/
+#endif
+#ifdef CONFIG_SAMSUNG_JACK
+#ifdef CONFIG_SAMSUNG_JACK_ADC_SCALE3
+	{"amux_2_6", ADC_MPP_2_AMUX6, CHAN_PATH_SCALING2, AMUX_RSV1,
+		ADC_DECIMATION_TYPE2, ADC_SCALE_DEFAULT},
+#endif
+	{"earjack", ADC_MPP_1_AMUX6_SCALE_DEFAULT,
+		CHAN_PATH_SCALING1, AMUX_RSV1,
+		ADC_DECIMATION_TYPE2, ADC_SCALE_DEFAULT},
+#endif
+>>>>>>> cm/cm-11.0
 };
 
 static struct pm8xxx_adc_properties pm8917_adc_data = {
@@ -574,10 +670,23 @@ void __init msm8930_init_pmic(void)
 					&msm8930_ssbi_pm8038_pdata;
 		pm8038_platform_data.num_regulators
 			= msm8930_pm8038_regulator_pdata_len;
+<<<<<<< HEAD
 		if (machine_is_msm8930_mtp())
 			pm8921_bms_pdata.battery_type = BATT_PALLADIUM;
 		else if (machine_is_msm8930_cdp())
 			pm8921_chg_pdata.has_dc_supply = true;
+=======
+		if (machine_is_msm8930_mtp() || machine_is_msm8930_evt())
+			pm8921_bms_pdata.battery_type = BATT_PALLADIUM;
+		else if (machine_is_msm8930_cdp())
+			pm8921_chg_pdata.has_dc_supply = true;
+		if (machine_is_msm8930_evt()) {
+			pm8038_platform_data.vibrator_pdata =
+				&pm8038_vib_pdata;
+			pm8038_platform_data.leds_pdata->configs[0]
+					.wled_cfg->comp_res_val = 80;
+		}
+>>>>>>> cm/cm-11.0
 	} else {
 		/* PM8917 configuration */
 		pmic_reset_irq = PM8917_IRQ_BASE + PM8921_RESOUT_IRQ;
@@ -590,4 +699,10 @@ void __init msm8930_init_pmic(void)
 		else if (machine_is_msm8930_cdp())
 			pm8921_chg_pdata.has_dc_supply = true;
 	}
+<<<<<<< HEAD
+=======
+
+	if (!machine_is_msm8930_mtp() && !machine_is_msm8930_evt())
+		pm8921_chg_pdata.battery_less_hardware = 1;
+>>>>>>> cm/cm-11.0
 }

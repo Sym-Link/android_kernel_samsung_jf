@@ -1928,7 +1928,11 @@ int __vm_enough_memory(struct mm_struct *mm, long pages, int cap_sys_admin)
 		 */
 		free -= global_page_state(NR_SHMEM);
 
+<<<<<<< HEAD
 		free += nr_swap_pages;
+=======
+		free += get_nr_swap_pages();
+>>>>>>> cm/cm-11.0
 
 		/*
 		 * Any slabs which are created with the

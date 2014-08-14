@@ -470,6 +470,11 @@ struct input_keymap_entry {
 
 #define KEY_MICMUTE		248	/* Mute / unmute the microphone */
 
+<<<<<<< HEAD
+=======
+#define KEY_RECENT   254
+
+>>>>>>> cm/cm-11.0
 /* Code 255 is reserved for special needs of AT keyboard driver */
 
 #define BTN_MISC		0x100
@@ -525,6 +530,10 @@ struct input_keymap_entry {
 #define BTN_MODE		0x13c
 #define BTN_THUMBL		0x13d
 #define BTN_THUMBR		0x13e
+<<<<<<< HEAD
+=======
+#define BTN_GAME		0x13f	/* Add game button for samsung bluetooth keypad */
+>>>>>>> cm/cm-11.0
 
 #define BTN_DIGI		0x140
 #define BTN_TOOL_PEN		0x140

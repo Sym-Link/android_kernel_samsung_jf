@@ -1,6 +1,10 @@
 /*
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -100,7 +104,11 @@ typedef long unsigned int size_t;
 #if defined(__GNUC__) && defined(__STRICT_ANSI__)
 #define TYPEDEF_INT64
 #define TYPEDEF_UINT64
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 
 #if defined(__ICL)

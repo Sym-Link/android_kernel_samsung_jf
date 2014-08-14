@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Guest Communications
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -48,6 +52,7 @@ int CommSvc_ScheduleAIOWork(CommOSWork *work);
 
 int
 CommSvc_Alloc(const CommTranspInitArgs *transpArgs,
+<<<<<<< HEAD
               const CommImpl *impl,
               int inBH,
               CommChannel *newChannel);
@@ -65,9 +70,32 @@ CommSvc_WriteVec(CommChannel channel,
                  unsigned long long *timeoutMillis,
                  unsigned int *iovOffset,
                  int kern);
+=======
+	      const CommImpl *impl,
+	      int inBH,
+	      CommChannel *newChannel);
+
+int
+CommSvc_Write(CommChannel channel,
+	      const CommPacket *packet,
+	      unsigned long long *timeoutMillis);
+
+int
+CommSvc_WriteVec(CommChannel channel,
+		 const CommPacket *packet,
+		 struct kvec **vec,
+		 unsigned int *vecLen,
+		 unsigned long long *timeoutMillis,
+		 unsigned int *iovOffset,
+		 int kern);
+>>>>>>> cm/cm-11.0
 
 unsigned int CommSvc_RequestInlineEvents(CommChannel channel);
 unsigned int CommSvc_ReleaseInlineEvents(CommChannel channel);
 
+<<<<<<< HEAD
 #endif // _COMM_SVC_H_
+=======
+#endif /* _COMM_SVC_H_ */
+>>>>>>> cm/cm-11.0
 

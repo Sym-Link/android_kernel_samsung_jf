@@ -25,6 +25,10 @@
  */
 
 #include <linux/delay.h>
+<<<<<<< HEAD
+=======
+#include <linux/smpboot.h>
+>>>>>>> cm/cm-11.0
 
 #define RCU_KTHREAD_PRIO 1
 
@@ -969,6 +973,7 @@ static void __init __rcu_init_preempt(void)
 	rcu_init_one(&rcu_preempt_state, &rcu_preempt_data);
 }
 
+<<<<<<< HEAD
 /*
  * Check for a task exiting while in a preemptible-RCU read-side
  * critical section, clean up if so.  No need to issue warnings,
@@ -985,6 +990,8 @@ void exit_rcu(void)
 	__rcu_read_unlock();
 }
 
+=======
+>>>>>>> cm/cm-11.0
 #else /* #ifdef CONFIG_TREE_PREEMPT_RCU */
 
 static struct rcu_state *rcu_state = &rcu_sched_state;
@@ -1241,6 +1248,19 @@ static void rcu_initiate_boost_trace(struct rcu_node *rnp)
 
 #endif /* #else #ifdef CONFIG_RCU_TRACE */
 
+<<<<<<< HEAD
+=======
+static void rcu_wake_cond(struct task_struct *t, int status)
+{
+	/*
+	 * If the thread is yielding, only wake it when this
+	 * is invoked from idle
+	 */
+	if (status != RCU_KTHREAD_YIELDING || is_idle_task(current))
+		wake_up_process(t);
+}
+
+>>>>>>> cm/cm-11.0
 /*
  * Carry out RCU priority boosting on the task indicated by ->exp_tasks
  * or ->boost_tasks, advancing the pointer to the next task in the
@@ -1313,6 +1333,7 @@ static int rcu_boost(struct rcu_node *rnp)
 }
 
 /*
+<<<<<<< HEAD
  * Timer handler to initiate waking up of boost kthreads that
  * have yielded the CPU due to excessive numbers of tasks to
  * boost.  We wake up the per-rcu_node kthread, which in turn
@@ -1324,6 +1345,8 @@ static void rcu_boost_kthread_timer(unsigned long arg)
 }
 
 /*
+=======
+>>>>>>> cm/cm-11.0
  * Priority-boosting kthread.  One per leaf rcu_node and one for the
  * root rcu_node.
  */
@@ -1346,8 +1369,14 @@ static int rcu_boost_kthread(void *arg)
 		else
 			spincnt = 0;
 		if (spincnt > 10) {
+<<<<<<< HEAD
 			trace_rcu_utilization("End boost kthread@rcu_yield");
 			rcu_yield(rcu_boost_kthread_timer, (unsigned long)rnp);
+=======
+			rnp->boost_kthread_status = RCU_KTHREAD_YIELDING;
+			trace_rcu_utilization("End boost kthread@rcu_yield");
+			schedule_timeout_interruptible(2);
+>>>>>>> cm/cm-11.0
 			trace_rcu_utilization("Start boost kthread@rcu_yield");
 			spincnt = 0;
 		}
@@ -1385,8 +1414,13 @@ static void rcu_initiate_boost(struct rcu_node *rnp, unsigned long flags)
 			rnp->boost_tasks = rnp->gp_tasks;
 		raw_spin_unlock_irqrestore(&rnp->lock, flags);
 		t = rnp->boost_kthread_task;
+<<<<<<< HEAD
 		if (t != NULL)
 			wake_up_process(t);
+=======
+		if (t)
+			rcu_wake_cond(t, rnp->boost_kthread_status);
+>>>>>>> cm/cm-11.0
 	} else {
 		rcu_initiate_boost_trace(rnp);
 		raw_spin_unlock_irqrestore(&rnp->lock, flags);
@@ -1403,8 +1437,15 @@ static void invoke_rcu_callbacks_kthread(void)
 	local_irq_save(flags);
 	__this_cpu_write(rcu_cpu_has_work, 1);
 	if (__this_cpu_read(rcu_cpu_kthread_task) != NULL &&
+<<<<<<< HEAD
 	    current != __this_cpu_read(rcu_cpu_kthread_task))
 		wake_up_process(__this_cpu_read(rcu_cpu_kthread_task));
+=======
+	    current != __this_cpu_read(rcu_cpu_kthread_task)) {
+		rcu_wake_cond(__this_cpu_read(rcu_cpu_kthread_task),
+			      __this_cpu_read(rcu_cpu_kthread_status));
+	}
+>>>>>>> cm/cm-11.0
 	local_irq_restore(flags);
 }
 
@@ -1417,6 +1458,7 @@ static bool rcu_is_callbacks_kthread(void)
 	return __get_cpu_var(rcu_cpu_kthread_task) == current;
 }
 
+<<<<<<< HEAD
 /*
  * Set the affinity of the boost kthread.  The CPU-hotplug locks are
  * held, so no one should be messing with the existence of the boost
@@ -1432,6 +1474,8 @@ static void rcu_boost_kthread_setaffinity(struct rcu_node *rnp,
 		set_cpus_allowed_ptr(rnp->boost_kthread_task, cm);
 }
 
+=======
+>>>>>>> cm/cm-11.0
 #define RCU_BOOST_DELAY_JIFFIES DIV_ROUND_UP(CONFIG_RCU_BOOST_DELAY * HZ, 1000)
 
 /*
@@ -1448,15 +1492,28 @@ static void rcu_preempt_boost_start_gp(struct rcu_node *rnp)
  * Returns zero if all is well, a negated errno otherwise.
  */
 static int __cpuinit rcu_spawn_one_boost_kthread(struct rcu_state *rsp,
+<<<<<<< HEAD
 						 struct rcu_node *rnp,
 						 int rnp_index)
 {
+=======
+						 struct rcu_node *rnp)
+{
+	int rnp_index = rnp - &rsp->node[0];
+>>>>>>> cm/cm-11.0
 	unsigned long flags;
 	struct sched_param sp;
 	struct task_struct *t;
 
 	if (&rcu_preempt_state != rsp)
 		return 0;
+<<<<<<< HEAD
+=======
+
+	if (!rcu_scheduler_fully_active || rnp->qsmaskinit == 0)
+		return 0;
+
+>>>>>>> cm/cm-11.0
 	rsp->boost = 1;
 	if (rnp->boost_kthread_task != NULL)
 		return 0;
@@ -1473,6 +1530,7 @@ static int __cpuinit rcu_spawn_one_boost_kthread(struct rcu_state *rsp,
 	return 0;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_HOTPLUG_CPU
 
 /*
@@ -1492,6 +1550,8 @@ static void rcu_stop_cpu_kthread(int cpu)
 
 #endif /* #ifdef CONFIG_HOTPLUG_CPU */
 
+=======
+>>>>>>> cm/cm-11.0
 static void rcu_kthread_do_work(void)
 {
 	rcu_do_batch(&rcu_sched_state, &__get_cpu_var(rcu_sched_data));
@@ -1499,6 +1559,7 @@ static void rcu_kthread_do_work(void)
 	rcu_preempt_do_callbacks();
 }
 
+<<<<<<< HEAD
 /*
  * Wake up the specified per-rcu_node-structure kthread.
  * Because the per-rcu_node kthreads are immortal, we don't need
@@ -1605,6 +1666,24 @@ static int rcu_cpu_kthread_should_stop(int cpu)
 	}
 	per_cpu(rcu_cpu_kthread_cpu, cpu) = cpu;
 	return 0;
+=======
+static void rcu_cpu_kthread_setup(unsigned int cpu)
+{
+	struct sched_param sp;
+
+	sp.sched_priority = RCU_KTHREAD_PRIO;
+	sched_setscheduler_nocheck(current, SCHED_FIFO, &sp);
+}
+
+static void rcu_cpu_kthread_park(unsigned int cpu)
+{
+	per_cpu(rcu_cpu_kthread_status, cpu) = RCU_KTHREAD_OFFCPU;
+}
+
+static int rcu_cpu_kthread_should_run(unsigned int cpu)
+{
+	return __get_cpu_var(rcu_cpu_has_work);
+>>>>>>> cm/cm-11.0
 }
 
 /*
@@ -1612,6 +1691,7 @@ static int rcu_cpu_kthread_should_stop(int cpu)
  * RCU softirq used in flavors and configurations of RCU that do not
  * support RCU priority boosting.
  */
+<<<<<<< HEAD
 static int rcu_cpu_kthread(void *arg)
 {
 	int cpu = (int)(long)arg;
@@ -1744,6 +1824,37 @@ static int rcu_node_kthread(void *arg)
 	/* NOTREACHED */
 	rnp->node_kthread_status = RCU_KTHREAD_STOPPED;
 	return 0;
+=======
+static void rcu_cpu_kthread(unsigned int cpu)
+{
+	unsigned int *statusp = &__get_cpu_var(rcu_cpu_kthread_status);
+	char work, *workp = &__get_cpu_var(rcu_cpu_has_work);
+	int spincnt;
+
+	for (spincnt = 0; spincnt < 10; spincnt++) {
+		trace_rcu_utilization("Start CPU kthread@rcu_wait");
+		local_bh_disable();
+		*statusp = RCU_KTHREAD_RUNNING;
+		this_cpu_inc(rcu_cpu_kthread_loops);
+		local_irq_disable();
+		work = *workp;
+		*workp = 0;
+		local_irq_enable();
+		if (work)
+			rcu_kthread_do_work();
+		local_bh_enable();
+		if (*workp == 0) {
+			trace_rcu_utilization("End CPU kthread@rcu_wait");
+			*statusp = RCU_KTHREAD_WAITING;
+			return;
+		}
+	}
+	*statusp = RCU_KTHREAD_YIELDING;
+	trace_rcu_utilization("Start CPU kthread@rcu_yield");
+	schedule_timeout_interruptible(2);
+	trace_rcu_utilization("End CPU kthread@rcu_yield");
+	*statusp = RCU_KTHREAD_WAITING;
+>>>>>>> cm/cm-11.0
 }
 
 /*
@@ -1755,6 +1866,7 @@ static int rcu_node_kthread(void *arg)
  * no outgoing CPU.  If there are no CPUs left in the affinity set,
  * this function allows the kthread to execute on any CPU.
  */
+<<<<<<< HEAD
 static void rcu_node_kthread_setaffinity(struct rcu_node *rnp, int outgoingcpu)
 {
 	cpumask_var_t cm;
@@ -1766,6 +1878,19 @@ static void rcu_node_kthread_setaffinity(struct rcu_node *rnp, int outgoingcpu)
 	if (!alloc_cpumask_var(&cm, GFP_KERNEL))
 		return;
 	cpumask_clear(cm);
+=======
+static void rcu_boost_kthread_setaffinity(struct rcu_node *rnp, int outgoingcpu)
+{
+	struct task_struct *t = rnp->boost_kthread_task;
+	unsigned long mask = rnp->qsmaskinit;
+	cpumask_var_t cm;
+	int cpu;
+
+	if (!t)
+		return;
+	if (!zalloc_cpumask_var(&cm, GFP_KERNEL))
+		return;
+>>>>>>> cm/cm-11.0
 	for (cpu = rnp->grplo; cpu <= rnp->grphi; cpu++, mask >>= 1)
 		if ((mask & 0x1) && cpu != outgoingcpu)
 			cpumask_set_cpu(cpu, cm);
@@ -1775,6 +1900,7 @@ static void rcu_node_kthread_setaffinity(struct rcu_node *rnp, int outgoingcpu)
 			cpumask_clear_cpu(cpu, cm);
 		WARN_ON_ONCE(cpumask_weight(cm) == 0);
 	}
+<<<<<<< HEAD
 	set_cpus_allowed_ptr(rnp->node_kthread_task, cm);
 	rcu_boost_kthread_setaffinity(rnp, cm);
 	free_cpumask_var(cm);
@@ -1811,12 +1937,27 @@ static int __cpuinit rcu_spawn_one_node_kthread(struct rcu_state *rsp,
 	}
 	return rcu_spawn_one_boost_kthread(rsp, rnp, rnp_index);
 }
+=======
+	set_cpus_allowed_ptr(t, cm);
+	free_cpumask_var(cm);
+}
+
+static struct smp_hotplug_thread rcu_cpu_thread_spec = {
+	.store			= &rcu_cpu_kthread_task,
+	.thread_should_run	= rcu_cpu_kthread_should_run,
+	.thread_fn		= rcu_cpu_kthread,
+	.thread_comm		= "rcuc/%u",
+	.setup			= rcu_cpu_kthread_setup,
+	.park			= rcu_cpu_kthread_park,
+};
+>>>>>>> cm/cm-11.0
 
 /*
  * Spawn all kthreads -- called as soon as the scheduler is running.
  */
 static int __init rcu_spawn_kthreads(void)
 {
+<<<<<<< HEAD
 	int cpu;
 	struct rcu_node *rnp;
 
@@ -1831,6 +1972,20 @@ static int __init rcu_spawn_kthreads(void)
 	if (NUM_RCU_NODES > 1) {
 		rcu_for_each_leaf_node(rcu_state, rnp)
 			(void)rcu_spawn_one_node_kthread(rcu_state, rnp);
+=======
+	struct rcu_node *rnp;
+	int cpu;
+
+	rcu_scheduler_fully_active = 1;
+	for_each_possible_cpu(cpu)
+		per_cpu(rcu_cpu_has_work, cpu) = 0;
+	BUG_ON(smpboot_register_percpu_thread(&rcu_cpu_thread_spec));
+	rnp = rcu_get_root(rcu_state);
+	(void)rcu_spawn_one_boost_kthread(rcu_state, rnp);
+	if (NUM_RCU_NODES > 1) {
+		rcu_for_each_leaf_node(rcu_state, rnp)
+			(void)rcu_spawn_one_boost_kthread(rcu_state, rnp);
+>>>>>>> cm/cm-11.0
 	}
 	return 0;
 }
@@ -1842,11 +1997,16 @@ static void __cpuinit rcu_prepare_kthreads(int cpu)
 	struct rcu_node *rnp = rdp->mynode;
 
 	/* Fire up the incoming CPU's kthread and leaf rcu_node kthread. */
+<<<<<<< HEAD
 	if (rcu_scheduler_fully_active) {
 		(void)rcu_spawn_one_cpu_kthread(cpu);
 		if (rnp->node_kthread_task == NULL)
 			(void)rcu_spawn_one_node_kthread(rcu_state, rnp);
 	}
+=======
+	if (rcu_scheduler_fully_active)
+		(void)rcu_spawn_one_boost_kthread(rcu_state, rnp);
+>>>>>>> cm/cm-11.0
 }
 
 #else /* #ifdef CONFIG_RCU_BOOST */
@@ -1870,6 +2030,7 @@ static void rcu_preempt_boost_start_gp(struct rcu_node *rnp)
 {
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_HOTPLUG_CPU
 
 static void rcu_stop_cpu_kthread(int cpu)
@@ -1883,6 +2044,9 @@ static void rcu_node_kthread_setaffinity(struct rcu_node *rnp, int outgoingcpu)
 }
 
 static void rcu_cpu_kthread_setrt(int cpu, int to_rt)
+=======
+static void rcu_boost_kthread_setaffinity(struct rcu_node *rnp, int outgoingcpu)
+>>>>>>> cm/cm-11.0
 {
 }
 
@@ -1910,8 +2074,14 @@ static void __cpuinit rcu_prepare_kthreads(int cpu)
  * Because we not have RCU_FAST_NO_HZ, just check whether this CPU needs
  * any flavor of RCU.
  */
+<<<<<<< HEAD
 int rcu_needs_cpu(int cpu)
 {
+=======
+int rcu_needs_cpu(int cpu, unsigned long *delta_jiffies)
+{
+	*delta_jiffies = ULONG_MAX;
+>>>>>>> cm/cm-11.0
 	return rcu_cpu_has_callbacks(cpu);
 }
 
@@ -1938,6 +2108,17 @@ static void rcu_prepare_for_idle(int cpu)
 {
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Don't bother keeping a running count of the number of RCU callbacks
+ * posted because CONFIG_RCU_FAST_NO_HZ=n.
+ */
+static void rcu_idle_count_callbacks_posted(void)
+{
+}
+
+>>>>>>> cm/cm-11.0
 #else /* #if !defined(CONFIG_RCU_FAST_NO_HZ) */
 
 /*
@@ -1978,6 +2159,7 @@ static void rcu_prepare_for_idle(int cpu)
 #define RCU_IDLE_GP_DELAY 6		/* Roughly one grace period. */
 #define RCU_IDLE_LAZY_GP_DELAY (6 * HZ)	/* Roughly six seconds. */
 
+<<<<<<< HEAD
 static DEFINE_PER_CPU(int, rcu_dyntick_drain);
 static DEFINE_PER_CPU(unsigned long, rcu_dyntick_holdoff);
 static DEFINE_PER_CPU(struct hrtimer, rcu_idle_gp_timer);
@@ -2002,6 +2184,8 @@ int rcu_needs_cpu(int cpu)
 	return per_cpu(rcu_dyntick_holdoff, cpu) == jiffies;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 /*
  * Does the specified flavor of RCU have non-lazy callbacks pending on
  * the specified CPU?  Both RCU flavor and CPU are specified by the
@@ -2045,16 +2229,86 @@ static bool rcu_cpu_has_nonlazy_callbacks(int cpu)
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * Allow the CPU to enter dyntick-idle mode if either: (1) There are no
+ * callbacks on this CPU, (2) this CPU has not yet attempted to enter
+ * dyntick-idle mode, or (3) this CPU is in the process of attempting to
+ * enter dyntick-idle mode.  Otherwise, if we have recently tried and failed
+ * to enter dyntick-idle mode, we refuse to try to enter it.  After all,
+ * it is better to incur scheduling-clock interrupts than to spin
+ * continuously for the same time duration!
+ *
+ * The delta_jiffies argument is used to store the time when RCU is
+ * going to need the CPU again if it still has callbacks.  The reason
+ * for this is that rcu_prepare_for_idle() might need to post a timer,
+ * but if so, it will do so after tick_nohz_stop_sched_tick() has set
+ * the wakeup time for this CPU.  This means that RCU's timer can be
+ * delayed until the wakeup time, which defeats the purpose of posting
+ * a timer.
+ */
+int rcu_needs_cpu(int cpu, unsigned long *delta_jiffies)
+{
+	struct rcu_dynticks *rdtp = &per_cpu(rcu_dynticks, cpu);
+
+	/* Flag a new idle sojourn to the idle-entry state machine. */
+	rdtp->idle_first_pass = 1;
+	/* If no callbacks, RCU doesn't need the CPU. */
+	if (!rcu_cpu_has_callbacks(cpu)) {
+		*delta_jiffies = ULONG_MAX;
+		return 0;
+	}
+	if (rdtp->dyntick_holdoff == jiffies) {
+		/* RCU recently tried and failed, so don't try again. */
+		*delta_jiffies = 1;
+		return 1;
+	}
+	/* Set up for the possibility that RCU will post a timer. */
+	if (rcu_cpu_has_nonlazy_callbacks(cpu))
+		*delta_jiffies = RCU_IDLE_GP_DELAY;
+	else
+		*delta_jiffies = RCU_IDLE_LAZY_GP_DELAY;
+	return 0;
+}
+
+/*
+ * Handler for smp_call_function_single().  The only point of this
+ * handler is to wake the CPU up, so the handler does only tracing.
+ */
+void rcu_idle_demigrate(void *unused)
+{
+	trace_rcu_prep_idle("Demigrate");
+}
+
+/*
+>>>>>>> cm/cm-11.0
  * Timer handler used to force CPU to start pushing its remaining RCU
  * callbacks in the case where it entered dyntick-idle mode with callbacks
  * pending.  The hander doesn't really need to do anything because the
  * real work is done upon re-entry to idle, or by the next scheduling-clock
  * interrupt should idle not be re-entered.
+<<<<<<< HEAD
  */
 static enum hrtimer_restart rcu_idle_gp_timer_func(struct hrtimer *hrtp)
 {
 	trace_rcu_prep_idle("Timer");
 	return HRTIMER_NORESTART;
+=======
+ *
+ * One special case: the timer gets migrated without awakening the CPU
+ * on which the timer was scheduled on.  In this case, we must wake up
+ * that CPU.  We do so with smp_call_function_single().
+ */
+static void rcu_idle_gp_timer_func(unsigned long cpu_in)
+{
+	int cpu = (int)cpu_in;
+
+	trace_rcu_prep_idle("Timer");
+	if (cpu != smp_processor_id())
+		smp_call_function_single(cpu, rcu_idle_demigrate, NULL, 0);
+	else
+		WARN_ON_ONCE(1); /* Getting here can hang the system... */
+>>>>>>> cm/cm-11.0
 }
 
 /*
@@ -2062,6 +2316,7 @@ static enum hrtimer_restart rcu_idle_gp_timer_func(struct hrtimer *hrtp)
  */
 static void rcu_prepare_for_idle_init(int cpu)
 {
+<<<<<<< HEAD
 	static int firsttime = 1;
 	struct hrtimer *hrtp = &per_cpu(rcu_idle_gp_timer, cpu);
 
@@ -2075,16 +2330,35 @@ static void rcu_prepare_for_idle_init(int cpu)
 		rcu_idle_lazy_gp_wait = ns_to_ktime(upj * (u64)1000);
 		firsttime = 0;
 	}
+=======
+	struct rcu_dynticks *rdtp = &per_cpu(rcu_dynticks, cpu);
+
+	rdtp->dyntick_holdoff = jiffies - 1;
+	setup_timer(&rdtp->idle_gp_timer, rcu_idle_gp_timer_func, cpu);
+	rdtp->idle_gp_timer_expires = jiffies - 1;
+	rdtp->idle_first_pass = 1;
+>>>>>>> cm/cm-11.0
 }
 
 /*
  * Clean up for exit from idle.  Because we are exiting from idle, there
+<<<<<<< HEAD
  * is no longer any point to rcu_idle_gp_timer, so cancel it.  This will
+=======
+ * is no longer any point to ->idle_gp_timer, so cancel it.  This will
+>>>>>>> cm/cm-11.0
  * do nothing if this timer is not active, so just cancel it unconditionally.
  */
 static void rcu_cleanup_after_idle(int cpu)
 {
+<<<<<<< HEAD
 	hrtimer_cancel(&per_cpu(rcu_idle_gp_timer, cpu));
+=======
+	struct rcu_dynticks *rdtp = &per_cpu(rcu_dynticks, cpu);
+
+	del_timer(&rdtp->idle_gp_timer);
+	trace_rcu_prep_idle("Cleanup after idle");
+>>>>>>> cm/cm-11.0
 }
 
 /*
@@ -2102,19 +2376,53 @@ static void rcu_cleanup_after_idle(int cpu)
  * Because it is not legal to invoke rcu_process_callbacks() with irqs
  * disabled, we do one pass of force_quiescent_state(), then do a
  * invoke_rcu_core() to cause rcu_process_callbacks() to be invoked
+<<<<<<< HEAD
  * later.  The per-cpu rcu_dyntick_drain variable controls the sequencing.
+=======
+ * later.  The ->dyntick_drain field controls the sequencing.
+>>>>>>> cm/cm-11.0
  *
  * The caller must have disabled interrupts.
  */
 static void rcu_prepare_for_idle(int cpu)
 {
+<<<<<<< HEAD
+=======
+	struct timer_list *tp;
+	struct rcu_dynticks *rdtp = &per_cpu(rcu_dynticks, cpu);
+
+	/*
+	 * If this is an idle re-entry, for example, due to use of
+	 * RCU_NONIDLE() or the new idle-loop tracing API within the idle
+	 * loop, then don't take any state-machine actions, unless the
+	 * momentary exit from idle queued additional non-lazy callbacks.
+	 * Instead, repost the ->idle_gp_timer if this CPU has callbacks
+	 * pending.
+	 */
+	if (!rdtp->idle_first_pass &&
+	    (rdtp->nonlazy_posted == rdtp->nonlazy_posted_snap)) {
+		if (rcu_cpu_has_callbacks(cpu)) {
+			tp = &rdtp->idle_gp_timer;
+			mod_timer_pinned(tp, rdtp->idle_gp_timer_expires);
+		}
+		return;
+	}
+	rdtp->idle_first_pass = 0;
+	rdtp->nonlazy_posted_snap = rdtp->nonlazy_posted - 1;
+
+>>>>>>> cm/cm-11.0
 	/*
 	 * If there are no callbacks on this CPU, enter dyntick-idle mode.
 	 * Also reset state to avoid prejudicing later attempts.
 	 */
 	if (!rcu_cpu_has_callbacks(cpu)) {
+<<<<<<< HEAD
 		per_cpu(rcu_dyntick_holdoff, cpu) = jiffies - 1;
 		per_cpu(rcu_dyntick_drain, cpu) = 0;
+=======
+		rdtp->dyntick_holdoff = jiffies - 1;
+		rdtp->dyntick_drain = 0;
+>>>>>>> cm/cm-11.0
 		trace_rcu_prep_idle("No callbacks");
 		return;
 	}
@@ -2123,11 +2431,16 @@ static void rcu_prepare_for_idle(int cpu)
 	 * If in holdoff mode, just return.  We will presumably have
 	 * refrained from disabling the scheduling-clock tick.
 	 */
+<<<<<<< HEAD
 	if (per_cpu(rcu_dyntick_holdoff, cpu) == jiffies) {
+=======
+	if (rdtp->dyntick_holdoff == jiffies) {
+>>>>>>> cm/cm-11.0
 		trace_rcu_prep_idle("In holdoff");
 		return;
 	}
 
+<<<<<<< HEAD
 	/* Check and update the rcu_dyntick_drain sequencing. */
 	if (per_cpu(rcu_dyntick_drain, cpu) <= 0) {
 		/* First time through, initialize the counter. */
@@ -2149,6 +2462,34 @@ static void rcu_prepare_for_idle(int cpu)
 	} else if (--per_cpu(rcu_dyntick_drain, cpu) <= 0) {
 		/* We have hit the limit, so time to give up. */
 		per_cpu(rcu_dyntick_holdoff, cpu) = jiffies;
+=======
+	/* Check and update the ->dyntick_drain sequencing. */
+	if (rdtp->dyntick_drain <= 0) {
+		/* First time through, initialize the counter. */
+		rdtp->dyntick_drain = RCU_IDLE_FLUSHES;
+	} else if (rdtp->dyntick_drain <= RCU_IDLE_OPT_FLUSHES &&
+		   !rcu_pending(cpu) &&
+		   !local_softirq_pending()) {
+		/* Can we go dyntick-idle despite still having callbacks? */
+		rdtp->dyntick_drain = 0;
+		rdtp->dyntick_holdoff = jiffies;
+		if (rcu_cpu_has_nonlazy_callbacks(cpu)) {
+			trace_rcu_prep_idle("Dyntick with callbacks");
+			rdtp->idle_gp_timer_expires =
+					   jiffies + RCU_IDLE_GP_DELAY;
+		} else {
+			rdtp->idle_gp_timer_expires =
+					   jiffies + RCU_IDLE_LAZY_GP_DELAY;
+			trace_rcu_prep_idle("Dyntick with lazy callbacks");
+		}
+		tp = &rdtp->idle_gp_timer;
+		mod_timer_pinned(tp, rdtp->idle_gp_timer_expires);
+		rdtp->nonlazy_posted_snap = rdtp->nonlazy_posted;
+		return; /* Nothing more to do immediately. */
+	} else if (--(rdtp->dyntick_drain) <= 0) {
+		/* We have hit the limit, so time to give up. */
+		rdtp->dyntick_holdoff = jiffies;
+>>>>>>> cm/cm-11.0
 		trace_rcu_prep_idle("Begin holdoff");
 		invoke_rcu_core();  /* Force the CPU out of dyntick-idle. */
 		return;
@@ -2184,6 +2525,22 @@ static void rcu_prepare_for_idle(int cpu)
 		trace_rcu_prep_idle("Callbacks drained");
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Keep a running count of the number of non-lazy callbacks posted
+ * on this CPU.  This running counter (which is never decremented) allows
+ * rcu_prepare_for_idle() to detect when something out of the idle loop
+ * posts a callback, even if an equal number of callbacks are invoked.
+ * Of course, callbacks should only be posted from within a trace event
+ * designed to be called from idle or from within RCU_NONIDLE().
+ */
+static void rcu_idle_count_callbacks_posted(void)
+{
+	__this_cpu_add(rcu_dynticks.nonlazy_posted, 1);
+}
+
+>>>>>>> cm/cm-11.0
 #endif /* #else #if !defined(CONFIG_RCU_FAST_NO_HZ) */
 
 #ifdef CONFIG_RCU_CPU_STALL_INFO
@@ -2192,6 +2549,7 @@ static void rcu_prepare_for_idle(int cpu)
 
 static void print_cpu_stall_fast_no_hz(char *cp, int cpu)
 {
+<<<<<<< HEAD
 	struct hrtimer *hrtp = &per_cpu(rcu_idle_gp_timer, cpu);
 
 	sprintf(cp, "drain=%d %c timer=%lld",
@@ -2200,6 +2558,15 @@ static void print_cpu_stall_fast_no_hz(char *cp, int cpu)
 		hrtimer_active(hrtp)
 			? ktime_to_us(hrtimer_get_remaining(hrtp))
 			: -1);
+=======
+	struct rcu_dynticks *rdtp = &per_cpu(rcu_dynticks, cpu);
+	struct timer_list *tltp = &rdtp->idle_gp_timer;
+
+	sprintf(cp, "drain=%d %c timer=%lu",
+		rdtp->dyntick_drain,
+		rdtp->dyntick_holdoff == jiffies ? 'H' : '.',
+		timer_pending(tltp) ? tltp->expires - jiffies : -1);
+>>>>>>> cm/cm-11.0
 }
 
 #else /* #ifdef CONFIG_RCU_FAST_NO_HZ */

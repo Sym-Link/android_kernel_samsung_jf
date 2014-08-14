@@ -32,6 +32,11 @@
 #define SHA256_DIGESTSIZE		32
 #define SHA1_DIGESTSIZE			20
 
+<<<<<<< HEAD
+=======
+#define AES_CE_BLOCK_SIZE		16
+
+>>>>>>> cm/cm-11.0
 /* key size in bytes */
 #define HMAC_KEY_SIZE			(SHA1_DIGESTSIZE)    /* hmac-sha1 */
 #define SHA_HMAC_KEY_SIZE		64

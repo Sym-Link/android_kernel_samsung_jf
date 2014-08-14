@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 /*
  * Qualcomm PMIC8XXX GPIO driver
  *
  * Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -87,9 +91,12 @@ static int pm_gpio_get(struct pm_gpio_chip *pm_gpio_chip, unsigned gpio)
 {
 	int	mode;
 
+<<<<<<< HEAD
 	if (gpio >= pm_gpio_chip->gpio_chip.ngpio || pm_gpio_chip == NULL)
 		return -EINVAL;
 
+=======
+>>>>>>> cm/cm-11.0
 	/* Get gpio value from config bank 1 if output gpio.
 	   Get gpio value from IRQ RT status register for all other gpio modes.
 	 */
@@ -109,9 +116,12 @@ static int pm_gpio_set(struct pm_gpio_chip *pm_gpio_chip,
 	u8	bank1;
 	unsigned long flags;
 
+<<<<<<< HEAD
 	if (gpio >= pm_gpio_chip->gpio_chip.ngpio || pm_gpio_chip == NULL)
 		return -EINVAL;
 
+=======
+>>>>>>> cm/cm-11.0
 	spin_lock_irqsave(&pm_gpio_chip->pm_lock, flags);
 	bank1 = PM_GPIO_WRITE
 			| (pm_gpio_chip->bank1[gpio] & ~PM_GPIO_OUT_INVERT);

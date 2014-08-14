@@ -1068,9 +1068,15 @@ static void gs_unthrottle(struct tty_struct *tty)
 	unsigned long		flags;
 
 	/*
+<<<<<<< HEAD
 	* tty's driver data is set to NULL during port close.  Nothing
 	* to do here.
 	*/
+=======
+	 * tty's driver data is set to NULL during port close.  Nothing
+	 * to do here.
+	 */
+>>>>>>> cm/cm-11.0
 	if (!port)
 		return;
 

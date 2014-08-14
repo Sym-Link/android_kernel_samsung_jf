@@ -2,7 +2,11 @@
  *
  * Copyright (C) 2008 Google, Inc.
  * Copyright (C) 2008 HTC Corporation
+<<<<<<< HEAD
  * Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -128,6 +132,13 @@ static int audio_open(struct inode *inode, struct file *file)
 		goto fail;
 	}
 	rc = audio_aio_open(audio, file);
+<<<<<<< HEAD
+=======
+	if (rc < 0) {
+		pr_err("audio_aio_open rc=%d\n", rc);
+		goto fail;
+	}
+>>>>>>> cm/cm-11.0
 
 #ifdef CONFIG_DEBUG_FS
 	snprintf(name, sizeof name, "msm_evrc_%04x", audio->ac->session);

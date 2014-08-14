@@ -591,6 +591,10 @@ static int msm_pcm_capture_copy(struct snd_pcm_substream *substream,
 	struct snd_pcm_runtime *runtime = substream->runtime;
 	struct voip_drv_info *prtd = runtime->private_data;
 	unsigned long dsp_flags;
+<<<<<<< HEAD
+=======
+	int size;
+>>>>>>> cm/cm-11.0
 
 	count = frames_to_bytes(runtime, frames);
 
@@ -609,6 +613,7 @@ static int msm_pcm_capture_copy(struct snd_pcm_substream *substream,
 					struct voip_buf_node, list);
 			list_del(&buf_node->list);
 			spin_unlock_irqrestore(&prtd->dsp_ul_lock, dsp_flags);
+<<<<<<< HEAD
 			if (prtd->mode == MODE_PCM)
 				ret = copy_to_user(buf,
 						   &buf_node->frame.voc_pkt,
@@ -617,6 +622,21 @@ static int msm_pcm_capture_copy(struct snd_pcm_substream *substream,
 				ret = copy_to_user(buf,
 						   &buf_node->frame,
 						   count);
+=======
+			if (prtd->mode == MODE_PCM) {
+				ret = copy_to_user(buf,
+						   &buf_node->frame.voc_pkt,
+						   buf_node->frame.len);
+			} else {
+				size = sizeof(buf_node->frame.header) +
+				       sizeof(buf_node->frame.len) +
+				       buf_node->frame.len;
+
+				ret = copy_to_user(buf,
+						   &buf_node->frame,
+						   size);
+			}
+>>>>>>> cm/cm-11.0
 			if (ret) {
 				pr_err("%s: Copy to user retuned %d\n",
 					__func__, ret);

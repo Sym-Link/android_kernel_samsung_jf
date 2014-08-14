@@ -12,7 +12,18 @@
 
 #include "internal.h"
 
+<<<<<<< HEAD
 int fips_enabled;
+=======
+// change@wtl.kSingh - In FIPS mode always enable this flag - starts
+#ifdef CONFIG_CRYPTO_FIPS
+int fips_enabled = 1;
+#else
+int fips_enabled;
+#endif
+// change@wtl.kSingh - In FIPS mode always enable this flag - ends
+
+>>>>>>> cm/cm-11.0
 EXPORT_SYMBOL_GPL(fips_enabled);
 
 /* Process kernel command-line parameter at boot time. fips=0 or fips=1 */

@@ -83,6 +83,10 @@ struct mipi_samsung_driver_data {
 
 struct mipi_panel_data {
 	const char panel_name[20];
+<<<<<<< HEAD
+=======
+	struct cmd_set ready_to_on;
+>>>>>>> cm/cm-11.0
 	struct cmd_set on;
 	struct cmd_set off;
 	struct cmd_set late_on;

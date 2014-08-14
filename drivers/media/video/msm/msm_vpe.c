@@ -142,7 +142,11 @@ static int msm_vpe_cfg_update(void *pinfo)
 	rot_flag = msm_camera_io_r(vpe_ctrl->vpebase +
 						VPE_OP_MODE_OFFSET) & 0xE00;
 	if (pinfo != NULL) {
+<<<<<<< HEAD
 		D("%s: Crop info in2_w = %d, in2_h = %d "\
+=======
+		D("%s: Crop info in2_w = %d, in2_h = %d "
+>>>>>>> cm/cm-11.0
 			"out2_w = %d out2_h = %d\n",
 			__func__, pcrop->src_w, pcrop->src_h,
 			pcrop->dst_w, pcrop->dst_h);
@@ -505,7 +509,11 @@ DECLARE_TASKLET(vpe_tasklet, vpe_do_tasklet, 0);
 
 static irqreturn_t vpe_parse_irq(int irq_num, void *data)
 {
+<<<<<<< HEAD
 	if (!vpe_ctrl || !vpe_ctrl->vpebase)
+=======
+	if(!vpe_ctrl || !vpe_ctrl->vpebase)
+>>>>>>> cm/cm-11.0
 		return IRQ_HANDLED;
 	vpe_ctrl->irq_status = msm_camera_io_r_mb(vpe_ctrl->vpebase +
 							VPE_INTR_STATUS_OFFSET);
@@ -1020,6 +1028,10 @@ static int msm_vpe_subdev_close(struct v4l2_subdev *sd,
 		msm_mctl_unmap_user_frame(&frame_info->dest_frame,
 			frame_info->p_mctl->client, mctl->domain_num);
 	}
+<<<<<<< HEAD
+=======
+	vpe_ctrl->pp_frame_info = NULL;
+>>>>>>> cm/cm-11.0
 	/* Drain the payload queue. */
 	msm_queue_drain(&vpe_ctrl->eventData_q, list_eventdata);
 	atomic_dec(&vpe_ctrl->active);

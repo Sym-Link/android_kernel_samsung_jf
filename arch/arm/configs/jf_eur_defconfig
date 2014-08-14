@@ -1,2 +1,8 @@
 CONFIG_MACH_JF_EUR=y
 CONFIG_EXTRA_FIRMWARE="audience-es325-fw-eur.bin"
+<<<<<<< HEAD
+=======
+CONFIG_EXTRA_FIRMWARE_DIR="firmware"
+CONFIG_INSIDESECURE_VPNCLIENT=y
+
+>>>>>>> cm/cm-11.0

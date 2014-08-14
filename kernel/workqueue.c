@@ -575,7 +575,14 @@ static struct cpu_workqueue_struct *get_work_cwq(struct work_struct *work)
 	if (data & WORK_STRUCT_CWQ)
 		return (void *)(data & WORK_STRUCT_WQ_DATA_MASK);
 	else
+<<<<<<< HEAD
 		return NULL;
+=======
+	{
+		WARN_ON_ONCE(1);
+		return NULL;
+	}
+>>>>>>> cm/cm-11.0
 }
 
 static struct global_cwq *get_work_gcwq(struct work_struct *work)
@@ -1096,7 +1103,12 @@ static void delayed_work_timer_fn(unsigned long __data)
 	struct delayed_work *dwork = (struct delayed_work *)__data;
 	struct cpu_workqueue_struct *cwq = get_work_cwq(&dwork->work);
 
+<<<<<<< HEAD
 	__queue_work(smp_processor_id(), cwq->wq, &dwork->work);
+=======
+	if (cwq != NULL)
+		__queue_work(smp_processor_id(), cwq->wq, &dwork->work);
+>>>>>>> cm/cm-11.0
 }
 
 /**
@@ -3644,6 +3656,44 @@ err_destroy:
 	return NOTIFY_BAD;
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Workqueues should be brought up before normal priority CPU notifiers.
+ * This will be registered high priority CPU notifier.
+ */
+static int __devinit workqueue_cpu_up_callback(struct notifier_block *nfb,
+					       unsigned long action,
+					       void *hcpu)
+{
+	switch (action & ~CPU_TASKS_FROZEN) {
+	case CPU_UP_PREPARE:
+	case CPU_UP_CANCELED:
+	case CPU_DOWN_FAILED:
+	case CPU_ONLINE:
+		return workqueue_cpu_callback(nfb, action, hcpu);
+	}
+	return NOTIFY_OK;
+}
+
+/*
+ * Workqueues should be brought down after normal priority CPU notifiers.
+ * This will be registered as low priority CPU notifier.
+ */
+static int __devinit workqueue_cpu_down_callback(struct notifier_block *nfb,
+						 unsigned long action,
+						 void *hcpu)
+{
+	switch (action & ~CPU_TASKS_FROZEN) {
+	case CPU_DOWN_PREPARE:
+	case CPU_DYING:
+	case CPU_POST_DEAD:
+		return workqueue_cpu_callback(nfb, action, hcpu);
+	}
+	return NOTIFY_OK;
+}
+
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_SMP
 
 struct work_for_cpu {
@@ -3839,7 +3889,12 @@ static int __init init_workqueues(void)
 	unsigned int cpu;
 	int i;
 
+<<<<<<< HEAD
 	cpu_notifier(workqueue_cpu_callback, CPU_PRI_WORKQUEUE);
+=======
+	cpu_notifier(workqueue_cpu_up_callback, CPU_PRI_WORKQUEUE_UP);
+	cpu_notifier(workqueue_cpu_down_callback, CPU_PRI_WORKQUEUE_DOWN);
+>>>>>>> cm/cm-11.0
 
 	/* initialize gcwqs */
 	for_each_gcwq_cpu(cpu) {

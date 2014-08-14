@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
  * Copyright (c) 1998-2011 Erez Zadok
  * Copyright (c) 2009	   Shrikar Archak
  * Copyright (c) 2003-2011 Stony Brook University
@@ -7,6 +8,30 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
+=======
+ * fs/sdcardfs/sdcardfs.h
+ *
+ * The sdcardfs v2.0 
+ *   This file system replaces the sdcard daemon on Android 
+ *   On version 2.0, some of the daemon functions have been ported  
+ *   to support the multi-user concepts of Android 4.4
+ *
+ * Copyright (c) 2013 Samsung Electronics Co. Ltd
+ *   Authors: Daeho Jeong, Woojoong Lee, Seunghwan Hyun, 
+ *               Sunghwan Yun, Sungjong Seo
+ *                      
+ * This program has been developed as a stackable file system based on
+ * the WrapFS which written by 
+ *
+ * Copyright (c) 1998-2011 Erez Zadok
+ * Copyright (c) 2009     Shrikar Archak
+ * Copyright (c) 2003-2011 Stony Brook University
+ * Copyright (c) 2003-2011 The Research Foundation of SUNY
+ *
+ * This file is dual licensed.  It may be redistributed and/or modified
+ * under the terms of the Apache 2.0 License OR version 2 of the GNU
+ * General Public License.
+>>>>>>> cm/cm-11.0
  */
 
 #ifndef _SDCARDFS_H_
@@ -27,9 +52,14 @@
 #include <linux/sched.h>
 #include <linux/types.h>
 #include <linux/security.h>
+<<<<<<< HEAD
 
 /* the file system magic number */
 #define SDCARDFS_SUPER_MAGIC	0xb550ca10
+=======
+#include <linux/string.h>
+#include "multiuser.h"
+>>>>>>> cm/cm-11.0
 
 /* the file system name */
 #define SDCARDFS_NAME "sdcardfs"
@@ -42,6 +72,7 @@
 
 #define SDCARDFS_DIRENT_SIZE 256
 
+<<<<<<< HEAD
 /* ######## ATTENTION ########
  * Old LOWER_FS_MIN_FREE_SIZE to 100MB.
  * Change New MIN_FREE_SIZE to 20MB cause of saving free memory.
@@ -67,6 +98,25 @@
 		(x)->i_uid = AID_ROOT;		\
 		(x)->i_gid = AID_SDCARD_RW; 	\
 		fix_mode((x)->i_mode);		\
+=======
+/* temporary static uid settings for development */ 
+#define AID_ROOT             0	/* uid for accessing /mnt/sdcard & extSdcard */
+#define AID_MEDIA_RW      1023	/* internal media storage write access */
+
+#define AID_SDCARD_RW     1015	/* external storage write access */
+#define AID_SDCARD_R      1028	/* external storage read access */
+#define AID_SDCARD_PICS   1033	/* external storage photos access */
+#define AID_SDCARD_AV     1034	/* external storage audio/video access */
+#define AID_SDCARD_ALL    1035	/* access all users external storage */
+
+#define AID_PACKAGE_INFO  1027
+
+#define fix_derived_permission(x)	\
+	do {						\
+		(x)->i_uid = SDCARDFS_I(x)->d_uid;	\
+		(x)->i_gid = SDCARDFS_I(x)->d_gid;	\
+		(x)->i_mode = ((x)->i_mode & S_IFMT) | SDCARDFS_I(x)->d_mode;\
+>>>>>>> cm/cm-11.0
 	} while (0)
 
 /* OVERRIDE_CRED() and REVERT_CRED() 
@@ -78,6 +128,7 @@
  * These two macro should be used in pair, and OVERRIDE_CRED() should be 
  * placed at the beginning of a function, right after variable declaration.
  */
+<<<<<<< HEAD
 #define OVERRIDE_CRED(sdcardfs_sbi) 		\
 	const struct cred * old_cred;		\
 	old_cred = override_fsids(sdcardfs_sbi);	\
@@ -89,6 +140,17 @@
         if (!old_cred) { return ERR_PTR(-ENOMEM); }
 
 #define REVERT_CRED()	 revert_fsids(old_cred)
+=======
+#define OVERRIDE_CRED(sdcardfs_sbi, saved_cred)		\
+	saved_cred = override_fsids(sdcardfs_sbi);	\
+	if (!saved_cred) { return -ENOMEM; }
+
+#define OVERRIDE_CRED_PTR(sdcardfs_sbi, saved_cred)	\
+	saved_cred = override_fsids(sdcardfs_sbi);	\
+	if (!saved_cred) { return ERR_PTR(-ENOMEM); }
+
+#define REVERT_CRED(saved_cred)	revert_fsids(saved_cred)
+>>>>>>> cm/cm-11.0
 
 #define DEBUG_CRED()		\
 	printk("KAKJAGI: %s:%d fsuid %d fsgid %d\n", 	\
@@ -96,6 +158,43 @@
 		(int)current->cred->fsuid, 		\
 		(int)current->cred->fsgid); 
 
+<<<<<<< HEAD
+=======
+/* Android 4.4 support */
+
+/* Permission mode for a specific node. Controls how file permissions
+ * are derived for children nodes. */
+typedef enum {
+	/* Nothing special; this node should just inherit from its parent. */
+	PERM_INHERIT,
+	/* This node is one level above a normal root; used for legacy layouts
+	 * which use the first level to represent user_id. */
+	PERM_LEGACY_PRE_ROOT,
+	/* This node is "/" */
+	PERM_ROOT,
+	/* This node is "/Android" */
+	PERM_ANDROID,
+	/* This node is "/Android/data" */
+	PERM_ANDROID_DATA,
+	/* This node is "/Android/obb" */
+	PERM_ANDROID_OBB,
+	/* This node is "/Android/user" */
+	PERM_ANDROID_USER,
+} perm_t;
+
+/* Permissions structure to derive */
+typedef enum {
+	DERIVE_NONE,
+	DERIVE_LEGACY,
+	DERIVE_UNIFIED,
+} derive_t;
+
+typedef enum {
+	LOWER_FS_EXT4,
+	LOWER_FS_FAT,
+} lower_fs_t;
+
+>>>>>>> cm/cm-11.0
 struct sdcardfs_sb_info;
 struct sdcardfs_mount_options;
 
@@ -111,7 +210,11 @@ extern const struct inode_operations sdcardfs_main_iops;
 extern const struct inode_operations sdcardfs_dir_iops;
 extern const struct inode_operations sdcardfs_symlink_iops;
 extern const struct super_operations sdcardfs_sops;
+<<<<<<< HEAD
 extern const struct dentry_operations sdcardfs_dops;
+=======
+extern const struct dentry_operations sdcardfs_ci_dops;
+>>>>>>> cm/cm-11.0
 extern const struct address_space_operations sdcardfs_aops, sdcardfs_dummy_aops;
 extern const struct vm_operations_struct sdcardfs_vm_ops;
 
@@ -135,6 +238,18 @@ struct sdcardfs_file_info {
 /* sdcardfs inode data in memory */
 struct sdcardfs_inode_info {
 	struct inode *lower_inode;
+<<<<<<< HEAD
+=======
+	/* state derived based on current position in hierachy
+	 * caution: d_mode does not include file types
+	 */
+	perm_t perm;
+	userid_t userid;
+	uid_t d_uid;
+	gid_t d_gid;
+	mode_t d_mode; 
+
+>>>>>>> cm/cm-11.0
 	struct inode vfs_inode;
 };
 
@@ -142,22 +257,44 @@ struct sdcardfs_inode_info {
 struct sdcardfs_dentry_info {
 	spinlock_t lock;	/* protects lower_path */
 	struct path lower_path;
+<<<<<<< HEAD
+=======
+	struct path orig_path;
+>>>>>>> cm/cm-11.0
 };
 
 struct sdcardfs_mount_options {
 	uid_t fs_low_uid;
 	gid_t fs_low_gid;
+<<<<<<< HEAD
+=======
+	gid_t write_gid;
+	int split_perms;
+	derive_t derive;
+	lower_fs_t lower_fs;
+	unsigned int reserved_mb;
+>>>>>>> cm/cm-11.0
 };
 
 /* sdcardfs super-block data in memory */
 struct sdcardfs_sb_info {
 	struct super_block *lower_sb;
+<<<<<<< HEAD
 	/* FIXME plz use following two field */
 	uid_t fs_uid;
 	gid_t fs_gid;
 	unsigned short fs_fmask;
 	unsigned short fs_dmask;
 	struct sdcardfs_mount_options options;
+=======
+	/* derived perm policy : some of options have been added 
+	 * to sdcardfs_mount_options (Android 4.4 support) */
+	struct sdcardfs_mount_options options;
+	spinlock_t lock;	/* protects obbpath */
+	char *obbpath_s;
+	struct path obbpath;
+	void *pkgl_id;
+>>>>>>> cm/cm-11.0
 };
 
 /*
@@ -222,6 +359,7 @@ static inline void pathcpy(struct path *dst, const struct path *src)
 	dst->dentry = src->dentry;
 	dst->mnt = src->mnt;
 }
+<<<<<<< HEAD
 /* Returns struct path.  Caller must path_put it. */
 static inline void sdcardfs_get_lower_path(const struct dentry *dent,
 					 struct path *lower_path)
@@ -266,6 +404,116 @@ static inline void sdcardfs_put_reset_lower_path(const struct dentry *dent)
 	return;
 }
 
+=======
+
+/* sdcardfs_get_pname functions calls path_get()
+ * therefore, the caller must call "proper" path_put functions 
+ */
+#define SDCARDFS_DENT_FUNC(pname) \
+static inline void sdcardfs_get_##pname(const struct dentry *dent, \
+					struct path *pname) \
+{ \
+	spin_lock(&SDCARDFS_D(dent)->lock); \
+	pathcpy(pname, &SDCARDFS_D(dent)->pname); \
+	path_get(pname); \
+	spin_unlock(&SDCARDFS_D(dent)->lock); \
+	return; \
+} \
+static inline void sdcardfs_put_##pname(const struct dentry *dent, \
+					struct path *pname) \
+{ \
+	path_put(pname); \
+	return; \
+} \
+static inline void sdcardfs_set_##pname(const struct dentry *dent, \
+					struct path *pname) \
+{ \
+	spin_lock(&SDCARDFS_D(dent)->lock); \
+	pathcpy(&SDCARDFS_D(dent)->pname, pname); \
+	spin_unlock(&SDCARDFS_D(dent)->lock); \
+	return; \
+} \
+static inline void sdcardfs_reset_##pname(const struct dentry *dent) \
+{ \
+	spin_lock(&SDCARDFS_D(dent)->lock); \
+	SDCARDFS_D(dent)->pname.dentry = NULL; \
+	SDCARDFS_D(dent)->pname.mnt = NULL; \
+	spin_unlock(&SDCARDFS_D(dent)->lock); \
+	return; \
+} \
+static inline void sdcardfs_put_reset_##pname(const struct dentry *dent) \
+{ \
+	struct path pname; \
+	spin_lock(&SDCARDFS_D(dent)->lock); \
+	if(SDCARDFS_D(dent)->pname.dentry) { \
+		pathcpy(&pname, &SDCARDFS_D(dent)->pname); \
+		SDCARDFS_D(dent)->pname.dentry = NULL; \
+		SDCARDFS_D(dent)->pname.mnt = NULL; \
+		spin_unlock(&SDCARDFS_D(dent)->lock); \
+		path_put(&pname); \
+	} else \
+		spin_unlock(&SDCARDFS_D(dent)->lock); \
+	return; \
+} 
+
+SDCARDFS_DENT_FUNC(lower_path) 
+SDCARDFS_DENT_FUNC(orig_path)  
+
+static inline int has_graft_path(const struct dentry *dent)
+{
+	int ret = 0;
+
+	spin_lock(&SDCARDFS_D(dent)->lock); 
+	if (SDCARDFS_D(dent)->orig_path.dentry != NULL)
+		ret = 1;
+	spin_unlock(&SDCARDFS_D(dent)->lock);
+
+	return ret;
+}
+
+static inline void sdcardfs_get_real_lower(const struct dentry *dent,
+						struct path *real_lower)
+{
+	/* in case of a local obb dentry 
+	 * the orig_path should be returned 
+	 */
+	if(has_graft_path(dent)) 
+		sdcardfs_get_orig_path(dent, real_lower);
+	else 
+		sdcardfs_get_lower_path(dent, real_lower);
+}
+
+static inline void sdcardfs_put_real_lower(const struct dentry *dent,
+						struct path *real_lower)
+{
+	if(has_graft_path(dent)) 
+		sdcardfs_put_orig_path(dent, real_lower);
+	else 
+		sdcardfs_put_lower_path(dent, real_lower);
+}
+
+/* for packagelist.c */
+extern int get_caller_has_rw_locked(void *pkgl_id, derive_t derive);
+extern appid_t get_appid(void *pkgl_id, const char *app_name);
+extern int check_caller_access_to_name(struct inode *parent_node, const char* name,
+                                        derive_t derive, int w_ok, int has_rw);
+extern int open_flags_to_access_mode(int open_flags);
+extern void * packagelist_create(gid_t write_gid);
+extern void packagelist_destroy(void *pkgl_id);
+extern int packagelist_init(void);
+extern void packagelist_exit(void);
+
+/* for derived_perm.c */
+extern void setup_derived_state(struct inode *inode, perm_t perm, 
+			userid_t userid, uid_t uid, gid_t gid, mode_t mode);
+extern void get_derived_permission(struct dentry *parent, struct dentry *dentry);
+extern void update_derived_permission(struct dentry *dentry);
+extern int need_graft_path(struct dentry *dentry);
+extern int is_base_obbpath(struct dentry *dentry);
+extern int is_obbpath_invalid(struct dentry *dentry);
+extern int setup_obb_dentry(struct dentry *dentry, struct path *lower_path);
+
+>>>>>>> cm/cm-11.0
 /* locking helpers */
 static inline struct dentry *lock_parent(struct dentry *dentry)
 {
@@ -280,8 +528,56 @@ static inline void unlock_dir(struct dentry *dir)
 	dput(dir);
 }
 
+<<<<<<< HEAD
 
 #if defined(LOWER_FS_MIN_FREE_SIZE)
+=======
+static inline int prepare_dir(const char *path_s, uid_t uid, gid_t gid, mode_t mode)
+{
+	int err;
+	struct dentry *dent;
+	struct path path;
+	struct iattr attrs;
+	
+	dent = kern_path_create(AT_FDCWD, path_s, &path, LOOKUP_DIRECTORY);
+	
+	if (IS_ERR(dent)) {
+		err = PTR_ERR(dent);
+		if (err == -EEXIST)
+			err = 0;
+		return err;
+	}
+	
+	err = mnt_want_write(path.mnt);
+	if (err) 
+		goto out;
+	
+	err = vfs_mkdir(path.dentry->d_inode, dent, mode);
+	if (err) {
+		if (err == -EEXIST)
+			err = 0;
+		goto out_drop;
+	}
+	
+	attrs.ia_uid = uid; 
+	attrs.ia_gid = gid; 
+	attrs.ia_valid = ATTR_UID | ATTR_GID;
+	mutex_lock(&dent->d_inode->i_mutex);
+	notify_change(dent, &attrs);
+	mutex_unlock(&dent->d_inode->i_mutex);
+
+out_drop:
+	mnt_drop_write(path.mnt);
+
+out: 
+	dput(dent);
+	/* parent dentry locked by kern_path_create */
+	mutex_unlock(&path.dentry->d_inode->i_mutex);
+	path_put(&path);
+	return err;
+}
+
+>>>>>>> cm/cm-11.0
 /*
  * Return 1, if a disk has enough free space, otherwise 0.
  * We assume that any files can not be overwritten.
@@ -292,6 +588,7 @@ static inline int check_min_free_space(struct dentry *dentry, size_t size, int d
 	struct path lower_path;
 	struct kstatfs statfs;
 	u64 avail;
+<<<<<<< HEAD
 
 	/* Get fs stat of lower filesystem. */
 	sdcardfs_get_lower_path(dentry, &lower_path);
@@ -323,5 +620,41 @@ static inline int check_min_free_space(struct dentry *dentry, size_t size, int d
 	return 0;
 }
 #endif
+=======
+	struct sdcardfs_sb_info *sbi = SDCARDFS_SB(dentry->d_sb);
+
+	if (sbi->options.reserved_mb) {
+		/* Get fs stat of lower filesystem. */
+		sdcardfs_get_lower_path(dentry, &lower_path);
+		err = vfs_statfs(&lower_path, &statfs);
+		sdcardfs_put_lower_path(dentry, &lower_path);
+	
+		if (unlikely(err))
+			return 0;
+	
+		/* Invalid statfs informations. */
+		if (unlikely(statfs.f_bsize == 0))
+			return 0;
+	
+		/* if you are checking directory, set size to f_bsize. */
+		if (unlikely(dir))
+			size = statfs.f_bsize;
+	
+		/* available size */
+		avail = statfs.f_bavail * statfs.f_bsize;
+	
+		/* not enough space */
+		if ((u64)size > avail)
+			return 0;
+	
+		/* enough space */
+		if ((avail - size) > (sbi->options.reserved_mb * 1024 * 1024))
+			return 1;
+	
+		return 0;
+	} else
+		return 1;
+}
+>>>>>>> cm/cm-11.0
 
 #endif	/* not _SDCARDFS_H_ */

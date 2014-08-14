@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Guest Communications
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -43,8 +47,13 @@ extern void (*commOSModExit)(void);
 
 /* Macro to assign Init and Exit callbacks. */
 #define COMM_OS_MOD_INIT(init, exit)        \
+<<<<<<< HEAD
    int (*commOSModInit)(void *args) = init; \
    void (*commOSModExit)(void) = exit
+=======
+	int (*commOSModInit)(void *args) = init; \
+	void (*commOSModExit)(void) = exit
+>>>>>>> cm/cm-11.0
 
 
 /*
@@ -141,10 +150,17 @@ void CommOS_FlushAIOWork(CommOSWork *work);
 
 int
 CommOS_StartIO(const char *dispatchTaskName,
+<<<<<<< HEAD
                CommOSDispatchFunc dispatchHandler,
                unsigned int interval,
                unsigned int maxCycles,
                const char *aioTaskName);
+=======
+	       CommOSDispatchFunc dispatchHandler,
+	       unsigned int interval,
+	       unsigned int maxCycles,
+	       const char *aioTaskName);
+>>>>>>> cm/cm-11.0
 
 
 #endif  /* _COMM_OS_H_ */

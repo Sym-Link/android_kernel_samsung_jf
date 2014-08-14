@@ -239,9 +239,12 @@ struct cfq_data {
 	unsigned long workload_expires;
 	struct cfq_group *serving_group;
 
+<<<<<<< HEAD
 	unsigned int nr_urgent_pending;
 	unsigned int nr_urgent_in_flight;
 
+=======
+>>>>>>> cm/cm-11.0
 	/*
 	 * Each priority tree is sorted by next_request position.  These
 	 * trees are used when determining if two or more queues are
@@ -2095,6 +2098,7 @@ static void cfq_dispatch_insert(struct request_queue *q, struct request *rq)
 	rq->ioprio = IOPRIO_PRIO_VALUE(cfqq->ioprio_class, cfqq->ioprio);
 	elv_dispatch_sort(q, rq);
 
+<<<<<<< HEAD
 	if (rq->cmd_flags & REQ_URGENT) {
 		if (!cfqd->nr_urgent_pending)
 			WARN_ON(1);
@@ -2103,6 +2107,8 @@ static void cfq_dispatch_insert(struct request_queue *q, struct request *rq)
 		cfqd->nr_urgent_in_flight++;
 	}
 
+=======
+>>>>>>> cm/cm-11.0
 	cfqd->rq_in_flight[cfq_cfqq_sync(cfqq)]++;
 	cfqq->nr_sectors += blk_rq_sectors(rq);
 	cfq_blkiocg_update_dispatch_stats(&cfqq->cfqg->blkg, blk_rq_bytes(rq),
@@ -2317,9 +2323,12 @@ static void cfq_choose_cfqg(struct cfq_data *cfqd)
 {
 	struct cfq_group *cfqg = cfq_get_next_cfqg(cfqd);
 
+<<<<<<< HEAD
 	if (!cfqg)
 		return;
 
+=======
+>>>>>>> cm/cm-11.0
 	cfqd->serving_group = cfqg;
 
 	/* Restore the workload type data */
@@ -3206,6 +3215,7 @@ cfq_rq_enqueued(struct cfq_data *cfqd, struct cfq_queue *cfqq,
 	}
 }
 
+<<<<<<< HEAD
 /*
  * Called when a request (rq) is reinserted (to cfqq). Check if there's
  * something we should do about it
@@ -3269,6 +3279,8 @@ static int cfq_reinsert_request(struct request_queue *q, struct request *rq)
 	return 0;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static void cfq_insert_request(struct request_queue *q, struct request *rq)
 {
 	struct cfq_data *cfqd = q->elevator->elevator_data;
@@ -3283,6 +3295,7 @@ static void cfq_insert_request(struct request_queue *q, struct request *rq)
 	cfq_blkiocg_update_io_add_stats(&(RQ_CFQG(rq))->blkg,
 			&cfqd->serving_group->blkg, rq_data_dir(rq),
 			rq_is_sync(rq));
+<<<<<<< HEAD
 
 	cfq_rq_enqueued(cfqd, cfqq, rq);
 
@@ -3322,6 +3335,9 @@ static bool cfq_urgent_pending(struct request_queue *q)
 		return true;
 
 	return false;
+=======
+	cfq_rq_enqueued(cfqd, cfqq, rq);
+>>>>>>> cm/cm-11.0
 }
 
 /*
@@ -3405,6 +3421,7 @@ static void cfq_completed_request(struct request_queue *q, struct request *rq)
 	const int sync = rq_is_sync(rq);
 	unsigned long now;
 
+<<<<<<< HEAD
 	if (rq->cmd_flags & REQ_URGENT) {
 		if (!cfqd->nr_urgent_in_flight)
 			WARN_ON(1);
@@ -3413,6 +3430,8 @@ static void cfq_completed_request(struct request_queue *q, struct request *rq)
 		rq->cmd_flags &= ~REQ_URGENT;
 	}
 
+=======
+>>>>>>> cm/cm-11.0
 	now = jiffies;
 	cfq_log_cfqq(cfqd, cfqq, "complete rqnoidle %d",
 		     !!(rq->cmd_flags & REQ_NOIDLE));
@@ -3980,8 +3999,11 @@ static struct elevator_type iosched_cfq = {
 		.elevator_bio_merged_fn =	cfq_bio_merged,
 		.elevator_dispatch_fn =		cfq_dispatch_requests,
 		.elevator_add_req_fn =		cfq_insert_request,
+<<<<<<< HEAD
 		.elevator_reinsert_req_fn	= cfq_reinsert_request,
 		.elevator_is_urgent_fn		= cfq_urgent_pending,
+=======
+>>>>>>> cm/cm-11.0
 		.elevator_activate_req_fn =	cfq_activate_request,
 		.elevator_deactivate_req_fn =	cfq_deactivate_request,
 		.elevator_completed_req_fn =	cfq_completed_request,

@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD
  * Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -125,6 +129,10 @@ static long aac_in_ioctl(struct file *file,
 	case AUDIO_GET_AAC_ENC_CONFIG: {
 		struct msm_audio_aac_enc_config cfg;
 		struct msm_audio_aac_enc_config *enc_cfg;
+<<<<<<< HEAD
+=======
+		memset(&cfg, 0, sizeof(cfg));
+>>>>>>> cm/cm-11.0
 		enc_cfg = audio->enc_cfg;
 		if (enc_cfg->channels == CH_MODE_MONO)
 			cfg.channels = 1;

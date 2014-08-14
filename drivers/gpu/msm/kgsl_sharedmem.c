@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2002,2007-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2002,2007-2012,2014, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -73,12 +77,20 @@ static struct kgsl_process_private *
 _get_priv_from_kobj(struct kobject *kobj)
 {
 	struct kgsl_process_private *private;
+<<<<<<< HEAD
 	unsigned long name;
+=======
+	unsigned int name;
+>>>>>>> cm/cm-11.0
 
 	if (!kobj)
 		return NULL;
 
+<<<<<<< HEAD
 	if (sscanf(kobj->name, "%ld", &name) != 1)
+=======
+	if (kstrtou32(kobj->name, 0, &name))
+>>>>>>> cm/cm-11.0
 		return NULL;
 
 	list_for_each_entry(private, &kgsl_driver.process_list, list) {
@@ -552,7 +564,10 @@ _kgsl_sharedmem_page_alloc(struct kgsl_memdesc *memdesc,
 
 	sglen_alloc = PAGE_ALIGN(size) >> PAGE_SHIFT;
 
+<<<<<<< HEAD
 	memdesc->size = size;
+=======
+>>>>>>> cm/cm-11.0
 	memdesc->pagetable = pagetable;
 	memdesc->ops = &kgsl_page_alloc_ops;
 
@@ -560,6 +575,11 @@ _kgsl_sharedmem_page_alloc(struct kgsl_memdesc *memdesc,
 	memdesc->sg = kgsl_sg_alloc(memdesc->sglen_alloc);
 
 	if (memdesc->sg == NULL) {
+<<<<<<< HEAD
+=======
+		KGSL_CORE_ERR("vmalloc(%d) failed\n",
+			sglen_alloc * sizeof(struct scatterlist));
+>>>>>>> cm/cm-11.0
 		ret = -ENOMEM;
 		goto done;
 	}
@@ -578,6 +598,11 @@ _kgsl_sharedmem_page_alloc(struct kgsl_memdesc *memdesc,
 		pages = kmalloc(PAGE_SIZE, GFP_KERNEL);
 
 	if (pages == NULL) {
+<<<<<<< HEAD
+=======
+		KGSL_CORE_ERR("page table alloc (%d) failed\n",
+			sglen_alloc * sizeof(struct page *));
+>>>>>>> cm/cm-11.0
 		ret = -ENOMEM;
 		goto done;
 	}
@@ -615,6 +640,17 @@ _kgsl_sharedmem_page_alloc(struct kgsl_memdesc *memdesc,
 				continue;
 			}
 
+<<<<<<< HEAD
+=======
+			/*
+			 * Update sglen and memdesc size,as requested allocation
+			 * not served fully. So that they can be correctly freed
+			 * in kgsl_sharedmem_free().
+			 */
+			memdesc->sglen = sglen;
+			memdesc->size = (size - len);
+
+>>>>>>> cm/cm-11.0
 			KGSL_CORE_ERR(
 				"Out of memory: only allocated %dKB of %dKB requested\n",
 				(size - len) >> 10, size >> 10);
@@ -631,6 +667,10 @@ _kgsl_sharedmem_page_alloc(struct kgsl_memdesc *memdesc,
 	}
 
 	memdesc->sglen = sglen;
+<<<<<<< HEAD
+=======
+	memdesc->size = size;
+>>>>>>> cm/cm-11.0
 
 	/*
 	 * All memory that goes to the user has to be zeroed out before it gets
@@ -671,18 +711,30 @@ _kgsl_sharedmem_page_alloc(struct kgsl_memdesc *memdesc,
 	outer_cache_range_op_sg(memdesc->sg, memdesc->sglen,
 				KGSL_CACHE_OP_FLUSH);
 
+<<<<<<< HEAD
 	KGSL_STATS_ADD(size, kgsl_driver.stats.page_alloc,
 		kgsl_driver.stats.page_alloc_max);
 
+=======
+>>>>>>> cm/cm-11.0
 	order = get_order(size);
 
 	if (order < 16)
 		kgsl_driver.stats.histogram[order]++;
 
 done:
+<<<<<<< HEAD
 	if ((memdesc->sglen_alloc * sizeof(struct page *)) > PAGE_SIZE)
 		vfree(pages);
 	else		
+=======
+	KGSL_STATS_ADD(memdesc->size, kgsl_driver.stats.page_alloc,
+		kgsl_driver.stats.page_alloc_max);
+
+	if ((memdesc->sglen_alloc * sizeof(struct page *)) > PAGE_SIZE)
+		vfree(pages);
+	else
+>>>>>>> cm/cm-11.0
 		kfree(pages);
 
 	if (ret)

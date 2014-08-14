@@ -40,6 +40,13 @@ struct bcm2079x_platform_data {
 	unsigned int en_gpio;
 	unsigned int wake_gpio;
 };
+<<<<<<< HEAD
 
 extern int poweroff_charging;
 #endif
+=======
+#ifdef CONFIG_SAMSUNG_LPM_MODE
+extern int poweroff_charging;
+#endif
+#endif
+>>>>>>> cm/cm-11.0

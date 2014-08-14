@@ -982,6 +982,7 @@ int msm_gemini_ioctl_set_outmode(struct msm_gemini_device *pgmn_dev,
 	return rc;
 }
 
+<<<<<<< HEAD
 int msm_gemini_ioctl_test_dump_region(struct msm_gemini_device *pgmn_dev,
 	unsigned long arg)
 {
@@ -990,6 +991,8 @@ int msm_gemini_ioctl_test_dump_region(struct msm_gemini_device *pgmn_dev,
 	return 0;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 long __msm_gemini_ioctl(struct msm_gemini_device *pgmn_dev,
 	unsigned int cmd, unsigned long arg)
 {
@@ -1058,10 +1061,13 @@ long __msm_gemini_ioctl(struct msm_gemini_device *pgmn_dev,
 		rc = msm_gemini_ioctl_hw_cmds(pgmn_dev, (void __user *) arg);
 		break;
 
+<<<<<<< HEAD
 	case MSM_GMN_IOCTL_TEST_DUMP_REGION:
 		rc = msm_gemini_ioctl_test_dump_region(pgmn_dev, arg);
 		break;
 
+=======
+>>>>>>> cm/cm-11.0
 	case MSM_GMN_IOCTL_SET_MODE:
 		rc = msm_gemini_ioctl_set_outmode(pgmn_dev, (void __user *)arg);
 		break;

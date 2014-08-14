@@ -24,8 +24,12 @@
 #include <linux/pm_qos.h>
 
 #include <asm/atomic.h>
+<<<<<<< HEAD
 
 #include "cp14.h"
+=======
+#include <asm/hardware/cp14.h>
+>>>>>>> cm/cm-11.0
 
 #define LOG_BUF_LEN			32768
 /* each slot is 4 bytes, 8kb total */

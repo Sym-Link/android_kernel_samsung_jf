@@ -20,6 +20,10 @@
 #include <linux/slab.h>
 #include <linux/pm_runtime.h>
 #include <linux/slimbus/slimbus.h>
+<<<<<<< HEAD
+=======
+#include <linux/input.h>
+>>>>>>> cm/cm-11.0
 #include <sound/core.h>
 #include <sound/soc.h>
 #include <sound/soc-dapm.h>
@@ -429,10 +433,18 @@ static int msm_mainmic_bias_event(struct snd_soc_dapm_widget *w,
 		__func__, (event), SND_SOC_DAPM_EVENT_ON(event));
 #if defined(CONFIG_MACH_JF_DCM)
 	ice_gpiox_set(FPGA_GPIO_MICBIAS_EN, SND_SOC_DAPM_EVENT_ON(event));
+<<<<<<< HEAD
 #else
 	gpio_set_value_cansleep(
 		PM8921_GPIO_PM_TO_SYS(PMIC_MAIN_MICBIAS_EN),
 			SND_SOC_DAPM_EVENT_ON(event));
+=======
+#endif
+#if !defined(CONFIG_MACH_MELIUS)
+	gpio_set_value_cansleep(
+	PM8921_GPIO_PM_TO_SYS(PMIC_MAIN_MICBIAS_EN),
+	SND_SOC_DAPM_EVENT_ON(event));
+>>>>>>> cm/cm-11.0
 #endif
         if(main_mic_delay) {
 			if(main_mic_delay != 100)
@@ -855,6 +867,7 @@ static int msm_slim_1_rate_put(struct snd_kcontrol *kcontrol,
 {
 	switch (ucontrol->value.integer.value[0]) {
 	case BTSCO_NBS:
+<<<<<<< HEAD
 		msm_slim_1_rate = SAMPLE_RATE_8KHZ;
 		break;
 	case BTSCO_WBS:
@@ -862,6 +875,12 @@ static int msm_slim_1_rate_put(struct snd_kcontrol *kcontrol,
 	case 8000:
 		msm_slim_1_rate = SAMPLE_RATE_8KHZ;
 		break;
+=======
+	case 8000:
+		msm_slim_1_rate = SAMPLE_RATE_8KHZ;
+		break;
+	case BTSCO_WBS:
+>>>>>>> cm/cm-11.0
 	case 16000:
 		msm_slim_1_rate = SAMPLE_RATE_16KHZ;
 		break;
@@ -872,7 +891,11 @@ static int msm_slim_1_rate_put(struct snd_kcontrol *kcontrol,
 		msm_slim_1_rate = SAMPLE_RATE_8KHZ;
 		break;
 	}
+<<<<<<< HEAD
 	pr_debug("%s: msm_slim_1_rate = %d\n", __func__,
+=======
+	pr_info("%s: msm_slim_1_rate = %d\n", __func__,
+>>>>>>> cm/cm-11.0
 		 msm_slim_1_rate);
 	return 0;
 }
@@ -964,7 +987,11 @@ static const struct snd_kcontrol_new tabla_msm_controls[] = {
 		msm_slim_3_rx_ch_get, msm_slim_3_rx_ch_put),
 	SOC_ENUM_EXT("HDMI_RX Channels", msm_enum[3],
 		msm_hdmi_rx_ch_get, msm_hdmi_rx_ch_put),
+<<<<<<< HEAD
 	SOC_ENUM_EXT("HDMI RX Rate", msm_enum[1],
+=======
+	SOC_ENUM_EXT("HDMI RX Rate", msm_enum[4],
+>>>>>>> cm/cm-11.0
 					msm_hdmi_rate_get,
 					msm_hdmi_rate_put),
 	SOC_SINGLE_EXT("Main Mic Delay",SND_SOC_NOPM, 0, 100, 0,
@@ -1328,7 +1355,11 @@ static int msm_slimbus_4_hw_params(struct snd_pcm_substream *substream,
 
 static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 {
+<<<<<<< HEAD
 	int err;
+=======
+	int err, ret;
+>>>>>>> cm/cm-11.0
 #ifndef CONFIG_SWITCH_FSA8008
 	uint32_t revision;
 #endif
@@ -1385,6 +1416,17 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 		return err;
 	}
 
+<<<<<<< HEAD
+=======
+	ret = snd_jack_set_key(button_jack.jack,
+			       SND_JACK_BTN_0,
+			       KEY_MEDIA);
+	if (ret) {
+		pr_err("%s: Failed to set code for btn-0\n", __func__);
+		return ret;
+	}
+
+>>>>>>> cm/cm-11.0
 	codec_clk = clk_get(cpu_dai->dev, "osr_clk");
 
 #ifndef CONFIG_SWITCH_FSA8008
@@ -1594,9 +1636,12 @@ static int msm_btsco_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 	rate->min = rate->max = msm_slim_1_rate;
 	channels->min = channels->max = msm_btsco_ch;
 
+<<<<<<< HEAD
 	pr_info("%s: rate = %u channels = %u ()\n", __func__,
 			rate->min, channels->min);
 
+=======
+>>>>>>> cm/cm-11.0
 	return 0;
 }
 static int msm_slim_1_rx_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
@@ -1626,6 +1671,12 @@ static int msm_slim_1_tx_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 	rate->min = rate->max = msm_slim_1_rate;
 	channels->min = channels->max = msm_slim_1_tx_ch;
 
+<<<<<<< HEAD
+=======
+	pr_info("%s: rate = %u channels = %u ()\n", __func__,
+			rate->min, channels->min);
+
+>>>>>>> cm/cm-11.0
 	return 0;
 }
 
@@ -2012,6 +2063,7 @@ static struct snd_soc_dai_link msm_dai[] = {
 		.codec_name = "snd-soc-dummy",
 	},
 	{
+<<<<<<< HEAD
 		.name = "VoLTE",
 		.stream_name = "VoLTE",
 		.cpu_dai_name   = "VoLTE",
@@ -2026,6 +2078,20 @@ static struct snd_soc_dai_link msm_dai[] = {
 		.codec_dai_name = "snd-soc-dummy-dai",
 		.codec_name = "snd-soc-dummy",
 		.be_id = MSM_FRONTEND_DAI_VOLTE,
+=======
+		.name = "VoLTE Stub",
+		.stream_name = "VoLTE Stub",
+		.cpu_dai_name   = "VOLTE_STUB",
+		.platform_name  = "msm-pcm-hostless",
+		.dynamic = 1,
+		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+			    SND_SOC_DPCM_TRIGGER_POST},
+		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
+		.ignore_suspend = 1,
+		.ignore_pmdown_time = 1,
+		.codec_dai_name = "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+>>>>>>> cm/cm-11.0
 	},
 	{
 		.name = "MSM8960 LowLatency",
@@ -2042,6 +2108,24 @@ static struct snd_soc_dai_link msm_dai[] = {
 		.ignore_pmdown_time = 1,
 		.be_id = MSM_FRONTEND_DAI_MULTIMEDIA5,
 	},
+<<<<<<< HEAD
+=======
+	{
+		.name = "Voice2 Stub",
+		.stream_name = "Voice2 Stub",
+		.cpu_dai_name = "VOICE2_STUB",
+		.platform_name = "msm-pcm-hostless",
+		.dynamic = 1,
+		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+			    SND_SOC_DPCM_TRIGGER_POST},
+		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
+		.ignore_suspend = 1,
+		.ignore_pmdown_time = 1,
+		/* this dainlink has playback support */
+		.codec_dai_name = "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+	},
+>>>>>>> cm/cm-11.0
 	/* Backend DAI Links */
 	{
 		.name = LPASS_BE_SLIMBUS_0_RX,

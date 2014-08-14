@@ -14,6 +14,10 @@ struct vm_area_struct;		/* vma defining user mapping in mm_types.h */
 #define VM_USERMAP	0x00000008	/* suitable for remap_vmalloc_range */
 #define VM_VPAGES	0x00000010	/* buffer for pages was vmalloc'ed */
 #define VM_UNLIST	0x00000020	/* vm_struct is not listed in vmlist */
+<<<<<<< HEAD
+=======
+#define VM_LOWMEM	0x00000040	/* Tracking of direct mapped lowmem */
+>>>>>>> cm/cm-11.0
 /* bits [20..32] reserved for arch specific ioremap internals */
 
 /*

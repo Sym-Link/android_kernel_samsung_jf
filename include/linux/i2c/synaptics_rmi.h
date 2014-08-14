@@ -70,15 +70,21 @@ struct synaptics_rmi4_platform_data {
 #ifdef CONFIG_FB_MSM_MIPI_SAMSUNG_OCTA_VIDEO_FULL_HD_PT_PANEL
 	int (*tout1_on)(void);
 #endif
+<<<<<<< HEAD
 #if defined(CONFIG_TOUCHSCREEN_SYNAPTICS_PREVENT_HSYNC_LEAKAGE)
 	void (*hsync_onoff)(bool onoff);
 #endif
+=======
+>>>>>>> cm/cm-11.0
 };
 
 #ifdef CONFIG_FB_MSM_MIPI_SAMSUNG_OCTA_VIDEO_FULL_HD_PT_PANEL
 extern int touch_tout1_on(void);
 #endif
+<<<<<<< HEAD
 #if defined(CONFIG_TOUCHSCREEN_SYNAPTICS_PREVENT_HSYNC_LEAKAGE)
 extern void lcd_hsync_onoff(bool onoff);
 #endif
+=======
+>>>>>>> cm/cm-11.0
 #endif

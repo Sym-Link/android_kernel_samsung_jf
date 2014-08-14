@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -17,7 +21,12 @@
 
 #define MAX_BRIDGES	5
 #define HSIC	0
+<<<<<<< HEAD
 #define SMUX	1
+=======
+#define HSIC_2	1
+#define SMUX	4
+>>>>>>> cm/cm-11.0
 
 int diagfwd_connect_bridge(int);
 void connect_bridge(int, int);
@@ -30,6 +39,10 @@ int diagfwd_read_complete_bridge(struct diag_request *diag_read_ptr);
  * for instance SMUX, HSIC working at same time
  */
 struct diag_bridge_dev {
+<<<<<<< HEAD
+=======
+	int id;
+>>>>>>> cm/cm-11.0
 	char name[20];
 	int enabled;
 	struct mutex bridge_mutex;

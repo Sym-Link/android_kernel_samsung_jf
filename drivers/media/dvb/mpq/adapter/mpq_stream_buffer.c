@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -177,6 +181,7 @@ int mpq_streambuffer_pkt_write(
 	if ((NULL == sbuff) || (NULL == packet))
 		return -EINVAL;
 
+<<<<<<< HEAD
 	MPQ_DVB_DBG_PRINT(
 		"%s: handle=%d, offset=%d, len=%d\n",
 		__func__,
@@ -184,6 +189,8 @@ int mpq_streambuffer_pkt_write(
 		packet->raw_data_offset,
 		packet->raw_data_len);
 
+=======
+>>>>>>> cm/cm-11.0
 	len = sizeof(struct mpq_streambuffer_packet_header) +
 		packet->user_data_len;
 
@@ -270,9 +277,12 @@ ssize_t mpq_streambuffer_data_write(
 		}
 		memcpy(desc->base + desc->write_ptr, buf, len);
 		desc->write_ptr += len;
+<<<<<<< HEAD
 		MPQ_DVB_DBG_PRINT(
 			"%s: copied %d data bytes. handle=%d, write_ptr=%d\n",
 			__func__, len, desc->handle, desc->write_ptr);
+=======
+>>>>>>> cm/cm-11.0
 		res = len;
 	}
 
@@ -288,10 +298,17 @@ int mpq_streambuffer_data_write_deposit(
 	if (NULL == sbuff)
 		return -EINVAL;
 
+<<<<<<< HEAD
 	if (unlikely(dvb_ringbuffer_free(&sbuff->raw_data) < len))
 		return -ENOSPC;
 
 	if (MPQ_STREAMBUFFER_BUFFER_MODE_RING == sbuff->mode) {
+=======
+	if (MPQ_STREAMBUFFER_BUFFER_MODE_RING == sbuff->mode) {
+		if (unlikely(dvb_ringbuffer_free(&sbuff->raw_data) < len))
+			return -ENOSPC;
+
+>>>>>>> cm/cm-11.0
 		DVB_RINGBUFFER_PUSH(&sbuff->raw_data, len);
 		wake_up_all(&sbuff->raw_data.queue);
 	} else {

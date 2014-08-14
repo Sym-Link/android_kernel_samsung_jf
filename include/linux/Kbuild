@@ -20,6 +20,10 @@ header-y += netfilter_ipv6/
 header-y += usb/
 header-y += wimax/
 header-y += mfd/
+<<<<<<< HEAD
+=======
+header-y += tima/
+>>>>>>> cm/cm-11.0
 
 objhdr-y += version.h
 
@@ -99,7 +103,10 @@ header-y += comstats.h
 header-y += connector.h
 header-y += const.h
 header-y += cramfs_fs.h
+<<<<<<< HEAD
 header-y += csdio.h
+=======
+>>>>>>> cm/cm-11.0
 header-y += cuda.h
 header-y += cyclades.h
 header-y += cycx_cfm.h
@@ -440,10 +447,18 @@ header-y += msm_audio_voicememo.h
 header-y += msm_audio_sbc.h
 header-y += msm_ipc.h
 header-y += msm_charm.h
+<<<<<<< HEAD
+=======
+header-y += msm_rmnet.h
+>>>>>>> cm/cm-11.0
 header-y += qseecom.h
 header-y += qcedev.h
 header-y += idle_stats_device.h
 header-y += genlock.h
 header-y += msm_audio_amrwb.h
 header-y += msm_audio_amrwbplus.h
+<<<<<<< HEAD
+=======
+header-y += coresight-stm.h
+>>>>>>> cm/cm-11.0
 header-y += avtimer.h

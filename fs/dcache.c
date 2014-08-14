@@ -1116,8 +1116,11 @@ positive:
 	return 1;
 
 rename_retry:
+<<<<<<< HEAD
 	if (locked)
 		goto again;
+=======
+>>>>>>> cm/cm-11.0
 	locked = 1;
 	write_seqlock(&rename_lock);
 	goto again;
@@ -1220,8 +1223,11 @@ out:
 rename_retry:
 	if (found)
 		return found;
+<<<<<<< HEAD
 	if (locked)
 		goto again;
+=======
+>>>>>>> cm/cm-11.0
 	locked = 1;
 	write_seqlock(&rename_lock);
 	goto again;
@@ -2967,8 +2973,11 @@ resume:
 	return;
 
 rename_retry:
+<<<<<<< HEAD
 	if (locked)
 		goto again;
+=======
+>>>>>>> cm/cm-11.0
 	locked = 1;
 	write_seqlock(&rename_lock);
 	goto again;

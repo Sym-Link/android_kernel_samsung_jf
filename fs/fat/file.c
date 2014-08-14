@@ -17,10 +17,17 @@
 #include <linux/blkdev.h>
 #include <linux/fsnotify.h>
 #include <linux/security.h>
+<<<<<<< HEAD
 #if defined(CONFIG_VMWARE_MVP)
 #include <linux/namei.h>
 #endif
 #include "fat.h"
+=======
+#include "fat.h"
+#if defined(CONFIG_VMWARE_MVP)
+#include <linux/namei.h>
+#endif
+>>>>>>> cm/cm-11.0
 
 static int fat_ioctl_get_attributes(struct inode *inode, u32 __user *user_attr)
 {
@@ -175,6 +182,10 @@ static long fat_vmw_extend(struct file *filp, unsigned long len)
 	return _fat_fallocate(inode, off);
 }
 #endif
+<<<<<<< HEAD
+=======
+
+>>>>>>> cm/cm-11.0
 long fat_generic_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	struct inode *inode = filp->f_path.dentry->d_inode;

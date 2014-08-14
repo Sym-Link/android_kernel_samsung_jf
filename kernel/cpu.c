@@ -19,6 +19,11 @@
 
 #include <trace/events/sched.h>
 
+<<<<<<< HEAD
+=======
+#include "smpboot.h"
+
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_SMP
 /* Serializes the updates to cpu_online_mask, cpu_present_mask */
 static DEFINE_MUTEX(cpu_add_remove_lock);
@@ -211,6 +216,11 @@ static int __ref take_cpu_down(void *_param)
 		return err;
 
 	cpu_notify(CPU_DYING | param->mod, param->hcpu);
+<<<<<<< HEAD
+=======
+	/* Park the stopper thread */
+	kthread_park(current);
+>>>>>>> cm/cm-11.0
 	return 0;
 }
 
@@ -241,12 +251,21 @@ static int __ref _cpu_down(unsigned int cpu, int tasks_frozen)
 				__func__, cpu);
 		goto out_release;
 	}
+<<<<<<< HEAD
+=======
+	smpboot_park_threads(cpu);
+>>>>>>> cm/cm-11.0
 
 	err = __stop_machine(take_cpu_down, &tcd_param, cpumask_of(cpu));
 	if (err) {
 		/* CPU didn't die: tell everyone.  Can't complain. */
+<<<<<<< HEAD
 		cpu_notify_nofail(CPU_DOWN_FAILED | mod, hcpu);
 
+=======
+		smpboot_unpark_threads(cpu);
+		cpu_notify_nofail(CPU_DOWN_FAILED | mod, hcpu);
+>>>>>>> cm/cm-11.0
 		goto out_release;
 	}
 	BUG_ON(cpu_online(cpu));
@@ -303,11 +322,29 @@ static int __cpuinit _cpu_up(unsigned int cpu, int tasks_frozen)
 	int ret, nr_calls = 0;
 	void *hcpu = (void *)(long)cpu;
 	unsigned long mod = tasks_frozen ? CPU_TASKS_FROZEN : 0;
+<<<<<<< HEAD
+=======
+	struct task_struct *idle;
+>>>>>>> cm/cm-11.0
 
 	if (cpu_online(cpu) || !cpu_present(cpu))
 		return -EINVAL;
 
 	cpu_hotplug_begin();
+<<<<<<< HEAD
+=======
+
+	idle = idle_thread_get(cpu);
+	if (IS_ERR(idle)) {
+		ret = PTR_ERR(idle);
+		goto out;
+	}
+
+	ret = smpboot_create_threads(cpu);
+	if (ret)
+		goto out;
+
+>>>>>>> cm/cm-11.0
 	ret = __cpu_notify(CPU_UP_PREPARE | mod, hcpu, -1, &nr_calls);
 	if (ret) {
 		nr_calls--;
@@ -322,12 +359,22 @@ static int __cpuinit _cpu_up(unsigned int cpu, int tasks_frozen)
 		goto out_notify;
 	BUG_ON(!cpu_online(cpu));
 
+<<<<<<< HEAD
+=======
+	/* Wake the per cpu threads */
+	smpboot_unpark_threads(cpu);
+
+>>>>>>> cm/cm-11.0
 	/* Now call notifier in preparation. */
 	cpu_notify(CPU_ONLINE | mod, hcpu);
 
 out_notify:
 	if (ret != 0)
 		__cpu_notify(CPU_UP_CANCELED | mod, hcpu, nr_calls, NULL);
+<<<<<<< HEAD
+=======
+out:
+>>>>>>> cm/cm-11.0
 	cpu_hotplug_done();
 	trace_sched_cpu_hotplug(cpu, ret, 1);
 

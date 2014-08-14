@@ -379,7 +379,11 @@ static void usb_wwan_indat_callback(struct urb *urb)
 		list_add_tail(&urb->urb_list, &portdata->in_urb_list);
 		spin_unlock_irqrestore(&portdata->in_lock, flags);
 
+<<<<<<< HEAD
 		schedule_work(&portdata->in_work);
+=======
+		queue_work(system_nrt_wq, &portdata->in_work);
+>>>>>>> cm/cm-11.0
 
 		return;
 	}
@@ -498,7 +502,11 @@ void usb_wwan_unthrottle(struct tty_struct *tty)
 	port->throttle_req = false;
 	port->throttled = false;
 
+<<<<<<< HEAD
 	schedule_work(&portdata->in_work);
+=======
+	queue_work(system_nrt_wq, &portdata->in_work);
+>>>>>>> cm/cm-11.0
 }
 EXPORT_SYMBOL(usb_wwan_unthrottle);
 

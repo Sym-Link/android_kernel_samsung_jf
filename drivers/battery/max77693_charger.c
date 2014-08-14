@@ -27,11 +27,14 @@
 #define SIOP_INPUT_LIMIT_CURRENT 1200
 #define SIOP_CHARGING_LIMIT_CURRENT 1000
 
+<<<<<<< HEAD
 #ifdef CONFIG_FORCE_FAST_CHARGE
  #include <linux/fastchg.h>
  #define USB_FASTCHG_LOAD 1000 /* uA */
  #endif 
  
+=======
+>>>>>>> cm/cm-11.0
 struct max77693_charger_data {
 	struct max77693_dev	*max77693;
 
@@ -268,9 +271,15 @@ static void max77693_set_input_current(struct max77693_charger_data *charger,
 				if ((chg_state != POWER_SUPPLY_STATUS_CHARGING) &&
 						(chg_state != POWER_SUPPLY_STATUS_FULL))
 					break;
+<<<<<<< HEAD
 				/* under 500mA, slow rate */
 				if (set_current_reg < (500 / 20) &&
 						(charger->cable_type == POWER_SUPPLY_TYPE_MAINS))
+=======
+				/* under 400mA, slow rate */
+				if (set_current_reg < (400 / 20) &&
+						(charger->cable_type != POWER_SUPPLY_TYPE_BATTERY))
+>>>>>>> cm/cm-11.0
 					charger->aicl_on = true;
 				else
 					charger->aicl_on = false;
@@ -324,9 +333,15 @@ static void max77693_set_input_current(struct max77693_charger_data *charger,
 					(chg_state != POWER_SUPPLY_STATUS_FULL))
 				goto exit;
 			if (curr_step < 2) {
+<<<<<<< HEAD
 				/* under 500mA, slow rate */
 				if (now_current_reg < (500 / 20) &&
 						(charger->cable_type == POWER_SUPPLY_TYPE_MAINS))
+=======
+				/* under 400mA, slow rate */
+				if (now_current_reg < (400 / 20) &&
+						(charger->cable_type != POWER_SUPPLY_TYPE_BATTERY))
+>>>>>>> cm/cm-11.0
 					charger->aicl_on = true;
 				else
 					charger->aicl_on = false;
@@ -607,24 +622,41 @@ static int max77693_get_charger_state(struct max77693_charger_data *charger)
 static int max77693_get_health_state(struct max77693_charger_data *charger)
 {
 	int state;
+<<<<<<< HEAD
 	int vbus_state;
 	int chg_state;
 	u8 reg_data;
+=======
+	u8 chg_dtls, reg_data, chg_cnfg_00;
+>>>>>>> cm/cm-11.0
 
 	max77693_read_reg(charger->max77693->i2c,
 		MAX77693_CHG_REG_CHG_DTLS_01, &reg_data);
 	reg_data = ((reg_data & MAX77693_BAT_DTLS) >> MAX77693_BAT_DTLS_SHIFT);
 
+<<<<<<< HEAD
+=======
+	pr_info("%s: reg_data(0x%x)\n", __func__, reg_data);
+>>>>>>> cm/cm-11.0
 	switch (reg_data) {
 	case 0x00:
 		pr_info("%s: No battery and the charger is suspended\n",
 			__func__);
+<<<<<<< HEAD
 		state = POWER_SUPPLY_HEALTH_UNKNOWN;
 		break;
 	case 0x01:
 		pr_info("%s: battery unspec failure\n",
 			__func__);
 		state = POWER_SUPPLY_HEALTH_UNSPEC_FAILURE;
+=======
+		state = POWER_SUPPLY_HEALTH_UNSPEC_FAILURE;
+		break;
+	case 0x01:
+		pr_info("%s: battery is okay "
+			"but its voltage is low(~VPQLB)\n", __func__);
+		state = POWER_SUPPLY_HEALTH_GOOD;
+>>>>>>> cm/cm-11.0
 		break;
 	case 0x02:
 		pr_info("%s: battery dead\n", __func__);
@@ -649,18 +681,48 @@ static int max77693_get_health_state(struct max77693_charger_data *charger)
 	}
 
 	if (state == POWER_SUPPLY_HEALTH_GOOD) {
+<<<<<<< HEAD
 		/* VBUS OVP state return battery OVP state */
 		vbus_state = max77693_get_vbus_state(charger);
 		/* read CHG_DTLS and detecting battery terminal error */
 		chg_state = max77693_get_charger_state(charger);
+=======
+		union power_supply_propval value;
+		int vbus_state;
+		psy_do_property("battery", get,
+				POWER_SUPPLY_PROP_HEALTH, value);
+		/* VBUS OVP state return battery OVP state */
+		vbus_state = max77693_get_vbus_state(charger);
+		/* read CHG_DTLS and detecting battery terminal error */
+		max77693_read_reg(charger->max77693->i2c,
+				MAX77693_CHG_REG_CHG_DTLS_01, &chg_dtls);
+		chg_dtls = ((chg_dtls & MAX77693_CHG_DTLS) >>
+				MAX77693_CHG_DTLS_SHIFT);
+		max77693_read_reg(charger->max77693->i2c,
+				MAX77693_CHG_REG_CHG_CNFG_00, &chg_cnfg_00);
+		pr_info("%s: vbus_state : 0x%d, chg_dtls : 0x%d\n", __func__, vbus_state, chg_dtls);
+>>>>>>> cm/cm-11.0
 		/*  OVP is higher priority */
 		if (vbus_state == 0x02) { /*  CHGIN_OVLO */
 			pr_info("%s: vbus ovp\n", __func__);
 			state = POWER_SUPPLY_HEALTH_OVERVOLTAGE;
+<<<<<<< HEAD
 		} else if (reg_data == 0x04 &&
 				chg_state == POWER_SUPPLY_STATUS_FULL) {
 			pr_info("%s: battery terminal error\n", __func__);
 			state = POWER_SUPPLY_HEALTH_UNDERVOLTAGE;
+=======
+		} else if (((vbus_state == 0x0) || (vbus_state == 0x01)) &&(chg_dtls & 0x08) && \
+				(chg_cnfg_00 & MAX77693_MODE_BUCK) && \
+				(chg_cnfg_00 & MAX77693_MODE_CHGR) && \
+				(charger->cable_type != POWER_SUPPLY_TYPE_WIRELESS)) {
+			pr_info("%s: vbus is under\n", __func__);
+			state = POWER_SUPPLY_HEALTH_UNDERVOLTAGE;
+		} else if((value.intval == POWER_SUPPLY_HEALTH_UNDERVOLTAGE) && \
+				!((vbus_state == 0x0) || (vbus_state == 0x01))){
+			max77693_set_input_current(charger,
+					charger->charging_current_max);
+>>>>>>> cm/cm-11.0
 		}
 	}
 
@@ -695,6 +757,7 @@ static int sec_chg_get_property(struct power_supply *psy,
 		val->intval = max77693_get_health_state(charger);
 		break;
 	case POWER_SUPPLY_PROP_CURRENT_MAX:
+<<<<<<< HEAD
 	  if (force_fast_charge == 1)
 	    charger->charging_current_max = USB_FASTCHG_LOAD;
 		val->intval = charger->charging_current_max;
@@ -702,6 +765,11 @@ static int sec_chg_get_property(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_CURRENT_AVG:
 	  if (force_fast_charge == 1)
  	    charger->charging_current = USB_FASTCHG_LOAD;
+=======
+		val->intval = charger->charging_current_max;
+		break;
+	case POWER_SUPPLY_PROP_CURRENT_AVG:
+>>>>>>> cm/cm-11.0
 		val->intval = charger->charging_current;
 		break;
 	case POWER_SUPPLY_PROP_CURRENT_NOW:
@@ -741,15 +809,23 @@ static int sec_chg_set_property(struct power_supply *psy,
 	const int wpc_charging_current = charger->pdata->charging_current[
 		POWER_SUPPLY_TYPE_WIRELESS].input_current_limit;
 
+<<<<<<< HEAD
 	/* check and unlock */
 	check_charger_unlock_state(charger);
 
+=======
+>>>>>>> cm/cm-11.0
 	switch (psp) {
 	case POWER_SUPPLY_PROP_STATUS:
 		charger->status = val->intval;
 		break;
 	/* val->intval : type */
 	case POWER_SUPPLY_PROP_ONLINE:
+<<<<<<< HEAD
+=======
+		/* check and unlock */
+		check_charger_unlock_state(charger);
+>>>>>>> cm/cm-11.0
 		charger->cable_type = val->intval;
 		psy_do_property("battery", get,
 				POWER_SUPPLY_PROP_HEALTH, value);
@@ -786,6 +862,7 @@ static int sec_chg_set_property(struct power_supply *psy,
 			if (set_charging_current > 0 &&
 					set_charging_current < usb_charging_current)
 				set_charging_current = usb_charging_current;
+<<<<<<< HEAD
 			      if (force_fast_charge == 1)
  			      {
  			        set_charging_current = USB_FASTCHG_LOAD * charger->siop_level / 100;
@@ -793,6 +870,8 @@ static int sec_chg_set_property(struct power_supply *psy,
  			        charger->charging_current_max = USB_FASTCHG_LOAD;
  			      }
 
+=======
+>>>>>>> cm/cm-11.0
 			if (val->intval == POWER_SUPPLY_TYPE_WIRELESS)
 				set_charging_current_max = wpc_charging_current;
 			else
@@ -805,7 +884,10 @@ static int sec_chg_set_property(struct power_supply *psy,
 				if (set_charging_current > SIOP_CHARGING_LIMIT_CURRENT)
 					set_charging_current = SIOP_CHARGING_LIMIT_CURRENT;
 			}
+<<<<<<< HEAD
 		  pr_alert("KTMAX77693-5-%d-%d",set_charging_current,set_charging_current_max);
+=======
+>>>>>>> cm/cm-11.0
 		}
 		max77693_set_charger_state(charger, charger->is_charging);
 		/* if battery full, only disable charging  */
@@ -831,6 +913,7 @@ static int sec_chg_set_property(struct power_supply *psy,
 		break;
 	/* val->intval : input charging current */
 	case POWER_SUPPLY_PROP_CURRENT_MAX:
+<<<<<<< HEAD
 	  if (force_fast_charge == 1)
             charger->charging_current_max = USB_FASTCHG_LOAD;
           else
@@ -844,21 +927,35 @@ static int sec_chg_set_property(struct power_supply *psy,
           else
             charger->charging_current = val->intval;
           pr_alert("KTMAX77693-7-%d",charger->charging_current);
+=======
+		charger->charging_current_max = val->intval;
+		break;
+	/*  val->intval : charging current */
+	case POWER_SUPPLY_PROP_CURRENT_AVG:
+		charger->charging_current = val->intval;
+>>>>>>> cm/cm-11.0
 		break;
 	case POWER_SUPPLY_PROP_CURRENT_NOW:
 		charger->siop_level = val->intval;
 		if (charger->is_charging) {
 			/* decrease the charging current according to siop level */
+<<<<<<< HEAD
 			int current_now;
  		        if (force_fast_charge == 1)
  		          charger->charging_current = USB_FASTCHG_LOAD;
  		        current_now = 
+=======
+			int current_now =
+>>>>>>> cm/cm-11.0
 				charger->charging_current * val->intval / 100;
 
 			if (current_now > 0 &&
 					current_now < usb_charging_current)
 				current_now = usb_charging_current;
+<<<<<<< HEAD
 				pr_alert("KTMAX77693-2-%d",current_now);
+=======
+>>>>>>> cm/cm-11.0
 
 			/* do forced set charging current */
 			if (charger->cable_type == POWER_SUPPLY_TYPE_MAINS) {
@@ -878,7 +975,10 @@ static int sec_chg_set_property(struct power_supply *psy,
 		}
 		break;
 	case POWER_SUPPLY_PROP_POWER_NOW:
+<<<<<<< HEAD
 	    pr_alert("KTMAX77693-3-%d",val->intval);
+=======
+>>>>>>> cm/cm-11.0
 		max77693_set_charge_current(charger,
 				val->intval);
 		max77693_set_input_current(charger,
@@ -1072,6 +1172,13 @@ static void wpc_detect_work(struct work_struct *work)
 	pr_debug("%s\n", __func__);
 	wake_unlock(&chg_data->wpc_wake_lock);
 
+<<<<<<< HEAD
+=======
+	reg_data = (0 << WCIN_SHIFT);
+	max77693_update_reg(chg_data->max77693->i2c, MAX77693_CHG_REG_CHG_INT_MASK, reg_data,
+			WCIN_MASK);
+
+>>>>>>> cm/cm-11.0
 	/* get status of cable*/
 	psy_do_property("battery", get,
 			POWER_SUPPLY_PROP_ONLINE, value);
@@ -1093,7 +1200,11 @@ static void wpc_detect_work(struct work_struct *work)
 				POWER_SUPPLY_PROP_ONLINE, value);
 		pr_info("%s: wpc activated, set V_INT as PN\n",
 				__func__);
+<<<<<<< HEAD
 	} else if ((chg_data->wc_w_state == 1) && (wc_w_state == 0)) {
+=======
+	} else if (wc_w_state == 0) {
+>>>>>>> cm/cm-11.0
 		if (!chg_data->is_charging)
 			max77693_set_charger_state(chg_data, true);
 		max77693_read_reg(chg_data->max77693->i2c,
@@ -1226,7 +1337,11 @@ static void max77693_chgin_isr_work(struct work_struct *work)
 {
 	struct max77693_charger_data *charger = container_of(work,
 				struct max77693_charger_data, chgin_work);
+<<<<<<< HEAD
 	u8 chgin_dtls, chg_dtls;
+=======
+	u8 chgin_dtls, chg_dtls, chg_cnfg_00;
+>>>>>>> cm/cm-11.0
 	u8 prev_chgin_dtls = 0xff;
 	int battery_health;
 	union power_supply_propval value;
@@ -1248,22 +1363,38 @@ static void max77693_chgin_isr_work(struct work_struct *work)
 				MAX77693_CHG_REG_CHG_DTLS_01, &chg_dtls);
 		chg_dtls = ((chg_dtls & MAX77693_CHG_DTLS) >>
 				MAX77693_CHG_DTLS_SHIFT);
+<<<<<<< HEAD
+=======
+		max77693_read_reg(charger->max77693->i2c,
+			MAX77693_CHG_REG_CHG_CNFG_00, &chg_cnfg_00);
+
+>>>>>>> cm/cm-11.0
 		if (prev_chgin_dtls == chgin_dtls)
 			stable_count++;
 		else
 			stable_count = 0;
 		if (stable_count > 10) {
+<<<<<<< HEAD
 			pr_info("%s: irq(%d), chgin(0x%x), prev 0x%x\n",
 					__func__, charger->irq_chgin,
 					chgin_dtls, prev_chgin_dtls);
 			if (charger->is_charging) {
 				if ((chgin_dtls == 0x02) && \
 					(battery_health == POWER_SUPPLY_HEALTH_GOOD)) {
+=======
+			pr_info("%s: irq(%d), chgin(0x%x), chg_dtls(0x%x) prev 0x%x\n",
+					__func__, charger->irq_chgin,
+					chgin_dtls, chg_dtls, prev_chgin_dtls);
+			if (charger->is_charging) {
+				if ((chgin_dtls == 0x02) && \
+					(battery_health != POWER_SUPPLY_HEALTH_OVERVOLTAGE)) {
+>>>>>>> cm/cm-11.0
 					pr_info("%s: charger is over voltage\n",
 							__func__);
 					value.intval = POWER_SUPPLY_HEALTH_OVERVOLTAGE;
 					psy_do_property("battery", set,
 						POWER_SUPPLY_PROP_HEALTH, value);
+<<<<<<< HEAD
 				} else if ((battery_health == \
 						POWER_SUPPLY_HEALTH_OVERVOLTAGE) &&
 						(chgin_dtls != 0x02)) {
@@ -1271,6 +1402,36 @@ static void max77693_chgin_isr_work(struct work_struct *work)
 					value.intval = POWER_SUPPLY_HEALTH_GOOD;
 					psy_do_property("battery", set,
 						POWER_SUPPLY_PROP_HEALTH, value);
+=======
+				} else if (((chgin_dtls == 0x0) || (chgin_dtls == 0x01)) &&(chg_dtls & 0x08) && \
+						(chg_cnfg_00 & MAX77693_MODE_BUCK) && \
+						(chg_cnfg_00 & MAX77693_MODE_CHGR) && \
+						(battery_health != POWER_SUPPLY_HEALTH_UNDERVOLTAGE) && \
+						(charger->cable_type != POWER_SUPPLY_TYPE_WIRELESS)) {
+					pr_info("%s, vbus_state : 0x%d, chg_state : 0x%d\n", __func__, chgin_dtls, chg_dtls);
+					pr_info("%s: vBus is undervoltage\n", __func__);
+					value.intval = POWER_SUPPLY_HEALTH_UNDERVOLTAGE;
+					psy_do_property("battery", set,
+							POWER_SUPPLY_PROP_HEALTH, value);
+				} else if ((battery_health == \
+							POWER_SUPPLY_HEALTH_OVERVOLTAGE) &&
+						(chgin_dtls != 0x02)) {
+					pr_info("%s: vbus_state : 0x%d, chg_state : 0x%d\n", __func__, chgin_dtls, chg_dtls);
+					pr_info("%s: overvoltage->normal\n", __func__);
+					value.intval = POWER_SUPPLY_HEALTH_GOOD;
+					psy_do_property("battery", set,
+							POWER_SUPPLY_PROP_HEALTH, value);
+				} else if ((battery_health == \
+							POWER_SUPPLY_HEALTH_UNDERVOLTAGE) &&
+						!((chgin_dtls == 0x0) || (chgin_dtls == 0x01))){
+					pr_info("%s: vbus_state : 0x%d, chg_state : 0x%d\n", __func__, chgin_dtls, chg_dtls);
+					pr_info("%s: undervoltage->normal\n", __func__);
+					value.intval = POWER_SUPPLY_HEALTH_GOOD;
+					psy_do_property("battery", set,
+							POWER_SUPPLY_PROP_HEALTH, value);
+					max77693_set_input_current(charger,
+							charger->charging_current_max);
+>>>>>>> cm/cm-11.0
 				}
 			}
 			break;
@@ -1319,7 +1480,13 @@ static __devinit int max77693_charger_probe(struct platform_device *pdev)
 	struct max77693_platform_data *pdata = dev_get_platdata(iodev->dev);
 	struct max77693_charger_data *charger;
 	int ret = 0;
+<<<<<<< HEAD
 	u8 reg_data;
+=======
+#if defined(CONFIG_CHARGER_MAX77803) || defined(CONFIG_MACH_JF)
+	u8 reg_data;
+#endif
+>>>>>>> cm/cm-11.0
 
 	pr_info("%s: MAX77693 Charger driver probe\n", __func__);
 
@@ -1363,9 +1530,19 @@ static __devinit int max77693_charger_probe(struct platform_device *pdev)
 	wake_lock_init(&charger->recovery_wake_lock, WAKE_LOCK_SUSPEND,
 					       "charger-recovery");
 	INIT_DELAYED_WORK(&charger->recovery_work, max77693_recovery_work);
+<<<<<<< HEAD
 	wake_lock_init(&charger->wpc_wake_lock, WAKE_LOCK_SUSPEND,
 					       "charger-wpc");
 	INIT_DELAYED_WORK(&charger->wpc_work, wpc_detect_work);
+=======
+
+#if defined(CONFIG_CHARGER_MAX77803) || defined(CONFIG_MACH_JF)
+	wake_lock_init(&charger->wpc_wake_lock, WAKE_LOCK_SUSPEND,
+					       "charger-wpc");
+	INIT_DELAYED_WORK(&charger->wpc_work, wpc_detect_work);
+#endif
+
+>>>>>>> cm/cm-11.0
 	ret = power_supply_register(&pdev->dev, &charger->psy_chg);
 	if (ret) {
 		pr_err("%s: Failed to Register psy_chg\n", __func__);
@@ -1388,8 +1565,16 @@ static __devinit int max77693_charger_probe(struct platform_device *pdev)
 	charger->wc_w_irq = pdata->irq_base + MAX77693_CHG_IRQ_WCIN_I;
 	ret = request_threaded_irq(charger->wc_w_irq,
 			NULL, wpc_charger_irq,
+<<<<<<< HEAD
 			IRQF_TRIGGER_FALLING,
 			"wpc-int", charger);
+=======
+#if defined(CONFIG_MACH_JF)
+			IRQF_TRIGGER_FALLING,"wpc-int", charger);
+#else
+			0, "wpc-int", charger);
+#endif
+>>>>>>> cm/cm-11.0
 	if (ret) {
 		pr_err("%s: Failed to Reqeust IRQ\n", __func__);
 		goto err_wc_irq;
@@ -1434,8 +1619,18 @@ static __devinit int max77693_charger_probe(struct platform_device *pdev)
 		pr_err("%s: fail to request bypass IRQ: %d: %d\n",
 				__func__, charger->irq_bypass, ret);
 	return 0;
+<<<<<<< HEAD
 err_wc_irq:
 	free_irq(charger->pdata->chg_irq, NULL);
+=======
+
+#if defined(CONFIG_WIRELESS_CHARGING) ||\
+	defined(CONFIG_CHARGER_MAX77803) ||\
+	defined(CONFIG_MACH_JF)
+err_wc_irq:
+	free_irq(charger->pdata->chg_irq, NULL);
+#endif
+>>>>>>> cm/cm-11.0
 err_irq:
 	power_supply_unregister(&charger->psy_chg);
 err_power_supply_register:

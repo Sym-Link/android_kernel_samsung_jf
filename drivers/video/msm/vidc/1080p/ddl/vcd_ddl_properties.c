@@ -536,7 +536,10 @@ static u32 ddl_set_dec_property(struct ddl_client_context *ddl,
 	}
 	break;
 	case VCD_REQ_PERF_LEVEL:
+<<<<<<< HEAD
 		DDL_MSG_LOW("%s: VCD_REQ_PERF_LEVEL (do nithing)", __func__);
+=======
+>>>>>>> cm/cm-11.0
 		vcd_status = VCD_S_SUCCESS;
 		break;
 	default:
@@ -1181,7 +1184,10 @@ static u32 ddl_set_enc_property(struct ddl_client_context *ddl,
 		}
 	break;
 	case VCD_REQ_PERF_LEVEL:
+<<<<<<< HEAD
 		DDL_MSG_LOW("%s: VCD_REQ_PERF_LEVEL (do nithing)", __func__);
+=======
+>>>>>>> cm/cm-11.0
 		vcd_status = VCD_S_SUCCESS;
 		break;
 	case VCD_I_ENABLE_DELIMITER_FLAG:
@@ -2133,7 +2139,11 @@ static void ddl_set_default_enc_rc_params(
 	encoder->rc_level.frame_level_rc = true;
 	encoder->qp_range.min_qp = 0x1;
 	if (codec == VCD_CODEC_H264) {
+<<<<<<< HEAD
 		encoder->qp_range.min_qp = 0x2;
+=======
+		encoder->qp_range.min_qp = 0x1;
+>>>>>>> cm/cm-11.0
 		encoder->qp_range.max_qp = 0x33;
 		encoder->session_qp.i_frame_qp = 0x14;
 		encoder->session_qp.p_frame_qp = 0x14;
@@ -2143,6 +2153,7 @@ static void ddl_set_default_enc_rc_params(
 		encoder->adaptive_rc.disable_dark_region_as_flag = true;
 		encoder->adaptive_rc.disable_smooth_region_as_flag = true;
 		encoder->adaptive_rc.disable_static_region_as_flag = true;
+<<<<<<< HEAD
 	} else if (codec == VCD_CODEC_MPEG4) {
 		encoder->qp_range.max_qp       = 0x1f;
 		encoder->qp_range.min_qp       = 0x1;
@@ -2157,6 +2168,14 @@ static void ddl_set_default_enc_rc_params(
 		encoder->session_qp.i_frame_qp = 0x9;
 		encoder->session_qp.p_frame_qp = 0x9;
 		encoder->session_qp.b_frame_qp = 0x9;
+=======
+	} else {
+		encoder->qp_range.max_qp       = 0x1f;
+		encoder->qp_range.min_qp       = 0x1;
+		encoder->session_qp.i_frame_qp = 0xd;
+		encoder->session_qp.p_frame_qp = 0xd;
+		encoder->session_qp.b_frame_qp = 0xd;
+>>>>>>> cm/cm-11.0
 		encoder->rc_level.frame_level_rc = true;
 		encoder->rc_level.mb_level_rc  = false;
 	}
@@ -2227,6 +2246,11 @@ void ddl_set_default_encoder_buffer_req(struct ddl_encoder_data *encoder)
 		encoder->output_buf_req.min_count + 3;
 	encoder->output_buf_req.max_count    = DDL_MAX_BUFFER_COUNT;
 	encoder->output_buf_req.align	= DDL_LINEAR_BUFFER_ALIGN_BYTES;
+<<<<<<< HEAD
+=======
+	if (y_cb_cr_size >= VCD_DDL_720P_YUV_BUF_SIZE)
+		y_cb_cr_size = y_cb_cr_size>>1;
+>>>>>>> cm/cm-11.0
 	encoder->output_buf_req.sz =
 		DDL_ALIGN(y_cb_cr_size, DDL_KILO_BYTE(4));
 	ddl_set_default_encoder_metadata_buffer_size(encoder);
@@ -2273,10 +2297,16 @@ u32 ddl_set_default_decoder_buffer_req(struct ddl_decoder_data *decoder,
 			min_dpb = res_trk_get_min_dpb_count();
 			min_dpb_from_res_trk = 1;
 			if (min_dpb < decoder->min_dpb_num) {
+<<<<<<< HEAD
 				DDL_MSG_HIGH("Warning: cont_mode dpb count"\
 					"(%u) is less than decoder min dpb count(%u)",
 					min_dpb, decoder->min_dpb_num);
 				min_dpb = decoder->min_dpb_num;
+=======
+				DDL_MSG_INFO("Warning: cont_mode dpb count"\
+					"(%u) is less than decoder min dpb count(%u)",
+					min_dpb, decoder->min_dpb_num);
+>>>>>>> cm/cm-11.0
 			}
 		}
 		if ((decoder->buf_format.buffer_format ==

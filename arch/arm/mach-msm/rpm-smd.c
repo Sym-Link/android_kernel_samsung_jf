@@ -35,8 +35,14 @@
 #include <mach/socinfo.h>
 #include <mach/msm_smd.h>
 #include <mach/rpm-smd.h>
+<<<<<<< HEAD
 #include "rpm-notifier.h"
 
+=======
+#define CREATE_TRACE_POINTS
+#include <mach/trace_rpm_smd.h>
+#include "rpm-notifier.h"
+>>>>>>> cm/cm-11.0
 /* Debug Definitions */
 
 enum {
@@ -987,8 +993,12 @@ static int __devinit msm_rpm_dev_probe(struct platform_device *pdev)
 	smd_disable_read_intr(msm_rpm_data.ch_info);
 
 	if (!standalone) {
+<<<<<<< HEAD
 		msm_rpm_smd_wq = alloc_workqueue("rpm-smd",
 				WQ_UNBOUND | WQ_MEM_RECLAIM | WQ_HIGHPRI, 1);
+=======
+		msm_rpm_smd_wq = create_singlethread_workqueue("rpm-smd");
+>>>>>>> cm/cm-11.0
 		if (!msm_rpm_smd_wq)
 			return -EINVAL;
 	}

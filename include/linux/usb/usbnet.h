@@ -131,6 +131,12 @@ struct driver_info {
 	/* link reset handling, called from defer_kevent */
 	int	(*link_reset)(struct usbnet *);
 
+<<<<<<< HEAD
+=======
+	/*in case if usbnet wrapper wants to override rx_complete()*/
+	void (*rx_complete) (struct urb *);
+
+>>>>>>> cm/cm-11.0
 	/* fixup rx packet (strip framing) */
 	int	(*rx_fixup)(struct usbnet *dev, struct sk_buff *skb);
 
@@ -228,5 +234,10 @@ extern u32 usbnet_get_msglevel(struct net_device *);
 extern void usbnet_set_msglevel(struct net_device *, u32);
 extern void usbnet_get_drvinfo(struct net_device *, struct ethtool_drvinfo *);
 extern int usbnet_nway_reset(struct net_device *net);
+<<<<<<< HEAD
+=======
+extern void usbnet_terminate_urbs(struct usbnet *dev);
+extern void rx_complete(struct urb *urb);
+>>>>>>> cm/cm-11.0
 
 #endif /* __LINUX_USB_USBNET_H */

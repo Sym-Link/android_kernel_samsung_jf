@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 /*
  * Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -31,6 +35,12 @@
 #define DRIVER_DESC	"USB host diag bridge driver"
 #define DRIVER_VERSION	"1.0"
 
+<<<<<<< HEAD
+=======
+#define MAX_DIAG_BRIDGE_DEVS	2
+#define AUTOSUSP_DELAY_WITH_USB 1000
+
+>>>>>>> cm/cm-11.0
 struct diag_bridge {
 	struct usb_device	*udev;
 	struct usb_interface	*ifc;
@@ -42,12 +52,17 @@ struct diag_bridge {
 	struct mutex		ifc_mutex;
 	struct diag_bridge_ops	*ops;
 	struct platform_device	*pdev;
+<<<<<<< HEAD
+=======
+	int			id;
+>>>>>>> cm/cm-11.0
 
 	/* debugging counters */
 	unsigned long		bytes_to_host;
 	unsigned long		bytes_to_mdm;
 	unsigned		pending_reads;
 	unsigned		pending_writes;
+<<<<<<< HEAD
 
 	atomic_t pmlock_cnt;
 };
@@ -87,6 +102,21 @@ int diag_bridge_open(struct diag_bridge_ops *ops)
 {
 	struct diag_bridge	*dev = __dev;
 
+=======
+};
+struct diag_bridge *__dev[MAX_DIAG_BRIDGE_DEVS];
+
+int diag_bridge_open(int id, struct diag_bridge_ops *ops)
+{
+	struct diag_bridge	*dev;
+
+	if (id < 0 || id >= MAX_DIAG_BRIDGE_DEVS) {
+		pr_err("Invalid device ID");
+		return -ENODEV;
+	}
+
+	dev = __dev[id];
+>>>>>>> cm/cm-11.0
 	if (!dev) {
 		pr_err("dev is null");
 		return -ENODEV;
@@ -109,6 +139,7 @@ EXPORT_SYMBOL(diag_bridge_open);
 static void diag_bridge_delete(struct kref *kref)
 {
 	struct diag_bridge *dev = container_of(kref, struct diag_bridge, kref);
+<<<<<<< HEAD
 
 	usb_put_dev(dev->udev);
 	__dev = 0;
@@ -119,6 +150,25 @@ void diag_bridge_close(void)
 {
 	struct diag_bridge	*dev = __dev;
 
+=======
+	int id = dev->id;
+
+	usb_put_dev(dev->udev);
+	__dev[id] = 0;
+	kfree(dev);
+}
+
+void diag_bridge_close(int id)
+{
+	struct diag_bridge	*dev;
+
+	if (id < 0 || id >= MAX_DIAG_BRIDGE_DEVS) {
+		pr_err("Invalid device ID");
+		return;
+	}
+
+	dev = __dev[id];
+>>>>>>> cm/cm-11.0
 	if (!dev) {
 		pr_err("dev is null");
 		return;
@@ -160,6 +210,7 @@ static void diag_bridge_read_cb(struct urb *urb)
 	kref_put(&dev->kref, diag_bridge_delete);
 }
 
+<<<<<<< HEAD
 int diag_bridge_read(char *data, int size)
 {
 	struct urb		*urb = NULL;
@@ -169,6 +220,23 @@ int diag_bridge_read(char *data, int size)
 
 	pr_debug("reading %d bytes", size);
 
+=======
+int diag_bridge_read(int id, char *data, int size)
+{
+	struct urb		*urb = NULL;
+	unsigned int		pipe;
+	struct diag_bridge	*dev;
+	int			ret;
+
+	if (id < 0 || id >= MAX_DIAG_BRIDGE_DEVS) {
+		pr_err("Invalid device ID");
+		return -ENODEV;
+	}
+
+	pr_debug("reading %d bytes", size);
+
+	dev = __dev[id];
+>>>>>>> cm/cm-11.0
 	if (!dev) {
 		pr_err("device is disconnected");
 		return -ENODEV;
@@ -262,6 +330,7 @@ static void diag_bridge_write_cb(struct urb *urb)
 	kref_put(&dev->kref, diag_bridge_delete);
 }
 
+<<<<<<< HEAD
 int diag_bridge_write(char *data, int size)
 {
 	struct urb		*urb = NULL;
@@ -271,6 +340,23 @@ int diag_bridge_write(char *data, int size)
 
 	pr_debug("writing %d bytes", size);
 
+=======
+int diag_bridge_write(int id, char *data, int size)
+{
+	struct urb		*urb = NULL;
+	unsigned int		pipe;
+	struct diag_bridge	*dev;
+	int			ret;
+
+	if (id < 0 || id >= MAX_DIAG_BRIDGE_DEVS) {
+		pr_err("Invalid device ID");
+		return -ENODEV;
+	}
+
+	pr_debug("writing %d bytes", size);
+
+	dev = __dev[id];
+>>>>>>> cm/cm-11.0
 	if (!dev) {
 		pr_err("device is disconnected");
 		return -ENODEV;
@@ -347,17 +433,23 @@ EXPORT_SYMBOL(diag_bridge_write);
 static ssize_t diag_read_stats(struct file *file, char __user *ubuf,
 				size_t count, loff_t *ppos)
 {
+<<<<<<< HEAD
 	struct diag_bridge	*dev = __dev;
 	char			*buf;
 	int			ret;
 
 	if (!dev)
 		return -ENODEV;
+=======
+	char			*buf;
+	int			i, ret = 0;
+>>>>>>> cm/cm-11.0
 
 	buf = kzalloc(sizeof(char) * DEBUG_BUF_SIZE, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
 
+<<<<<<< HEAD
 	ret = scnprintf(buf, DEBUG_BUF_SIZE,
 			"epin:%d, epout:%d\n"
 			"bytes to host: %lu\n"
@@ -369,6 +461,25 @@ static ssize_t diag_read_stats(struct file *file, char __user *ubuf,
 			dev->bytes_to_host, dev->bytes_to_mdm,
 			dev->pending_reads, dev->pending_writes,
 			dev->err);
+=======
+	for (i = 0; i < MAX_DIAG_BRIDGE_DEVS; i++) {
+		struct diag_bridge *dev = __dev[i];
+		if (!dev)
+			continue;
+
+		ret += scnprintf(buf, DEBUG_BUF_SIZE,
+				"epin:%d, epout:%d\n"
+				"bytes to host: %lu\n"
+				"bytes to mdm: %lu\n"
+				"pending reads: %u\n"
+				"pending writes: %u\n"
+				"last error: %d\n",
+				dev->in_epAddr, dev->out_epAddr,
+				dev->bytes_to_host, dev->bytes_to_mdm,
+				dev->pending_reads, dev->pending_writes,
+				dev->err);
+	}
+>>>>>>> cm/cm-11.0
 
 	ret = simple_read_from_buffer(ubuf, count, ppos, buf, ret);
 	kfree(buf);
@@ -378,11 +489,22 @@ static ssize_t diag_read_stats(struct file *file, char __user *ubuf,
 static ssize_t diag_reset_stats(struct file *file, const char __user *buf,
 				 size_t count, loff_t *ppos)
 {
+<<<<<<< HEAD
 	struct diag_bridge	*dev = __dev;
 
 	if (dev) {
 		dev->bytes_to_host = dev->bytes_to_mdm = 0;
 		dev->pending_reads = dev->pending_writes = 0;
+=======
+	int i;
+
+	for (i = 0; i < MAX_DIAG_BRIDGE_DEVS; i++) {
+		struct diag_bridge *dev = __dev[i];
+		if (dev) {
+			dev->bytes_to_host = dev->bytes_to_mdm = 0;
+			dev->pending_reads = dev->pending_writes = 0;
+		}
+>>>>>>> cm/cm-11.0
 	}
 
 	return count;
@@ -426,8 +548,12 @@ diag_bridge_probe(struct usb_interface *ifc, const struct usb_device_id *id)
 	struct diag_bridge		*dev;
 	struct usb_host_interface	*ifc_desc;
 	struct usb_endpoint_descriptor	*ep_desc;
+<<<<<<< HEAD
 	int				i;
 	int				ret = -ENOMEM;
+=======
+	int				i, devid, ret = -ENOMEM;
+>>>>>>> cm/cm-11.0
 	__u8				ifc_num;
 
 	pr_debug("id:%lu", id->driver_info);
@@ -435,21 +561,46 @@ diag_bridge_probe(struct usb_interface *ifc, const struct usb_device_id *id)
 	ifc_num = ifc->cur_altsetting->desc.bInterfaceNumber;
 
 	/* is this interface supported ? */
+<<<<<<< HEAD
 	if (ifc_num != id->driver_info)
 		return -ENODEV;
 
+=======
+	if (ifc_num != (id->driver_info & 0xFF))
+		return -ENODEV;
+
+	devid = (id->driver_info >> 8) & 0xFF;
+	if (devid < 0 || devid >= MAX_DIAG_BRIDGE_DEVS)
+		return -ENODEV;
+
+	/* already probed? */
+	if (__dev[devid]) {
+		pr_err("Diag device already probed");
+		return -ENODEV;
+	}
+
+>>>>>>> cm/cm-11.0
 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
 	if (!dev) {
 		pr_err("unable to allocate dev");
 		return -ENOMEM;
 	}
+<<<<<<< HEAD
 	dev->pdev = platform_device_alloc("diag_bridge", -1);
+=======
+	dev->pdev = platform_device_alloc("diag_bridge", devid);
+>>>>>>> cm/cm-11.0
 	if (!dev->pdev) {
 		pr_err("unable to allocate platform device");
 		kfree(dev);
 		return -ENOMEM;
 	}
+<<<<<<< HEAD
 	__dev = dev;
+=======
+	__dev[devid] = dev;
+	dev->id = devid;
+>>>>>>> cm/cm-11.0
 
 	dev->udev = usb_get_dev(interface_to_usbdev(ifc));
 	dev->ifc = ifc;
@@ -478,8 +629,11 @@ diag_bridge_probe(struct usb_interface *ifc, const struct usb_device_id *id)
 	diag_bridge_debugfs_init();
 	platform_device_add(dev->pdev);
 
+<<<<<<< HEAD
 	atomic_set(&dev->pmlock_cnt, 0);
 
+=======
+>>>>>>> cm/cm-11.0
 	dev_dbg(&dev->ifc->dev, "%s: complete\n", __func__);
 
 	return 0;
@@ -539,6 +693,7 @@ static int diag_bridge_resume(struct usb_interface *ifc)
 }
 
 #define VALID_INTERFACE_NUM	0
+<<<<<<< HEAD
 static const struct usb_device_id diag_bridge_ids[] = {
 	{ USB_DEVICE(0x5c6, 0x9001),
 	.driver_info = VALID_INTERFACE_NUM, },
@@ -548,6 +703,25 @@ static const struct usb_device_id diag_bridge_ids[] = {
 	.driver_info = VALID_INTERFACE_NUM, },
 	{ USB_DEVICE(0x5c6, 0x904C),
 	.driver_info = VALID_INTERFACE_NUM, },
+=======
+#define DEV_ID(n)		((n)<<8)
+
+static const struct usb_device_id diag_bridge_ids[] = {
+	{ USB_DEVICE(0x5c6, 0x9001),
+	.driver_info = VALID_INTERFACE_NUM | DEV_ID(0), },
+	{ USB_DEVICE(0x5c6, 0x9034),
+	.driver_info = VALID_INTERFACE_NUM | DEV_ID(0), },
+	{ USB_DEVICE(0x5c6, 0x9048),
+	.driver_info = VALID_INTERFACE_NUM | DEV_ID(0), },
+	{ USB_DEVICE(0x5c6, 0x904C),
+	.driver_info = VALID_INTERFACE_NUM | DEV_ID(0), },
+	{ USB_DEVICE(0x5c6, 0x9075),
+	.driver_info = VALID_INTERFACE_NUM | DEV_ID(0), },
+	{ USB_DEVICE(0x5c6, 0x9079),
+	.driver_info = VALID_INTERFACE_NUM | DEV_ID(1), },
+	{ USB_DEVICE(0x5c6, 0x908A),
+	.driver_info = VALID_INTERFACE_NUM | DEV_ID(0), },
+>>>>>>> cm/cm-11.0
 
 	{} /* terminating entry */
 };

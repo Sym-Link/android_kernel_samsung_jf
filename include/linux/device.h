@@ -35,7 +35,10 @@ struct subsys_private;
 struct bus_type;
 struct device_node;
 struct iommu_ops;
+<<<<<<< HEAD
 struct iommu_group;
+=======
+>>>>>>> cm/cm-11.0
 
 struct bus_attribute {
 	struct attribute	attr;
@@ -687,7 +690,10 @@ struct device {
 	const struct attribute_group **groups;	/* optional groups */
 
 	void	(*release)(struct device *dev);
+<<<<<<< HEAD
 	struct iommu_group	*iommu_group;
+=======
+>>>>>>> cm/cm-11.0
 };
 
 /* Get the wakeup routines, which depend on struct device */

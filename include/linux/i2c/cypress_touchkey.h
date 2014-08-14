@@ -13,6 +13,10 @@
 #define __LINUX_CYPRESS_TOUCHKEY_H
 extern struct class *sec_class;
 extern int ISSP_main(void);
+<<<<<<< HEAD
+=======
+extern int get_lcd_attached(void);
+>>>>>>> cm/cm-11.0
 
 /* DVFS feature : TOUCH BOOSTER */
 #ifdef CONFIG_SEC_DVFS_BOOSTER

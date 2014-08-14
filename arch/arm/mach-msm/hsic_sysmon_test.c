@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -15,6 +19,10 @@
 
 #include <linux/slab.h>
 #include <linux/kernel.h>
+<<<<<<< HEAD
+=======
+#include <linux/module.h>
+>>>>>>> cm/cm-11.0
 #include <linux/device.h>
 #include <linux/debugfs.h>
 #include <linux/uaccess.h>
@@ -36,13 +44,22 @@ static ssize_t sysmon_test_read(struct file *file, char __user *ubuf,
 				 size_t count, loff_t *ppos)
 {
 	struct sysmon_test_dev *dev = sysmon_dev;
+<<<<<<< HEAD
+=======
+	enum hsic_sysmon_device_id id =
+				(enum hsic_sysmon_device_id)file->private_data;
+>>>>>>> cm/cm-11.0
 	int ret;
 
 	if (!dev)
 		return -ENODEV;
 
+<<<<<<< HEAD
 	ret = hsic_sysmon_read(HSIC_SYSMON_DEV_EXT_MODEM, dev->buf, RD_BUF_SIZE,
 				&dev->buflen, 3000);
+=======
+	ret = hsic_sysmon_read(id, dev->buf, RD_BUF_SIZE, &dev->buflen, 3000);
+>>>>>>> cm/cm-11.0
 	if (!ret)
 		return simple_read_from_buffer(ubuf, count, ppos,
 					dev->buf, dev->buflen);
@@ -53,7 +70,13 @@ static ssize_t sysmon_test_read(struct file *file, char __user *ubuf,
 static ssize_t sysmon_test_write(struct file *file, const char __user *ubuf,
 				 size_t count, loff_t *ppos)
 {
+<<<<<<< HEAD
 	struct sysmon_test_dev	*dev = sysmon_dev;
+=======
+	struct sysmon_test_dev *dev = sysmon_dev;
+	enum hsic_sysmon_device_id id =
+				(enum hsic_sysmon_device_id)file->private_data;
+>>>>>>> cm/cm-11.0
 	int ret;
 
 	if (!dev)
@@ -64,8 +87,12 @@ static ssize_t sysmon_test_write(struct file *file, const char __user *ubuf,
 		return 0;
 	}
 
+<<<<<<< HEAD
 	ret = hsic_sysmon_write(HSIC_SYSMON_DEV_EXT_MODEM,
 				dev->buf, count, 1000);
+=======
+	ret = hsic_sysmon_write(id, dev->buf, count, 1000);
+>>>>>>> cm/cm-11.0
 	if (ret < 0) {
 		pr_err("error writing to hsic_sysmon");
 		return ret;
@@ -76,38 +103,70 @@ static ssize_t sysmon_test_write(struct file *file, const char __user *ubuf,
 
 static int sysmon_test_open(struct inode *inode, struct file *file)
 {
+<<<<<<< HEAD
 	return hsic_sysmon_open(HSIC_SYSMON_DEV_EXT_MODEM);
+=======
+	file->private_data = inode->i_private;
+	return hsic_sysmon_open((enum hsic_sysmon_device_id)inode->i_private);
+>>>>>>> cm/cm-11.0
 }
 
 static int sysmon_test_release(struct inode *inode, struct file *file)
 {
+<<<<<<< HEAD
 	hsic_sysmon_close(HSIC_SYSMON_DEV_EXT_MODEM);
 	return 0;
 }
 
 static struct dentry *dfile;
 const struct file_operations sysmon_test_ops = {
+=======
+	hsic_sysmon_close((enum hsic_sysmon_device_id)inode->i_private);
+	return 0;
+}
+
+static const struct file_operations sysmon_test_ops = {
+>>>>>>> cm/cm-11.0
 	.read = sysmon_test_read,
 	.write = sysmon_test_write,
 	.open = sysmon_test_open,
 	.release = sysmon_test_release
 };
 
+<<<<<<< HEAD
+=======
+static struct dentry *dfile0, *dfile1;
+
+>>>>>>> cm/cm-11.0
 static int __init sysmon_test_init(void)
 {
 	sysmon_dev = kzalloc(sizeof(*sysmon_dev), GFP_KERNEL);
 	if (!sysmon_dev)
 		return -ENOMEM;
 
+<<<<<<< HEAD
 	dfile = debugfs_create_file("hsic_sysmon_test", 0666, NULL,
 			0, &sysmon_test_ops);
+=======
+	dfile0 = debugfs_create_file("hsic_sysmon_test.0", 0666, NULL,
+			(void *)HSIC_SYSMON_DEV_EXT_MODEM, &sysmon_test_ops);
+	dfile1 = debugfs_create_file("hsic_sysmon_test.1", 0666, NULL,
+			(void *)HSIC_SYSMON_DEV_EXT_MODEM_2, &sysmon_test_ops);
+>>>>>>> cm/cm-11.0
 	return 0;
 }
 
 static void __exit sysmon_test_exit(void)
 {
+<<<<<<< HEAD
 	if (dfile)
 		debugfs_remove(dfile);
+=======
+	if (dfile0)
+		debugfs_remove(dfile0);
+	if (dfile1)
+		debugfs_remove(dfile1);
+>>>>>>> cm/cm-11.0
 	kfree(sysmon_dev);
 }
 

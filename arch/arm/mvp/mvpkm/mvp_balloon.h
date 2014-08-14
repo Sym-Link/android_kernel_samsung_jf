@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -45,6 +49,7 @@
 #define BALLOON_WATCHDOG_TIMEOUT_SECS 90
 
 /**
+<<<<<<< HEAD
  * @brief MVP_BALLOON_GET_DELTA return.
  */
 typedef union {
@@ -52,6 +57,21 @@ typedef union {
       int32 delta      : 21; ///< Number/direction balloon adjustment in pages.
    };
    uint32 u;
+=======
+ * @brief Threshold to distinguish an oom_score_adj from an oom_adj value.
+ */
+#define USE_OOM_SCORE_ADJ_THRESHOLD 50
+
+/**
+ * @brief MVP_BALLOON_GET_DELTA return.
+ */
+typedef union {
+	struct {
+		/**< Number/direction balloon adjustment in pages. */
+		int32 delta:21;
+	};
+	uint32 u;
+>>>>>>> cm/cm-11.0
 } Balloon_GetDeltaRet;
 
 /**
@@ -62,6 +82,7 @@ typedef union {
  */
 
 /**
+<<<<<<< HEAD
  * @brief Android oom_adj levels for the various thresholds.
  */
 typedef enum {
@@ -90,6 +111,38 @@ typedef enum {
 } Balloon_AndroidGuestMinFreePages;
 
 /* @} */
+=======
+ * @brief Android low memory killer thresholds (in pages).
+ */
+typedef enum {
+	BALLOON_ANDROID_GUEST_MIN_FREE_FOREGROUND_APP_PAGES = 1536,
+	BALLOON_ANDROID_GUEST_MIN_FREE_VISIBLE_APP_PAGES = 2048,
+	BALLOON_ANDROID_GUEST_MIN_FREE_SECONDARY_SERVER_PAGES = 4096,
+	BALLOON_ANDROID_GUEST_MIN_FREE_BACKUP_APP_PAGES = 4096,
+	BALLOON_ANDROID_GUEST_MIN_FREE_HOME_APP_PAGES = 4096,
+	BALLOON_ANDROID_GUEST_MIN_FREE_HIDDEN_APP_PAGES = 5120,
+	BALLOON_ANDROID_GUEST_MIN_FREE_CONTENT_PROVIDER_PAGES = 5632,
+	BALLOON_ANDROID_GUEST_MIN_FREE_EMPTY_APP_MEM_PAGES = 6144
+} Balloon_AndroidGuestMinFreePages;
+
+/* @} */
+
+/**
+ * @brief Host Android levels for the various thresholds.
+ *
+ * From framework/base/services/java/com/android/server/am/ProcessList.java
+ * mOomAdj[]
+ */
+typedef enum {
+	HOST_FOREGROUND_APP = 0,
+	HOST_VISIBLE_APP = 1,
+	HOST_PERCEPTIBLE_APP = 2,
+	HOST_BACKUP_APP = 3,
+	HOST_HIDDEN_APP_MIN = 4,
+	HOST_HIDDEN_APP_MAX = 5,
+} Balloon_AndroidHostApp;
+
+>>>>>>> cm/cm-11.0
 /**
  * @brief Calculate distance to the point at which Android will terminate
  *        processes.
@@ -134,11 +187,21 @@ typedef enum {
  * @return Low memory distance measure (in pages), negative if below threshold.
  */
 static inline int32
+<<<<<<< HEAD
 Balloon_LowMemDistance(uint32 freePages, uint32 filePages, uint32 emptyAppPages)
 {
    return filePages >= emptyAppPages ?
           (int32) (freePages + filePages) - (int32) emptyAppPages :
           (int32) freePages - (int32) emptyAppPages;
+=======
+Balloon_LowMemDistance(uint32 freePages,
+		       uint32 filePages,
+		       uint32 emptyAppPages)
+{
+	return filePages >= emptyAppPages ?
+		(int32) (freePages + filePages) - (int32) emptyAppPages :
+		(int32) freePages - (int32) emptyAppPages;
+>>>>>>> cm/cm-11.0
 }
 
 #ifdef __KERNEL__
@@ -161,6 +224,7 @@ Balloon_LowMemDistance(uint32 freePages, uint32 filePages, uint32 emptyAppPages)
 static uint32
 Balloon_AndroidBackgroundPages(uint32 minHiddenAppOOMScoreAdj)
 {
+<<<<<<< HEAD
    uint32 backgroundPages = 0, nonBackgroundPages = 0;
    struct task_struct *t;
 
@@ -223,6 +287,74 @@ Balloon_AndroidBackgroundPages(uint32 minHiddenAppOOMScoreAdj)
 #endif
 
    return backgroundPages;
+=======
+	uint32 backgroundPages = 0, nonBackgroundPages = 0;
+	struct task_struct *t;
+
+	/*
+	 * Traverse the tasklist to replicate the behavior of the Android
+	 * low memory killer.
+	 */
+	rcu_read_lock();
+
+	for_each_process(t) {
+		int oom_score_adj = 0;
+
+		task_lock(t);
+
+		if (t->signal == NULL) {
+			task_unlock(t);
+			continue;
+		} else {
+			/*
+			 * Use 50 as a threshold. 15 is the highest value we've
+			 * observed on Android phones, and new phones will all
+			 * use the oom_score_adj and thus have much bigger
+			 * numbers (529 for example).
+			 */
+			oom_score_adj =
+			  minHiddenAppOOMScoreAdj > USE_OOM_SCORE_ADJ_THRESHOLD
+				?  t->signal->oom_score_adj
+				: t->signal->oom_adj;
+		}
+
+		if (t->mm != NULL) {
+#ifdef BALLOON_DEBUG_PRINT_ANDROID_PAGES
+			pr_info("Balloon_AndroidBackgroundPages: %d %d %s\n",
+				oom_score_adj,
+				(int)get_mm_counter(t->mm, MM_ANONPAGES),
+				t->comm);
+#endif
+
+			if (oom_score_adj >= (int)minHiddenAppOOMScoreAdj)
+				/*
+				 * Unlike the Android low memory killer, we
+				 * only consider anonymous memory here, since
+				 * we already account for file pages in the
+				 * balloon policy using
+				 * global_page_state(NR_FILE_PAGES).
+				 */
+				backgroundPages +=
+					get_mm_counter(t->mm, MM_ANONPAGES);
+			else
+				nonBackgroundPages +=
+					get_mm_counter(t->mm, MM_ANONPAGES);
+		}
+
+		task_unlock(t);
+	}
+
+	rcu_read_unlock();
+
+#ifdef BALLOON_DEBUG_PRINT_ANDROID_PAGES
+	pr_info("Balloon_AndroidBackgroundPages: non-background pages: %d " \
+		"background pages: %d\n",
+		nonBackgroundPages,
+		backgroundPages);
+#endif
+
+	return backgroundPages;
+>>>>>>> cm/cm-11.0
 }
 #endif
 

@@ -62,7 +62,10 @@ DHDCFLAGS += -DDISABLE_11H_SOFTAP
 DHDCFLAGS += -DSUPPORT_PM2_ONLY
 DHDCFLAGS += -DSUPPORT_DEEP_SLEEP
 DHDCFLAGS += -DSUPPORT_AMPDU_MPDU_CMD
+<<<<<<< HEAD
 #DHDCFLAGS += -DBLOCK_IPV6_PACKET
+=======
+>>>>>>> cm/cm-11.0
 
 # For special PNO Event keep wake lock for 10sec
 DHDCFLAGS += -DCUSTOM_PNO_EVENT_LOCK_xTIME=10
@@ -94,7 +97,15 @@ DHDCFLAGS += -DCUSTOM_SUSPEND_BCN_LI_DTIM=0
 DHDCFLAGS += -DIOCTL_RESP_TIMEOUT=5000
 
 # DPC priority
+<<<<<<< HEAD
 DHDCFLAGS += -DCUSTOM_DPC_PRIO_SETTING=98
+=======
+ifeq ($(CONFIG_MACH_JF),y)
+DHDCFLAGS += -DCUSTOM_DPC_PRIO_SETTING=49
+else
+DHDCFLAGS += -DCUSTOM_DPC_PRIO_SETTING=98
+endif
+>>>>>>> cm/cm-11.0
 
 # Priority mismatch fix with kernel stack
 DHDCFLAGS += -DPKTPRIO_OVERRIDE
@@ -112,8 +123,11 @@ DHDCFLAGS += -DUSE_INITIAL_SHORT_DWELL_TIME
 # JellyBean
 ############
 DHDCFLAGS += -DWL_ENABLE_P2P_IF
+<<<<<<< HEAD
 #DHDCFLAGS += -DWL_CFG80211_P2P_DEV_IF
 DHDCFLAGS += -DWL_IFACE_COMB_NUM_CHANNELS
+=======
+>>>>>>> cm/cm-11.0
 DHDCFLAGS += -DMULTIPLE_SUPPLICANT
 DHDCFLAGS += -DWL_CFG80211_STA_EVENT
 
@@ -122,12 +136,29 @@ DHDCFLAGS += -DWL_CFG80211_STA_EVENT
 #################
 DHDCFLAGS += -DWL_SUPPORT_BACKPORTED_KPATCHES
 
+<<<<<<< HEAD
+=======
+########################################################
+# Kitkat Only, These FLAGS should be removed on JB/JBP.
+########################################################
+DHDCFLAGS += -DWL_IFACE_COMB_NUM_CHANNELS
+DHDCFLAGS :=$(filter-out -DMULTIPLE_SUPPLICANT,$(DHDCFLAGS))
+
+>>>>>>> cm/cm-11.0
 ##########################
 # driver type
 # m: module type driver
 # y: built-in type driver
 ##########################
+<<<<<<< HEAD
 DRIVER_TYPE ?= m
+=======
+ifeq ($(CONFIG_MODULES),y)
+DRIVER_TYPE ?= m
+else
+DRIVER_TYPE ?= y
+endif
+>>>>>>> cm/cm-11.0
 
 #########################
 # Chip dependent feature
@@ -147,7 +178,11 @@ ifneq ($(CONFIG_BCM4339),)
   DHDCFLAGS += -DUSE_WL_TXBF
   DHDCFLAGS += -DUSE_WL_FRAMEBURST
   DHDCFLAGS += -DRXFRAME_THREAD
+<<<<<<< HEAD
   DHDCFLAGS += -DCUSTOM_AMPDU_BA_WSIZE=64
+=======
+  DHDCFLAGS += -DCUSTOM_AMPDU_BA_WSIZE=64 -DCUSTOM_IBSS_AMPDU_BA_WSIZE=16
+>>>>>>> cm/cm-11.0
   DHDCFLAGS += -DCUSTOM_DPC_CPUCORE=0
   DHDCFLAGS += -DPROP_TXSTATUS_VSDB
 ifeq ($(CONFIG_ARCH_MSM8974),y)
@@ -166,7 +201,13 @@ endif
   DHDCFLAGS += -DDHD_ENABLE_LPC
   DHDCFLAGS += -DSUPPORT_AIBSS
   DHDCFLAGS += -DSUPPORT_LTECX
+<<<<<<< HEAD
   DHDCFLAGS += -DSUPPORT_2G_VHT
+=======
+ifneq ($(CONFIG_2GHZ_VHT_NO_SUPPORT),y)
+  DHDCFLAGS += -DSUPPORT_2G_VHT
+endif
+>>>>>>> cm/cm-11.0
   DHDCFLAGS += -DSUPPORT_WL_TXPOWER
   DHDCFLAGS += -DBCMCCX_S69
 ifeq ($(CONFIG_BCM4339),y)

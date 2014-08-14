@@ -851,6 +851,7 @@ int rcu_preempt_needs_cpu(void)
 	return rcu_preempt_ctrlblk.rcb.rcucblist != NULL;
 }
 
+<<<<<<< HEAD
 /*
  * Check for a task exiting while in a preemptible -RCU read-side
  * critical section, clean up if so.  No need to issue warnings,
@@ -867,6 +868,8 @@ void exit_rcu(void)
 	__rcu_read_unlock();
 }
 
+=======
+>>>>>>> cm/cm-11.0
 #else /* #ifdef CONFIG_TINY_PREEMPT_RCU */
 
 #ifdef CONFIG_RCU_TRACE

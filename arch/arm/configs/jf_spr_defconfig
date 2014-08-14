@@ -1,2 +1,10 @@
 CONFIG_MACH_JF_SPR=y
 CONFIG_EXTRA_FIRMWARE="audience-es325-fw.bin"
+<<<<<<< HEAD
+=======
+CONFIG_EXTRA_FIRMWARE_DIR="firmware"
+
+# InsideSecure VPN Client
+CONFIG_INSIDESECURE_VPNCLIENT=y
+
+>>>>>>> cm/cm-11.0

@@ -324,9 +324,21 @@ ipt_do_table(struct sk_buff *skb,
 
 	IP_NF_ASSERT(table->valid_hooks & (1 << hook));
 	local_bh_disable();
+<<<<<<< HEAD
 	addend = xt_write_recseq_begin();
 	private = table->private;
 	cpu        = smp_processor_id();
+=======
+	get_reader(&(table->private_lock));
+	addend = xt_write_recseq_begin();
+	private = table->private;
+	cpu        = smp_processor_id();
+	/*
+	 * Ensure we load private-> members after we've fetched the base
+	 * pointer.
+	 */
+	smp_read_barrier_depends();
+>>>>>>> cm/cm-11.0
 	table_base = private->entries[cpu];
 	jumpstack  = (struct ipt_entry **)private->jumpstack[cpu];
 	stackptr   = per_cpu_ptr(private->stackptr, cpu);
@@ -423,9 +435,15 @@ ipt_do_table(struct sk_buff *skb,
 	pr_debug("Exiting %s; resetting sp from %u to %u\n",
 		 __func__, *stackptr, origptr);
 	*stackptr = origptr;
+<<<<<<< HEAD
 
 	xt_write_recseq_end(addend);
 	local_bh_enable();
+=======
+ 	xt_write_recseq_end(addend);
+	put_reader(&(table->private_lock));
+ 	local_bh_enable();
+>>>>>>> cm/cm-11.0
 
 #ifdef DEBUG_ALLOW_ALL
 	return NF_ACCEPT;

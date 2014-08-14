@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -43,11 +47,19 @@ MksckPage *MksckPage_GetFromTgidIncRefc(void);
 MksckPage *MksckPage_GetFromVmIdIncRefc(Mksck_VmId vmId);
 MksckPage *MksckPage_GetFromIdx(uint32 idx);
 void       MksckPageInfo_Init(struct dentry *parent);
+<<<<<<< HEAD
 int        Mksck_WspInitialize(MvpkmVM *vm);
 void       Mksck_WspRelease(WorldSwitchPage *wsp);
 int        MksckPage_LookupAndInsertPage(struct vm_area_struct *vma,
                                          unsigned long address,
                                          MPN mpn);
+=======
+int        Mksck_WspInitialize(struct MvpkmVM *vm);
+void       Mksck_WspRelease(WorldSwitchPage *wsp);
+int        MksckPage_LookupAndInsertPage(struct vm_area_struct *vma,
+					 unsigned long address,
+					 MPN mpn);
+>>>>>>> cm/cm-11.0
 
 /*
  * Mksck open request must come from this uid.
@@ -56,10 +68,18 @@ extern uid_t Mvpkm_vmwareUid;
 
 #define MKSCK_DEVEL 0
 
+<<<<<<< HEAD
 #if MKSCK_DEVEL
 #define PRINTK printk
 #else
 #define PRINTK if (0) printk
+=======
+
+#if MKSCK_DEVEL
+#define PRINTK(...) pr_info(__VA_ARGS__)
+#else
+#define PRINTK(...)
+>>>>>>> cm/cm-11.0
 #endif
 
 #define HOST_CPUID_UNDEF (~0)

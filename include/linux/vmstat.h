@@ -140,7 +140,10 @@ static inline unsigned long zone_page_state_snapshot(struct zone *zone,
 }
 
 extern unsigned long global_reclaimable_pages(void);
+<<<<<<< HEAD
 extern unsigned long zone_reclaimable_pages(struct zone *zone);
+=======
+>>>>>>> cm/cm-11.0
 
 #ifdef CONFIG_NUMA
 /*

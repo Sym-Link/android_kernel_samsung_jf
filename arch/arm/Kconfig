@@ -36,6 +36,10 @@ config ARM
 	select CPU_PM if (SUSPEND || CPU_IDLE)
 	select GENERIC_PCI_IOMAP
 	select HAVE_BPF_JIT if NET
+<<<<<<< HEAD
+=======
+	select GENERIC_SMP_IDLE_THREAD
+>>>>>>> cm/cm-11.0
 	help
 	  The ARM series is a line of low-power-consumption RISC chip designs
 	  licensed by ARM Ltd and targeted at embedded applications and
@@ -212,16 +216,24 @@ config NEED_RET_TO_USER
 config ARCH_MTD_XIP
 	bool
 
+<<<<<<< HEAD
 config ARCH_WANT_KMAP_ATOMIC_FLUSH
 	bool
 
+=======
+>>>>>>> cm/cm-11.0
 config VECTORS_BASE
 	hex
 	default 0xffff0000 if MMU || CPU_HIGH_VECTOR
 	default DRAM_BASE if REMAP_VECTORS_TO_RAM
 	default 0x00000000
 	help
+<<<<<<< HEAD
 	  The base address of exception vectors.
+=======
+	  The base address of exception vectors.  This must be two pages
+	  in size.
+>>>>>>> cm/cm-11.0
 
 config ARM_PATCH_PHYS_VIRT
 	bool "Patch physical to virtual translations at runtime" if EMBEDDED
@@ -266,6 +278,17 @@ config GENERIC_BUG
 	def_bool y
 	depends on BUG
 
+<<<<<<< HEAD
+=======
+config ARCH_RANDOM
+	bool "SOC specific random number generation"
+	help
+	 Allow the kernel to use an architecture specific implementation for
+	 random number generation
+
+	 If unsure, say N
+
+>>>>>>> cm/cm-11.0
 config GENERIC_TIME_VSYSCALL
 	bool "Enable gettimeofday updates"
 	depends on CPU_V7
@@ -1553,6 +1576,7 @@ source "drivers/pci/Kconfig"
 
 source "drivers/pcmcia/Kconfig"
 
+<<<<<<< HEAD
 config ARM_ERRATA_764369
 	bool "ARM errata: Data cache line maintenance operation by MVA may not succeed"
 	depends on CPU_V7 && SMP
@@ -1579,6 +1603,8 @@ config PL310_ERRATA_769419
 	  on systems with an outer cache, the store buffer is drained
 	  explicitly.
 
+=======
+>>>>>>> cm/cm-11.0
 endmenu
 
 menu "Kernel Features"
@@ -1810,7 +1836,11 @@ config AEABI
 config OABI_COMPAT
 	bool "Allow old ABI binaries to run with this kernel (EXPERIMENTAL)"
 	depends on AEABI && EXPERIMENTAL && !THUMB2_KERNEL
+<<<<<<< HEAD
 	default n
+=======
+	default y if !SMP
+>>>>>>> cm/cm-11.0
 	help
 	  This option preserves the old syscall interface along with the
 	  new (ARM EABI) one. It also provides a compatibility layer to
@@ -1886,9 +1916,42 @@ config ARCH_MEMORY_REMOVE
 config ENABLE_DMM
 	def_bool n
 
+<<<<<<< HEAD
 config DONT_MAP_HOLE_AFTER_MEMBANK0
 	def_bool n
 	depends on SPARSEMEM
+=======
+choice
+	prompt "Virtual Memory Reclaim"
+	default NO_VM_RECLAIM
+	help
+	  Select the method of reclaiming virtual memory
+
+config DONT_MAP_HOLE_AFTER_MEMBANK0
+	bool "Map around the largest hole"
+	help
+	  Do not map the memory belonging to the largest hole
+	  into the virtual space. This results in more lowmem.
+	  If multiple holes are present, only the largest hole
+	  in the first 256MB of memory is not mapped.
+
+config ENABLE_VMALLOC_SAVING
+	bool "Reclaim memory for each subsystem"
+	help
+	  Enable this config to reclaim the virtual space belonging
+	  to any subsystem which is expected to have a lifetime of
+	  the entire system. This feature allows lowmem to be non-
+	  contiguous.
+
+config NO_VM_RECLAIM
+	bool "Do not reclaim memory"
+	help
+	  Do not reclaim any memory. This might result in less lowmem
+	  and wasting virtual memory space which could otherwise be
+	  reclaimed by using any of the other two config options.
+
+endchoice
+>>>>>>> cm/cm-11.0
 
 config HOLES_IN_ZONE
 	def_bool n
@@ -2046,10 +2109,17 @@ config CP_ACCESS
 
 	  If unsure, say N.
 
+<<<<<<< HEAD
 source "arch/arm/mvp/Kconfig"
 
 endmenu
 
+=======
+endmenu
+
+source "arch/arm/mvp/Kconfig"
+
+>>>>>>> cm/cm-11.0
 menu "Boot options"
 
 config USE_OF

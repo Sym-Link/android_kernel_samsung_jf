@@ -32,6 +32,7 @@ int __init sec_avc_log_init(void)
 	unsigned size = SZ_256K;
 	unsigned *sec_avc_log_mag;
 
+<<<<<<< HEAD
 #ifdef CONFIG_SEC_DEBUG
 	if (kernel_sec_get_debug_level() == KERNEL_SEC_DEBUG_LEVEL_LOW) {
 		pr_info("AVC_MSG:debug level is low.\n");
@@ -39,6 +40,8 @@ int __init sec_avc_log_init(void)
 	}
 #endif
 
+=======
+>>>>>>> cm/cm-11.0
 	sec_avc_log_size = size + 8;
 	sec_avc_log_mag = alloc_bootmem(sec_avc_log_size);
 	pr_info("allocating %u bytes at %p (%lx physical) for avc log\n",

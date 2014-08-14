@@ -20,6 +20,11 @@
 int diagfwd_read_complete_smux(void);
 int diagfwd_write_complete_smux(void);
 int diagfwd_connect_smux(void);
+<<<<<<< HEAD
+=======
+void diag_usb_read_complete_smux_fn(struct work_struct *w);
+void diag_read_usb_smux_work_fn(struct work_struct *work);
+>>>>>>> cm/cm-11.0
 extern struct platform_driver msm_diagfwd_smux_driver;
 
 #endif

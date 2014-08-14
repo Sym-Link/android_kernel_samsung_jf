@@ -342,6 +342,14 @@ void mipi_dsi_mdp_busy_wait(void);
 
 irqreturn_t mipi_dsi_isr(int irq, void *ptr);
 
+<<<<<<< HEAD
+=======
+enum {
+	HS_TX_MODE,
+	LP_TX_MODE,
+};
+
+>>>>>>> cm/cm-11.0
 void mipi_set_tx_power_mode(int mode);
 void mipi_dsi_phy_init(int panel_ndx, struct msm_panel_info const *panel_info,
 	int target_type);

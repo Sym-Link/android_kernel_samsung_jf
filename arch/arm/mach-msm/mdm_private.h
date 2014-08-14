@@ -48,15 +48,20 @@ struct mdm_modem_drv {
 	unsigned mdm2ap_pblrdy;
 	unsigned usb_switch_gpio;
 
+<<<<<<< HEAD
 	int mdm_errfatal_irq;
 	int mdm_status_irq;
 	int mdm_ready;
+=======
+	atomic_t mdm_ready;
+>>>>>>> cm/cm-11.0
 	int mdm_boot_status;
 	int mdm_ram_dump_status;
 	enum charm_boot_type boot_type;
 	int mdm_debug_on;
 	int mdm_unexpected_reset_occurred;
 	int disable_status_check;
+<<<<<<< HEAD
 
 	struct mdm_ops *ops;
 	struct mdm_platform_data *pdata;
@@ -67,6 +72,16 @@ int mdm_common_create(struct platform_device  *pdev,
 int mdm_common_modem_remove(struct platform_device *pdev);
 void mdm_common_modem_shutdown(struct platform_device *pdev);
 void mdm_common_set_debug_state(int value);
+=======
+	int power_on_count;
+	int peripheral_status;
+	struct mutex peripheral_status_lock;
+	int device_id;
+
+	struct mdm_platform_data *pdata;
+};
+int mdm_get_ops(struct mdm_ops **mdm_ops);
+>>>>>>> cm/cm-11.0
 
 #endif
 

@@ -304,7 +304,10 @@ static int gport_setup(struct usb_configuration *c)
 		ret = ghsic_ctrl_setup(no_hsic_sports, USB_GADGET_SERIAL);
 		if (ret < 0)
 			return ret;
+<<<<<<< HEAD
 		return 0;
+=======
+>>>>>>> cm/cm-11.0
 	}
 	if (no_hsuart_sports) {
 		port_idx = ghsuart_data_setup(no_hsuart_sports,
@@ -319,8 +322,11 @@ static int gport_setup(struct usb_configuration *c)
 				port_idx++;
 			}
 		}
+<<<<<<< HEAD
 
 		return 0;
+=======
+>>>>>>> cm/cm-11.0
 	}
 	return ret;
 }
@@ -951,9 +957,17 @@ int gser_bind_config(struct usb_configuration *c, u8 port_num)
 /**
  * gserial_init_port - bind a gserial_port to its transport
  */
+<<<<<<< HEAD
 static int gserial_init_port(int port_num, const char *name)
 {
 	enum transport_type transport;
+=======
+static int gserial_init_port(int port_num, const char *name,
+		const char *port_name)
+{
+	enum transport_type transport;
+	int ret = 0;
+>>>>>>> cm/cm-11.0
 
 	if (port_num >= GSERIAL_NO_PORTS)
 		return -ENODEV;
@@ -979,6 +993,12 @@ static int gserial_init_port(int port_num, const char *name)
 		no_smd_ports++;
 		break;
 	case USB_GADGET_XPORT_HSIC:
+<<<<<<< HEAD
+=======
+		ghsic_ctrl_set_port_name(port_name, name);
+		ghsic_data_set_port_name(port_name, name);
+
+>>>>>>> cm/cm-11.0
 		/*client port number will be updated in gport_setup*/
 		no_hsic_sports++;
 		break;
@@ -994,5 +1014,9 @@ static int gserial_init_port(int port_num, const char *name)
 
 	nr_ports++;
 
+<<<<<<< HEAD
 	return 0;
+=======
+	return ret;
+>>>>>>> cm/cm-11.0
 }

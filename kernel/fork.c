@@ -581,8 +581,14 @@ EXPORT_SYMBOL_GPL(__mmdrop);
 /*
  * Decrement the use count and release all resources for an mm.
  */
+<<<<<<< HEAD
 void mmput(struct mm_struct *mm)
 {
+=======
+int mmput(struct mm_struct *mm)
+{
+	int mm_freed = 0;
+>>>>>>> cm/cm-11.0
 	might_sleep();
 
 	if (atomic_dec_and_test(&mm->mm_users)) {
@@ -599,7 +605,13 @@ void mmput(struct mm_struct *mm)
 		if (mm->binfmt)
 			module_put(mm->binfmt->module);
 		mmdrop(mm);
+<<<<<<< HEAD
 	}
+=======
+		mm_freed = 1;
+	}
+	return mm_freed;
+>>>>>>> cm/cm-11.0
 }
 EXPORT_SYMBOL_GPL(mmput);
 

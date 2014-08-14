@@ -94,7 +94,11 @@ enum z180_cmdwindow_type {
 #define Z180_CMDWINDOW_ADDR_SHIFT		8
 
 static int z180_init(struct kgsl_device *device);
+<<<<<<< HEAD
 static int z180_start(struct kgsl_device *device);
+=======
+static int z180_start(struct kgsl_device *device, int priority);
+>>>>>>> cm/cm-11.0
 static int z180_stop(struct kgsl_device *device);
 static int z180_wait(struct kgsl_device *device,
 				struct kgsl_context *context,
@@ -595,7 +599,11 @@ static int z180_init(struct kgsl_device *device)
 	return 0;
 }
 
+<<<<<<< HEAD
 static int z180_start(struct kgsl_device *device)
+=======
+static int z180_start(struct kgsl_device *device, int priority)
+>>>>>>> cm/cm-11.0
 {
 	int status = 0;
 

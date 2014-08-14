@@ -31,7 +31,10 @@
 #define PON_CNTL_1 0x1C
 #define PON_CNTL_PULL_UP BIT(7)
 #define PON_CNTL_TRIG_DELAY_MASK (0x7)
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 /**
  * struct pmic8xxx_pwrkey - pmic8xxx pwrkey information
  * @key_press_irq: key press irq number
@@ -40,7 +43,11 @@
 struct pmic8xxx_pwrkey {
 	struct input_dev *pwr;
 	int key_press_irq;
+<<<<<<< HEAD
 	u32	powerkey_state ;
+=======
+	u32	powerkey_state;
+>>>>>>> cm/cm-11.0
 	int key_release_irq;
 	bool press;
 	const struct pm8xxx_pwrkey_platform_data *pdata;
@@ -49,7 +56,11 @@ struct pmic8xxx_pwrkey {
 static irqreturn_t pwrkey_press_irq(int irq, void *_pwrkey)
 {
 	struct pmic8xxx_pwrkey *pwrkey = _pwrkey;
+<<<<<<< HEAD
 	pwrkey->powerkey_state = 1;
+=======
+
+>>>>>>> cm/cm-11.0
 	if (pwrkey->press == true) {
 		pwrkey->press = false;
 		return IRQ_HANDLED;
@@ -57,6 +68,10 @@ static irqreturn_t pwrkey_press_irq(int irq, void *_pwrkey)
 		pwrkey->press = true;
 	}
 
+<<<<<<< HEAD
+=======
+	pwrkey->powerkey_state = 1;
+>>>>>>> cm/cm-11.0
 	input_report_key(pwrkey->pwr, KEY_POWER, 1);
 	input_sync(pwrkey->pwr);
 #ifdef CONFIG_SEC_DEBUG
@@ -68,7 +83,11 @@ static irqreturn_t pwrkey_press_irq(int irq, void *_pwrkey)
 static irqreturn_t pwrkey_release_irq(int irq, void *_pwrkey)
 {
 	struct pmic8xxx_pwrkey *pwrkey = _pwrkey;
+<<<<<<< HEAD
 	pwrkey->powerkey_state = 0;
+=======
+
+>>>>>>> cm/cm-11.0
 	if (pwrkey->press == false) {
 		input_report_key(pwrkey->pwr, KEY_POWER, 1);
 		input_sync(pwrkey->pwr);
@@ -77,6 +96,10 @@ static irqreturn_t pwrkey_release_irq(int irq, void *_pwrkey)
 		pwrkey->press = false;
 	}
 
+<<<<<<< HEAD
+=======
+	pwrkey->powerkey_state = 0;
+>>>>>>> cm/cm-11.0
 	input_report_key(pwrkey->pwr, KEY_POWER, 0);
 	input_sync(pwrkey->pwr);
 #ifdef CONFIG_SEC_DEBUG
@@ -84,7 +107,11 @@ static irqreturn_t pwrkey_release_irq(int irq, void *_pwrkey)
 #endif
 	return IRQ_HANDLED;
 }
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_PM_SLEEP
 static int pmic8xxx_pwrkey_suspend(struct device *dev)
 {
@@ -114,25 +141,43 @@ static int pmic8xxx_pwrkey_resume(struct device *dev)
 static SIMPLE_DEV_PM_OPS(pm8xxx_pwr_key_pm_ops,
 		pmic8xxx_pwrkey_suspend, pmic8xxx_pwrkey_resume);
 
+<<<<<<< HEAD
 
 static ssize_t  sysfs_powerkey_onoff_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 
+=======
+static ssize_t  sysfs_powerkey_onoff_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+>>>>>>> cm/cm-11.0
 {
 	struct pmic8xxx_pwrkey *pwrkey = dev_get_drvdata(dev);
 	printk(KERN_INFO "inside sysfs_powerkey_onoff_show\n");
 	if (pwrkey->powerkey_state == 1) {
 		printk(KERN_INFO "powerkey is pressed\n");
 		return snprintf(buf, 5, "%d\n", pwrkey->powerkey_state);
+<<<<<<< HEAD
 	} else {
 		printk(KERN_INFO "powerkey is released\n");
 		return snprintf(buf, 5, "%d\n", pwrkey->powerkey_state);
 	}
+=======
+	}
+	if (pwrkey->powerkey_state == 0) {
+		printk(KERN_INFO "powerkey is released\n");
+		return snprintf(buf, 5, "%d\n", pwrkey->powerkey_state);
+	}
+
+	return 0;
+>>>>>>> cm/cm-11.0
 }
 
 static DEVICE_ATTR(sec_powerkey_pressed, 0664 , sysfs_powerkey_onoff_show,
 	NULL);
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 static int __devinit pmic8xxx_pwrkey_probe(struct platform_device *pdev)
 {
 	struct input_dev *pwr;
@@ -141,7 +186,11 @@ static int __devinit pmic8xxx_pwrkey_probe(struct platform_device *pdev)
 	int err;
 	unsigned int delay;
 	u8 pon_cntl;
+<<<<<<< HEAD
 	int ret ;
+=======
+	int ret;
+>>>>>>> cm/cm-11.0
 	struct pmic8xxx_pwrkey *pwrkey;
 	struct device *sec_powerkey;
 	const struct pm8xxx_pwrkey_platform_data *pdata =
@@ -241,6 +290,7 @@ static int __devinit pmic8xxx_pwrkey_probe(struct platform_device *pdev)
 
 		goto free_press_irq;
 	}
+<<<<<<< HEAD
 	sec_powerkey = device_create(sec_class, NULL, 0, NULL,
 	"sec_powerkey");
 	 if (IS_ERR(sec_powerkey))
@@ -249,6 +299,16 @@ static int __devinit pmic8xxx_pwrkey_probe(struct platform_device *pdev)
 	 if (ret) {
 		pr_err("Failed to create device file in sysfs entries(%s)!\n",
 		dev_attr_sec_powerkey_pressed.attr.name);
+=======
+
+	sec_powerkey = device_create(sec_class, NULL, 0, NULL, "sec_powerkey");
+	if (IS_ERR(sec_powerkey))
+		pr_err("Failed to create device(sec_powerkey)!\n");
+	ret = device_create_file(sec_powerkey, &dev_attr_sec_powerkey_pressed);
+	if (ret) {
+		pr_err("Failed to create device file in sysfs entries(%s)!\n",
+			dev_attr_sec_powerkey_pressed.attr.name);
+>>>>>>> cm/cm-11.0
 	}
 	dev_set_drvdata(sec_powerkey, pwrkey);
 	device_init_wakeup(&pdev->dev, pdata->wakeup);

@@ -1,2 +1,10 @@
 CONFIG_MACH_JF_TMO=y
 CONFIG_EXTRA_FIRMWARE="audience-es325-fw-tmo.bin"
+<<<<<<< HEAD
+=======
+CONFIG_EXTRA_FIRMWARE_DIR="firmware"
+# InsideSecure VPN Client
+CONFIG_INSIDESECURE_VPNCLIENT=y
+#Wifi Region code
+CONFIG_WLAN_REGION_CODE=402
+>>>>>>> cm/cm-11.0

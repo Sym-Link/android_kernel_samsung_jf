@@ -981,7 +981,11 @@ static char STANDARD_VIDEO_1[] = {
 	0x01, //mdnie_en
 	0x00, //data_width mask 00 000
 	0x33, //scr_roi 1 scr algo_roi 1 algo 00 1 0 00 1 0
+<<<<<<< HEAD
 	0x06, //sharpen cc gamma 00 0 0
+=======
+	0x0e, //sharpen cc gamma 00 0 0
+>>>>>>> cm/cm-11.0
 };
 
 static char STANDARD_VIDEO_2[] = {
@@ -1100,7 +1104,11 @@ static char DYNAMIC_VIDEO_1[] = {
 	0x01, //mdnie_en
 	0x00, //data_width mask 00 000
 	0x33, //scr_roi 1 scr algo_roi 1 algo 00 1 0 00 1 0
+<<<<<<< HEAD
 	0x0b, //sharpen cc gamma 00 0 0
+=======
+	0x0f, //sharpen cc gamma 00 0 0
+>>>>>>> cm/cm-11.0
 };
 
 static char DYNAMIC_VIDEO_2[] = {
@@ -1338,7 +1346,11 @@ char AUTO_VIDEO_1[] = {
 	0x01, //mdnie_en
 	0x00, //data_width mask 00 000
 	0x33, //scr_roi 1 scr algo_roi 1 algo 00 1 0 00 1 0
+<<<<<<< HEAD
 	0x06, //sharpen cc gamma 00 0 0
+=======
+	0x0e, //sharpen cc gamma 00 0 0
+>>>>>>> cm/cm-11.0
 };
 
 char AUTO_VIDEO_2[] = {
@@ -1937,7 +1949,11 @@ static char CAMERA_1[] = {
 	0x01, //mdnie_en
 	0x00, //data_width mask 00 000
 	0x33, //scr_roi 1 scr algo_roi 1 algo 00 1 0 00 1 0
+<<<<<<< HEAD
 	0x02, //sharpen cc gamma 00 0 0
+=======
+	0x00, //sharpen cc gamma 00 0 0
+>>>>>>> cm/cm-11.0
 };
 
 static char CAMERA_2[] = {
@@ -2031,6 +2047,7 @@ static char CAMERA_2[] = {
 	0x20, //curve23 a
 	0x00, //curve24 b
 	0xFF, //curve24 a
+<<<<<<< HEAD
 	0x04, //cc r1 0.1
 	0x48,
 	0x1f, //cc r2
@@ -2049,6 +2066,26 @@ static char CAMERA_2[] = {
 	0xc4,
 	0x04, //cc b3
 	0x5b,
+=======
+	0x04, //cc r1 0.06
+	0x2b,
+	0x1f, //cc r2
+	0xdc,
+	0x1f, //cc r3
+	0xf9,
+	0x1f, //cc g1
+	0xee,
+	0x04, //cc g2
+	0x19,
+	0x1f, //cc g3
+	0xf9,
+	0x1f, //cc b1
+	0xee,
+	0x1f, //cc b2
+	0xdc,
+	0x04, //cc b3
+	0x36,
+>>>>>>> cm/cm-11.0
 };
 
 char AUTO_CAMERA_1[] = {

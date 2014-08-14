@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -85,6 +89,7 @@ static ssize_t tz_governor_store(struct kgsl_device *device,
 				struct kgsl_pwrscale *pwrscale,
 				 const char *buf, size_t count)
 {
+<<<<<<< HEAD
 	char str[20];
 	struct tz_priv *priv = pwrscale->priv;
 	struct kgsl_pwrctrl *pwr = &device->pwrctrl;
@@ -99,6 +104,16 @@ static ssize_t tz_governor_store(struct kgsl_device *device,
 	if (!strncmp(str, "ondemand", 8))
 		priv->governor = TZ_GOVERNOR_ONDEMAND;
 	else if (!strncmp(str, "performance", 11))
+=======
+	struct tz_priv *priv = pwrscale->priv;
+	struct kgsl_pwrctrl *pwr = &device->pwrctrl;
+
+	mutex_lock(&device->mutex);
+
+	if (!strncmp(buf, "ondemand", 8))
+		priv->governor = TZ_GOVERNOR_ONDEMAND;
+	else if (!strncmp(buf, "performance", 11))
+>>>>>>> cm/cm-11.0
 		priv->governor = TZ_GOVERNOR_PERFORMANCE;
 
 	if (priv->governor == TZ_GOVERNOR_PERFORMANCE)
@@ -179,12 +194,15 @@ static void tz_idle(struct kgsl_device *device, struct kgsl_pwrscale *pwrscale)
 	}
 	priv->bin.total_time = 0;
 	priv->bin.busy_time = 0;
+<<<<<<< HEAD
 
 	/* If the decision is to move to a lower level, make sure the GPU
 	 * frequency drops.
 	 */
 	if (val > 0)
 		val *= pwr->step_mul;
+=======
+>>>>>>> cm/cm-11.0
 	if (val)
 		kgsl_pwrctrl_pwrlevel_change(device,
 					     pwr->active_pwrlevel + val);

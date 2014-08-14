@@ -259,7 +259,11 @@ endif
 core-$(CONFIG_FPE_NWFPE)	+= arch/arm/nwfpe/
 core-$(CONFIG_FPE_FASTFPE)	+= $(FASTFPE_OBJ)
 core-$(CONFIG_VFP)		+= arch/arm/vfp/
+<<<<<<< HEAD
 core-$(CONFIG_VMWARE_MVP)	+= arch/arm/mvp/
+=======
+core-$(CONFIG_VMWARE_MVP)      += arch/arm/mvp/
+>>>>>>> cm/cm-11.0
 
 # If we have a machine-specific directory, then include it in the build.
 core-y				+= arch/arm/kernel/ arch/arm/mm/ arch/arm/common/

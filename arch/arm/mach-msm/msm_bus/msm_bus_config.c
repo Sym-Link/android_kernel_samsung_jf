@@ -36,6 +36,13 @@ int msm_bus_axi_porthalt(int master_port)
 	struct msm_bus_fabric_device *fabdev;
 
 	priv_id = msm_bus_board_get_iid(master_port);
+<<<<<<< HEAD
+=======
+	if (priv_id == -ENXIO) {
+		MSM_BUS_ERR("Error in getting the iid \n");
+		return -ENODEV;
+	}
+>>>>>>> cm/cm-11.0
 	MSM_BUS_DBG("master_port: %d iid: %d fabid%d\n",
 		master_port, priv_id, GET_FABID(priv_id));
 	fabdev = msm_bus_get_fabric_device(GET_FABID(priv_id));
@@ -62,6 +69,13 @@ int msm_bus_axi_portunhalt(int master_port)
 	struct msm_bus_fabric_device *fabdev;
 
 	priv_id = msm_bus_board_get_iid(master_port);
+<<<<<<< HEAD
+=======
+	if (priv_id == -ENXIO) {
+		MSM_BUS_ERR("Error in getting the iid \n");
+		return -ENODEV;
+	}
+>>>>>>> cm/cm-11.0
 	MSM_BUS_DBG("master_port: %d iid: %d fabid: %d\n",
 		master_port, priv_id, GET_FABID(priv_id));
 	fabdev = msm_bus_get_fabric_device(GET_FABID(priv_id));

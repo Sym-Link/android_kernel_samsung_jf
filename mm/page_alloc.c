@@ -57,6 +57,10 @@
 #include <linux/ftrace_event.h>
 #include <linux/memcontrol.h>
 #include <linux/prefetch.h>
+<<<<<<< HEAD
+=======
+#include <linux/mm_inline.h>
+>>>>>>> cm/cm-11.0
 #include <linux/migrate.h>
 #include <linux/page-debug-flags.h>
 
@@ -647,7 +651,10 @@ static void free_pcppages_bulk(struct zone *zone, int count,
 	int mt = 0;
 
 	spin_lock(&zone->lock);
+<<<<<<< HEAD
 	zone->all_unreclaimable = 0;
+=======
+>>>>>>> cm/cm-11.0
 	zone->pages_scanned = 0;
 
 	while (to_free) {
@@ -693,7 +700,10 @@ static void free_one_page(struct zone *zone, struct page *page, int order,
 				int migratetype)
 {
 	spin_lock(&zone->lock);
+<<<<<<< HEAD
 	zone->all_unreclaimable = 0;
+=======
+>>>>>>> cm/cm-11.0
 	zone->pages_scanned = 0;
 
 	__free_one_page(page, zone, order, migratetype);
@@ -785,6 +795,13 @@ void __init init_cma_reserved_pageblock(struct page *page)
 	set_pageblock_migratetype(page, MIGRATE_CMA);
 	__free_pages(page, pageblock_order);
 	totalram_pages += pageblock_nr_pages;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_HIGHMEM
+	if (PageHighMem(page))
+		totalhigh_pages += pageblock_nr_pages;
+#endif
+>>>>>>> cm/cm-11.0
 }
 #endif
 
@@ -1128,7 +1145,11 @@ static struct page *__rmqueue_cma(struct zone *zone, unsigned int order,
 #ifdef CONFIG_CMA
 	if (migratetype == MIGRATE_MOVABLE && !zone->cma_alloc)
 		page = __rmqueue_smallest(zone, order, MIGRATE_CMA);
+<<<<<<< HEAD
 	else
+=======
+	if (!page)
+>>>>>>> cm/cm-11.0
 #endif
 retry_reserve :
 		page = __rmqueue_smallest(zone, order, migratetype);
@@ -1373,7 +1394,12 @@ void free_hot_cold_page(struct page *page, int cold)
 	 * excessively into the page allocator
 	 */
 	if (migratetype >= MIGRATE_PCPTYPES) {
+<<<<<<< HEAD
 		if (unlikely(migratetype == MIGRATE_ISOLATE)) {
+=======
+		if (unlikely(migratetype == MIGRATE_ISOLATE) ||
+			     is_migrate_cma(migratetype)) {
+>>>>>>> cm/cm-11.0
 			free_one_page(zone, page, 0, migratetype);
 			goto out;
 		}
@@ -1447,10 +1473,18 @@ static int __isolate_free_page(struct page *page, unsigned int order)
 	zone = page_zone(page);
 	mt = get_pageblock_migratetype(page);
 
+<<<<<<< HEAD
 	if (mt != MIGRATE_ISOLATE && !is_migrate_cma(mt)) {
 		/* Obey watermarks as if the page was being allocated */
 		watermark = low_wmark_pages(zone) + (1 << order);
 		if (!zone_watermark_ok(zone, 0, watermark, 0, 0))
+=======
+	if (mt != MIGRATE_ISOLATE) {
+		/* Obey watermarks as if the page was being allocated */
+		watermark = low_wmark_pages(zone) + (1 << order);
+		if (!is_migrate_cma(mt) &&
+		    !zone_watermark_ok(zone, 0, watermark, 0, 0))
+>>>>>>> cm/cm-11.0
 			return 0;
 
 		__mod_zone_freepage_state(zone, -(1UL << order), mt);
@@ -2008,6 +2042,16 @@ void warn_alloc_failed(gfp_t gfp_mask, int order, const char *fmt, ...)
 		return;
 
 	/*
+<<<<<<< HEAD
+=======
+	 * Walking all memory to count page types is very expensive and should
+	 * be inhibited in non-blockable contexts.
+	 */
+	if (!(gfp_mask & __GFP_WAIT))
+		filter |= SHOW_MEM_FILTER_PAGE_COUNT;
+
+	/*
+>>>>>>> cm/cm-11.0
 	 * This documents exceptions given to allocations in certain
 	 * contexts that are allowed to allocate outside current's set
 	 * of allowed nodes.
@@ -2372,6 +2416,12 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
 	bool sync_migration = false;
 	bool deferred_compaction = false;
 	bool contended_compaction = false;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SEC_OOM_KILLER
+	unsigned long oom_invoke_timeout = jiffies + HZ/4;
+#endif
+>>>>>>> cm/cm-11.0
 
 	/*
 	 * In the slowpath, we sanity check order to avoid ever trying to
@@ -2483,7 +2533,16 @@ rebalance:
 	 * If we failed to make any progress reclaiming, then we are
 	 * running out of options and have to consider going OOM
 	 */
+<<<<<<< HEAD
 	if (!did_some_progress) {
+=======
+#ifdef CONFIG_SEC_OOM_KILLER
+#define SHOULD_CONSIDER_OOM !did_some_progress || time_after(jiffies, oom_invoke_timeout)
+#else
+#define SHOULD_CONSIDER_OOM !did_some_progress
+#endif
+	if (SHOULD_CONSIDER_OOM) {
+>>>>>>> cm/cm-11.0
 		if ((gfp_mask & __GFP_FS) && !(gfp_mask & __GFP_NORETRY)) {
 			if (oom_killer_disabled)
 				goto nopage;
@@ -2491,6 +2550,16 @@ rebalance:
 			if ((current->flags & PF_DUMPCORE) &&
 			    !(gfp_mask & __GFP_NOFAIL))
 				goto nopage;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SEC_OOM_KILLER
+			if (did_some_progress)
+				pr_info("time's up : calling "
+					"__alloc_pages_may_oom(o:%d, gfp:0x%x)\n", order, gfp_mask);
+
+#endif
+
+>>>>>>> cm/cm-11.0
 			page = __alloc_pages_may_oom(gfp_mask, order,
 					zonelist, high_zoneidx,
 					nodemask, preferred_zone,
@@ -2516,10 +2585,20 @@ rebalance:
 					goto nopage;
 			}
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SEC_OOM_KILLER
+			oom_invoke_timeout = jiffies + HZ/4;
+#endif
+>>>>>>> cm/cm-11.0
 			goto restart;
 		}
 	}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cm/cm-11.0
 	/* Check if we should retry the allocation */
 	pages_reclaimed += did_some_progress;
 	if (should_alloc_retry(gfp_mask, order, did_some_progress,
@@ -2992,7 +3071,11 @@ void show_free_areas(unsigned int filter)
 			K(zone_page_state(zone, NR_FREE_CMA_PAGES)),
 			K(zone_page_state(zone, NR_WRITEBACK_TEMP)),
 			zone->pages_scanned,
+<<<<<<< HEAD
 			(zone->all_unreclaimable ? "yes" : "no")
+=======
+			(!zone_reclaimable(zone) ? "yes" : "no")
+>>>>>>> cm/cm-11.0
 			);
 		printk("lowmem_reserve[]:");
 		for (i = 0; i < MAX_NR_ZONES; i++)
@@ -5218,10 +5301,13 @@ static void __setup_per_zone_wmarks(void)
 		zone->watermark[WMARK_LOW]  = min_wmark_pages(zone) + (tmp >> 2);
 		zone->watermark[WMARK_HIGH] = min_wmark_pages(zone) + (tmp >> 1);
 
+<<<<<<< HEAD
 		zone->watermark[WMARK_MIN] += cma_wmark_pages(zone);
 		zone->watermark[WMARK_LOW] += cma_wmark_pages(zone);
 		zone->watermark[WMARK_HIGH] += cma_wmark_pages(zone);
 
+=======
+>>>>>>> cm/cm-11.0
 		setup_zone_migrate_reserve(zone);
 		spin_unlock_irqrestore(&zone->lock, flags);
 	}
@@ -5845,6 +5931,7 @@ static int __alloc_contig_migrate_range(struct compact_control *cc,
 	return ret > 0 ? 0 : ret;
 }
 
+<<<<<<< HEAD
 /*
  * Update zone's cma pages counter used for watermark level calculation.
  */
@@ -5893,6 +5980,8 @@ static int __reclaim_pages(struct zone *zone, gfp_t gfp_mask, int count)
 	return count;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 /**
  * alloc_contig_range() -- tries to allocate given range of pages
  * @start:	start PFN to allocate
@@ -6002,11 +6091,14 @@ int alloc_contig_range(unsigned long start, unsigned long end,
 		goto done;
 	}
 
+<<<<<<< HEAD
 	/*
 	 * Reclaim enough pages to make sure that contiguous allocation
 	 * will not starve the system.
 	 */
 	__reclaim_pages(zone, GFP_HIGHUSER_MOVABLE, end-start);
+=======
+>>>>>>> cm/cm-11.0
 
 	/* Grab isolated pages from freelists. */
 	outer_end = isolate_freepages_range(&cc, outer_start, end);

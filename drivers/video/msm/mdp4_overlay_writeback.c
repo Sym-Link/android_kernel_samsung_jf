@@ -201,8 +201,13 @@ int mdp4_overlay_writeback_off(struct platform_device *pdev)
 	}
 
 	complete(&vctrl->ov_comp);
+<<<<<<< HEAD
 	msleep(20); 			  
 	mdp_clk_ctrl(1);		  
+=======
+	msleep(20);
+	mdp_clk_ctrl(1);
+>>>>>>> cm/cm-11.0
 
 	/* sanity check, free pipes besides base layer */
 	mdp4_overlay_unset_mixer(pipe->mixer_num);
@@ -423,11 +428,21 @@ int mdp4_wfd_pipe_commit(struct msm_fb_data_type *mfd,
 		}
 	}
 
+<<<<<<< HEAD
 	mdp_clk_ctrl(1);
 
 	mdp4_mixer_stage_commit(mixer);
 
 	pipe = vctrl->base_pipe;
+=======
+	mdp4_mixer_stage_commit(mixer);
+
+	pipe = vctrl->base_pipe;
+	if (!pipe->ov_blt_addr) {
+		schedule_work(&vctrl->clk_work);
+		return cnt;
+	}
+>>>>>>> cm/cm-11.0
 	spin_lock_irqsave(&vctrl->spin_lock, flags);
 	vctrl->ov_koff++;
 	INIT_COMPLETION(vctrl->ov_comp);
@@ -539,6 +554,10 @@ void mdp4_writeback_overlay(struct msm_fb_data_type *mfd)
 	mdp4_overlay_mdp_perf_upd(mfd, 0);
 
 	mutex_unlock(&mfd->dma->ov_mutex);
+<<<<<<< HEAD
+=======
+
+>>>>>>> cm/cm-11.0
 }
 
 static int mdp4_overlay_writeback_register_buffer(

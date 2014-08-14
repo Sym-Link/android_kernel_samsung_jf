@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD
  * Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -31,6 +35,10 @@ enum subsys_id {
 
 	/* Non-SMD subsystems */
 	SYSMON_SS_EXT_MODEM = SMD_NUM_TYPE,
+<<<<<<< HEAD
+=======
+	SYSMON_SS_EXT_MODEM2,
+>>>>>>> cm/cm-11.0
 	SYSMON_NUM_SS
 };
 

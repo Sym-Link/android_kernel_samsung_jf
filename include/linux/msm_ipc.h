@@ -45,6 +45,17 @@ struct sockaddr_msm_ipc {
 	unsigned char reserved;
 };
 
+<<<<<<< HEAD
+=======
+struct config_sec_rules_args {
+	int num_group_info;
+	uint32_t service_id;
+	uint32_t instance_id;
+	unsigned reserved;
+	gid_t group_id[0];
+};
+
+>>>>>>> cm/cm-11.0
 #define IPC_ROUTER_IOCTL_MAGIC (0xC3)
 
 #define IPC_ROUTER_IOCTL_GET_VERSION \
@@ -62,6 +73,12 @@ struct sockaddr_msm_ipc {
 #define IPC_ROUTER_IOCTL_BIND_CONTROL_PORT \
 	_IOR(IPC_ROUTER_IOCTL_MAGIC, 4, unsigned int)
 
+<<<<<<< HEAD
+=======
+#define IPC_ROUTER_IOCTL_CONFIG_SEC_RULES \
+	_IOR(IPC_ROUTER_IOCTL_MAGIC, 5, struct config_sec_rules_args)
+
+>>>>>>> cm/cm-11.0
 struct msm_ipc_server_info {
 	uint32_t node_id;
 	uint32_t port_id;

@@ -2,7 +2,11 @@
  * Misc system wide definitions
  *
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -64,7 +68,11 @@
 #define BCMFASTPATH
 #define BCMFASTPATH_HOST
 #endif
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 
 
@@ -186,13 +194,22 @@ typedef struct {
 #if defined(BCM_RPC_NOCOPY) || defined(BCM_RCP_TXNOCOPY)
 
 #define BCMEXTRAHDROOM 260
+<<<<<<< HEAD
 #else 
+=======
+#else
+>>>>>>> cm/cm-11.0
 #if defined(BCM47XX_CA9)
 #define BCMEXTRAHDROOM 224
 #else
 #define BCMEXTRAHDROOM 204
+<<<<<<< HEAD
 #endif 
 #endif 
+=======
+#endif
+#endif
+>>>>>>> cm/cm-11.0
 
 
 #ifndef SDALIGN

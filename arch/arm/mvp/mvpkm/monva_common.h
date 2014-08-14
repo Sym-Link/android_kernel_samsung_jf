@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -53,6 +57,7 @@
  * Worldswitch page gets mapped right after the stack guard.
  */
 #define MONITOR_VA_WORLDSWITCH \
+<<<<<<< HEAD
    ((MVA)(MONITOR_VA_START + 3 * PAGE_SIZE))
 
 #define MONITOR_VA_WORLDSWITCH_CODE \
@@ -60,12 +65,22 @@
 
 #define MONITOR_VA_UART \
    (MONITOR_VA_WORLDSWITCH_CODE + PAGE_SIZE)
+=======
+	((MVA)(MONITOR_VA_START + 3 * PAGE_SIZE))
+
+#define MONITOR_VA_WORLDSWITCH_CODE \
+	(MONITOR_VA_WORLDSWITCH + PAGE_SIZE)
+
+#define MONITOR_VA_UART \
+	(MONITOR_VA_WORLDSWITCH_CODE + PAGE_SIZE)
+>>>>>>> cm/cm-11.0
 
 /**
  * @brief Type of physmem region mapping that we want the VMX to know about.
  *        Helps to identify Guest page allocations.
  */
 typedef enum {
+<<<<<<< HEAD
    MEMREGION_MAINMEM = 1,
    MEMREGION_MODULE = 2,
    MEMREGION_WSP = 3,
@@ -76,6 +91,18 @@ typedef enum {
 typedef struct MonVA { /* Note that this struct is VE only */
    MA  l2BaseMA;       ///< MA of monitor L2 page table page
    MVA excVec;         ///< Monitor exception vector virtual address
+=======
+	MEMREGION_MAINMEM = 1,
+	MEMREGION_MODULE = 2,
+	MEMREGION_WSP = 3,
+	MEMREGION_MONITOR_MISC = 4,
+	MEMREGION_DEFAULT = 0
+} PACKED PhysMem_RegionType;
+
+typedef struct MonVA {		/* Note that this struct is VE only */
+	MA  l2BaseMA;		/**< MA of monitor L2 page table page */
+	MVA excVec;		/**< Monitor exception vector virtual address */
+>>>>>>> cm/cm-11.0
 } MonVA;
 
 /**
@@ -85,8 +112,13 @@ typedef struct MonVA { /* Note that this struct is VE only */
  * without making the required update to HMAIR0.
  */
 typedef enum {
+<<<<<<< HEAD
    MVA_MEMORY = 0,
    MVA_DEVICE = 1
+=======
+	MVA_MEMORY = 0,
+	MVA_DEVICE = 1
+>>>>>>> cm/cm-11.0
 } MVAType;
 
 /**

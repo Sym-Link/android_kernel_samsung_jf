@@ -2,7 +2,11 @@
  * Linux OS Independent Layer
  *
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -95,9 +99,15 @@ extern struct pci_dev *osl_pci_device(osl_t *osh);
 
 typedef struct {
 	bool pkttag;
+<<<<<<< HEAD
 	bool mmbus;		
 	pktfree_cb_fn_t tx_fn;  
 	void *tx_ctx;		
+=======
+	bool mmbus;
+	pktfree_cb_fn_t tx_fn;
+	void *tx_ctx;
+>>>>>>> cm/cm-11.0
 	void	*unused[3];
 } osl_pubinfo_t;
 
@@ -166,16 +176,28 @@ extern int osl_error(int bcmerror);
 
 
 #include <linuxver.h>           
+<<<<<<< HEAD
 #include <linux/kernel.h>       
 #include <linux/string.h>       
+=======
+#include <linux/kernel.h>
+#include <linux/string.h>
+>>>>>>> cm/cm-11.0
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 4, 29)
 #define OSL_SYSUPTIME()		((uint32)jiffies_to_msecs(jiffies))
 #else
 #define OSL_SYSUPTIME()		((uint32)jiffies * (1000 / HZ))
+<<<<<<< HEAD
 #endif 
 #define	printf(fmt, args...)	printk(fmt , ## args)
 #include <linux/kernel.h>	
 #include <linux/string.h>	
+=======
+#endif
+#define	printf(fmt, args...)	printk(fmt , ## args)
+#include <linux/kernel.h>
+#include <linux/string.h>
+>>>>>>> cm/cm-11.0
 
 #define	bcopy(src, dst, len)	memcpy((dst), (src), (len))
 #define	bcmp(b1, b2, len)	memcmp((b1), (b2), (len))
@@ -268,7 +290,11 @@ extern int osl_error(int bcmerror);
 #else
 #define	PKTGET_STATIC	PKTGET
 #define	PKTFREE_STATIC	PKTFREE
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 #define	PKTDATA(osh, skb)		(((struct sk_buff*)(skb))->data)
 #define	PKTLEN(osh, skb)		(((struct sk_buff*)(skb))->len)
 #define PKTHEADROOM(osh, skb)		(PKTDATA(osh, skb)-(((struct sk_buff*)(skb))->head))
@@ -317,7 +343,11 @@ typedef struct ctfpool {
 #define	PKTCLRFAST(osh, skb)	((((struct sk_buff*)(skb))->__unused) &= (~FASTBUF))
 #define	PKTISFAST(osh, skb)	((((struct sk_buff*)(skb))->__unused) & FASTBUF)
 #define	PKTFAST(osh, skb)	(((struct sk_buff*)(skb))->__unused)
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 36)
 #define	CTFPOOLPTR(osh, skb)	(((struct sk_buff*)(skb))->ctfpool)
@@ -332,11 +362,19 @@ extern void osl_ctfpool_replenish(osl_t *osh, uint thresh);
 extern int32 osl_ctfpool_init(osl_t *osh, uint numobj, uint size);
 extern void osl_ctfpool_cleanup(osl_t *osh);
 extern void osl_ctfpool_stats(osl_t *osh, void *b);
+<<<<<<< HEAD
 #else 
 #define	PKTSETFAST(osh, skb)
 #define	PKTCLRFAST(osh, skb)
 #define	PKTISFAST(osh, skb)	(FALSE)
 #endif 
+=======
+#else
+#define	PKTSETFAST(osh, skb)
+#define	PKTCLRFAST(osh, skb)
+#define	PKTISFAST(osh, skb)	(FALSE)
+#endif
+>>>>>>> cm/cm-11.0
 
 #define	PKTSETCTF(osh, skb)
 #define	PKTCLRCTF(osh, skb)
@@ -362,7 +400,11 @@ extern void osl_ctfpool_stats(osl_t *osh, void *b);
 #define	PKTSETCHAINED(osh, skb)	(((struct sk_buff*)(skb))->mac_len |= CHAINED)
 #define	PKTCLRCHAINED(osh, skb)	(((struct sk_buff*)(skb))->mac_len &= (~CHAINED))
 #define	PKTISCHAINED(skb)	(((struct sk_buff*)(skb))->mac_len & CHAINED)
+<<<<<<< HEAD
 #else 
+=======
+#else
+>>>>>>> cm/cm-11.0
 #define	SKIPCT	(1 << 2)
 #define	CHAINED	(1 << 3)
 #define	PKTSETSKIPCT(osh, skb)	(((struct sk_buff*)(skb))->__unused |= SKIPCT)
@@ -371,17 +413,29 @@ extern void osl_ctfpool_stats(osl_t *osh, void *b);
 #define	PKTSETCHAINED(osh, skb)	(((struct sk_buff*)(skb))->__unused |= CHAINED)
 #define	PKTCLRCHAINED(osh, skb)	(((struct sk_buff*)(skb))->__unused &= (~CHAINED))
 #define	PKTISCHAINED(skb)	(((struct sk_buff*)(skb))->__unused & CHAINED)
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 typedef struct ctf_mark {
 	uint32	value;
 }	ctf_mark_t;
 #define CTF_MARK(m)				(m.value)
+<<<<<<< HEAD
 #else 
+=======
+#else
+>>>>>>> cm/cm-11.0
 #define	PKTSETSKIPCT(osh, skb)
 #define	PKTCLRSKIPCT(osh, skb)
 #define	PKTSKIPCT(osh, skb)
 #define CTF_MARK(m)				0
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 extern void osl_pktfree(osl_t *osh, void *skb, bool send);
 extern void *osl_pktget_static(osl_t *osh, uint len);
@@ -409,6 +463,7 @@ extern struct sk_buff *osl_pkt_tonative(osl_t *osh, void *pkt);
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 0))
 #define PKTMARK(p)                     (((struct sk_buff *)(p))->mark)
 #define PKTSETMARK(p, m)               ((struct sk_buff *)(p))->mark = (m)
+<<<<<<< HEAD
 #else 
 #define PKTMARK(p)                     (((struct sk_buff *)(p))->nfmark)
 #define PKTSETMARK(p, m)               ((struct sk_buff *)(p))->nfmark = (m)
@@ -417,6 +472,16 @@ extern struct sk_buff *osl_pkt_tonative(osl_t *osh, void *pkt);
 #define PKTMARK(p)                     0
 #define PKTSETMARK(p, m)
 #endif 
+=======
+#else
+#define PKTMARK(p)                     (((struct sk_buff *)(p))->nfmark)
+#define PKTSETMARK(p, m)               ((struct sk_buff *)(p))->nfmark = (m)
+#endif
+#else
+#define PKTMARK(p)                     0
+#define PKTSETMARK(p, m)
+#endif
+>>>>>>> cm/cm-11.0
 
 #define PKTALLOCED(osh)		osl_pktalloced(osh)
 extern uint osl_pktalloced(osl_t *osh);
@@ -477,9 +542,15 @@ do { \
 		(t) = (p); \
 	} \
 } while (0)
+<<<<<<< HEAD
 #endif 
 
 #else 
+=======
+#endif
+
+#else
+>>>>>>> cm/cm-11.0
 
 
 

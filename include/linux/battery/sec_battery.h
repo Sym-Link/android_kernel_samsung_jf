@@ -67,6 +67,12 @@ struct sec_battery_info {
 	struct wake_lock monitor_wake_lock;
 	struct workqueue_struct *monitor_wqueue;
 	struct work_struct monitor_work;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SAMSUNG_BATTERY_FACTORY
+	struct wake_lock lpm_wake_lock;
+#endif
+>>>>>>> cm/cm-11.0
 	unsigned int polling_count;
 	unsigned int polling_time;
 	bool polling_in_sleep;
@@ -132,6 +138,10 @@ struct sec_battery_info {
 	int siop_level;
 #if defined(CONFIG_SAMSUNG_BATTERY_ENG_TEST)
 	int stability_test;
+<<<<<<< HEAD
+=======
+	int eng_not_full_status;
+>>>>>>> cm/cm-11.0
 #endif
 };
 

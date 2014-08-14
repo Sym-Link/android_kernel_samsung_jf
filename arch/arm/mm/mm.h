@@ -55,9 +55,12 @@ extern void __flush_dcache_page(struct address_space *mapping, struct page *page
 /* permanent static mappings from iotable_init() */
 #define VM_ARM_STATIC_MAPPING	0x40000000
 
+<<<<<<< HEAD
 /* empty mapping */
 #define VM_ARM_EMPTY_MAPPING	0x20000000
 
+=======
+>>>>>>> cm/cm-11.0
 /* mapping type (attributes) for permanent static mappings */
 #define VM_ARM_MTYPE(mt)		((mt) << 20)
 #define VM_ARM_MTYPE_MASK	(0x1f << 20)
@@ -73,7 +76,10 @@ extern phys_addr_t arm_dma_limit;
 #define arm_dma_limit ((phys_addr_t)~0)
 #endif
 
+<<<<<<< HEAD
 struct map_desc;
+=======
+>>>>>>> cm/cm-11.0
 extern phys_addr_t arm_lowmem_limit;
 
 void __init bootmem_init(void);

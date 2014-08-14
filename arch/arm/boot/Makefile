@@ -11,6 +11,12 @@
 # Copyright (C) 1995-2002 Russell King
 #
 
+<<<<<<< HEAD
+=======
+ifeq ($(CONFIG_CRYPTO_FIPS),y)
+MKFIPS          := $(srctree)/scripts/mk_fipsbinary.sh
+endif
+>>>>>>> cm/cm-11.0
 ifneq ($(MACHINE),)
 include $(srctree)/$(MACHINE)/Makefile.boot
 endif
@@ -53,6 +59,12 @@ $(obj)/compressed/vmlinux: $(obj)/Image FORCE
 
 $(obj)/zImage:	$(obj)/compressed/vmlinux FORCE
 	$(call if_changed,objcopy)
+<<<<<<< HEAD
+=======
+ifeq ($(CONFIG_CRYPTO_FIPS),y)
+	$(MKFIPS) $(obj)/zImage
+endif
+>>>>>>> cm/cm-11.0
 	@echo '  Kernel: $@ is ready'
 
 endif

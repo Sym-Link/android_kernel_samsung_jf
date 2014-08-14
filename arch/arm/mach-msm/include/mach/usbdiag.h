@@ -26,6 +26,10 @@
 #define DIAG_LEGACY		"diag"
 #define DIAG_MDM		"diag_mdm"
 #define DIAG_QSC		"diag_qsc"
+<<<<<<< HEAD
+=======
+#define DIAG_MDM2		"diag_mdm2"
+>>>>>>> cm/cm-11.0
 
 #define USB_DIAG_CONNECT	0
 #define USB_DIAG_DISCONNECT	1

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011,2014, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -23,7 +27,11 @@ struct msm_buspm_map_dev {
 
 /* Read/write data into kernel buffer */
 struct buspm_xfer_req {
+<<<<<<< HEAD
 	int size;		/* Size of this request, in bytes */
+=======
+	unsigned int  size;		/* Size of this request, in bytes */
+>>>>>>> cm/cm-11.0
 	void *data;		/* Data buffer to transfer data to/from */
 };
 

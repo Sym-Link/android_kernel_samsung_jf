@@ -852,7 +852,10 @@ rndis_unbind(struct usb_configuration *c, struct usb_function *f)
 
 	rndis_deregister(rndis->config);
 	rndis_exit();
+<<<<<<< HEAD
 	rndis_string_defs[0].id = 0;
+=======
+>>>>>>> cm/cm-11.0
 
 	if (gadget_is_superspeed(c->cdev->gadget))
 		usb_free_descriptors(f->ss_descriptors);

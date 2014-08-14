@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Guest Communications
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -38,7 +42,11 @@
 #define INCLUDE_ALLOW_GPL
 #include "include_check.h"
 
+<<<<<<< HEAD
 #define VMID_UNDEF (uint16)0xffff
+=======
+#define VMID_UNDEF ((uint16)0xffff)
+>>>>>>> cm/cm-11.0
 typedef uint16 VmId;
 
 #endif

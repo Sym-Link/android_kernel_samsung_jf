@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -33,9 +37,21 @@
 
 #include "mutex.h"
 
+<<<<<<< HEAD
 void  Mutex_Init(Mutex *mutex);
 void  Mutex_Destroy(Mutex *mutex);
 void  Mutex_CondSig(Mutex *mutex, uint32 cvi, _Bool all);
 void  Mutex_UnlPoll(Mutex *mutex, MutexMode mode, uint32 cvi, void *filp, void *wait);
+=======
+void Mutex_Init(Mutex *mutex);
+void Mutex_Destroy(Mutex *mutex);
+void Mutex_CondSig(Mutex *mutex, uint32 cvi, _Bool all);
+void
+Mutex_UnlPoll(Mutex *mutex,
+	      MutexMode mode,
+	      uint32 cvi,
+	      void *filp,
+	      void *wait);
+>>>>>>> cm/cm-11.0
 
 #endif

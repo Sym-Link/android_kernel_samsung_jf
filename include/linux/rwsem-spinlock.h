@@ -29,7 +29,11 @@ struct rw_semaphore {
 #endif
 #ifdef CONFIG_SEC_FORKHANG_DEBUG
 	/* FIX ME - This is just for the temporary debug, never add this to final version.
+<<<<<<< HEAD
 	 * If activity == -1 owner is who posses the lock 
+=======
+	 * If activity == -1 owner is who posses the lock
+>>>>>>> cm/cm-11.0
 	 * If activity == 0 owner is who lastly released the lock
 	 */
 	struct task_struct *	owner;

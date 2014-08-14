@@ -2454,6 +2454,7 @@ static void a3xx_drawctxt_restore(struct adreno_device *adreno_dev,
 	kgsl_mmu_setstate(&device->mmu, context->pagetable, context->id);
 
 	/*
+<<<<<<< HEAD
 	 * Issue an extra draw call on the A305 when resuming from
 	 * SLUMBER state.
 	 */
@@ -3224,6 +3225,84 @@ static void a305_create_on_resume_ib(struct adreno_device *adreno_dev)
 
 	*dummy_src = adreno_dev->on_resume_cmd.gpuaddr +
 	   ((cmds - (unsigned int *)adreno_dev->on_resume_cmd.hostptr) << 2);
+=======
+	 * Restore GMEM.  (note: changes shader.
+	 * Shader must not already be restored.)
+	 */
+
+	if (context->flags & CTXT_FLAGS_GMEM_RESTORE) {
+		kgsl_cffdump_syncmem(NULL,
+			&context->gpustate,
+			context->context_gmem_shadow.gmem_restore[1],
+			context->context_gmem_shadow.gmem_restore[2] << 2,
+			true);
+
+		adreno_ringbuffer_issuecmds(device, context,
+					KGSL_CMD_FLAGS_PMODE,
+					    context->context_gmem_shadow.
+					    gmem_restore, 3);
+		context->flags &= ~CTXT_FLAGS_GMEM_RESTORE;
+	}
+
+	if (!(context->flags & CTXT_FLAGS_PREAMBLE)) {
+		adreno_ringbuffer_issuecmds(device, context,
+			KGSL_CMD_FLAGS_NONE, context->reg_restore, 3);
+
+		/* Fixup self modifying IBs for restore operations */
+		adreno_ringbuffer_issuecmds(device, context,
+			KGSL_CMD_FLAGS_NONE,
+			context->restore_fixup, 3);
+
+		adreno_ringbuffer_issuecmds(device, context,
+			KGSL_CMD_FLAGS_NONE,
+			context->constant_restore, 3);
+
+		if (context->flags & CTXT_FLAGS_SHADER_RESTORE)
+			adreno_ringbuffer_issuecmds(device, context,
+				KGSL_CMD_FLAGS_NONE,
+				context->shader_restore, 3);
+
+		/* Restore HLSQ_CONTROL_0 register */
+		adreno_ringbuffer_issuecmds(device, context,
+			KGSL_CMD_FLAGS_NONE,
+			context->hlsqcontrol_restore, 3);
+	}
+}
+
+static int a3xx_rb_init(struct adreno_device *adreno_dev,
+			 struct adreno_ringbuffer *rb)
+{
+	unsigned int *cmds, cmds_gpu;
+	cmds = adreno_ringbuffer_allocspace(rb, NULL, 18);
+	if (cmds == NULL)
+		return -ENOMEM;
+
+	cmds_gpu = rb->buffer_desc.gpuaddr + sizeof(uint) * (rb->wptr - 18);
+
+	GSL_RB_WRITE(cmds, cmds_gpu, cp_type3_packet(CP_ME_INIT, 17));
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x000003f7);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000000);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000000);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000000);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000080);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000100);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000180);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00006600);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000150);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x0000014e);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000154);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000001);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000000);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000000);
+	/* Protected mode control - turned off for A3XX */
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000000);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000000);
+	GSL_RB_WRITE(cmds, cmds_gpu, 0x00000000);
+
+	adreno_ringbuffer_submit(rb);
+
+	return 0;
+>>>>>>> cm/cm-11.0
 }
 
 static void a3xx_err_callback(struct adreno_device *adreno_dev, int bit)
@@ -3903,9 +3982,12 @@ static void a3xx_start(struct adreno_device *adreno_dev)
 	/* Turn on the GPU busy counter and let it run free */
 
 	adreno_dev->gpu_cycles = 0;
+<<<<<<< HEAD
 
 	if (adreno_is_a305(adreno_dev))
 		a305_create_on_resume_ib(adreno_dev);
+=======
+>>>>>>> cm/cm-11.0
 }
 
 /*

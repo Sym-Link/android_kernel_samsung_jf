@@ -679,6 +679,10 @@ static int __init msm_bus_debugfs_init(void)
 			commit, (void *)fablist->name, &fabric_data_fops);
 		if (fablist->file == NULL) {
 			MSM_BUS_DBG("Cannot create files for commit data\n");
+<<<<<<< HEAD
+=======
+			mutex_unlock(&msm_bus_dbg_fablist_lock);
+>>>>>>> cm/cm-11.0
 			goto err;
 		}
 	}

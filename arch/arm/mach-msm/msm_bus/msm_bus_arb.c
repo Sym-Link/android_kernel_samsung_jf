@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -462,7 +466,11 @@ uint32_t msm_bus_scale_register_client(struct msm_bus_scale_pdata *pdata)
 	deffab = msm_bus_get_fabric_device(MSM_BUS_FAB_DEFAULT);
 	if (!deffab) {
 		MSM_BUS_ERR("Error finding default fabric\n");
+<<<<<<< HEAD
 		return -ENXIO;
+=======
+		return 0;
+>>>>>>> cm/cm-11.0
 	}
 
 	nfab = msm_bus_get_num_fab();
@@ -574,6 +582,13 @@ int msm_bus_scale_client_update_request(uint32_t cl, unsigned index)
 
 	curr = client->curr;
 	pdata = client->pdata;
+<<<<<<< HEAD
+=======
+	if (!pdata) {
+		MSM_BUS_ERR("Null pdata passed to update-request\n");
+		return -ENXIO;
+	}
+>>>>>>> cm/cm-11.0
 
 	if (index >= pdata->num_usecases) {
 		MSM_BUS_ERR("Client %u passed invalid index: %d\n",
@@ -718,7 +733,11 @@ void msm_bus_scale_client_reset_pnodes(uint32_t cl)
 {
 	int i, src, pnode, index;
 	struct msm_bus_client *client = (struct msm_bus_client *)(cl);
+<<<<<<< HEAD
 	if (IS_ERR(client)) {
+=======
+	if (IS_ERR_OR_NULL(client)) {
+>>>>>>> cm/cm-11.0
 		MSM_BUS_ERR("msm_bus_scale_reset_pnodes error\n");
 		return;
 	}
@@ -739,7 +758,11 @@ void msm_bus_scale_client_reset_pnodes(uint32_t cl)
 void msm_bus_scale_unregister_client(uint32_t cl)
 {
 	struct msm_bus_client *client = (struct msm_bus_client *)(cl);
+<<<<<<< HEAD
 	if (IS_ERR(client) || (!client))
+=======
+	if (IS_ERR_OR_NULL(client))
+>>>>>>> cm/cm-11.0
 		return;
 	if (client->curr != 0)
 		msm_bus_scale_client_update_request(cl, 0);

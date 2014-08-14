@@ -33,8 +33,11 @@
 // #define	DEBUG			// error path messages, extra info
 // #define	VERBOSE			// more; success messages
 
+<<<<<<< HEAD
 #define FD_WAKELOCK	/* define fast dormancy wakelock */
 
+=======
+>>>>>>> cm/cm-11.0
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/if_arp.h>
@@ -50,11 +53,14 @@
 #include <linux/kernel.h>
 #include <linux/pm_runtime.h>
 
+<<<<<<< HEAD
 #ifdef FD_WAKELOCK
 #include <linux/wakelock.h>
 #include <linux/sec_class.h>
 #endif
 
+=======
+>>>>>>> cm/cm-11.0
 #define DRIVER_VERSION		"22-Aug-2005"
 
 
@@ -94,7 +100,11 @@ static u8	node_id [ETH_ALEN];
 
 static const char driver_name [] = "usbnet";
 
+<<<<<<< HEAD
 static struct workqueue_struct	*usbnet_wq;
+=======
+struct workqueue_struct	*usbnet_wq;
+>>>>>>> cm/cm-11.0
 
 static DECLARE_WAIT_QUEUE_HEAD(unlink_wakeup);
 
@@ -104,10 +114,13 @@ module_param (msg_level, int, 0);
 MODULE_PARM_DESC (msg_level, "Override default message level");
 
 /*-------------------------------------------------------------------------*/
+<<<<<<< HEAD
 #ifdef FD_WAKELOCK
 static struct wake_lock fd_wakelock;
 static unsigned int fdwakelock_time;
 #endif
+=======
+>>>>>>> cm/cm-11.0
 
 /* handles CDC Ethernet and many other network "bulk data" interfaces */
 int usbnet_get_endpoints(struct usbnet *dev, struct usb_interface *intf)
@@ -265,6 +278,7 @@ void usbnet_skb_return (struct usbnet *dev, struct sk_buff *skb)
 	if (status != NET_RX_SUCCESS)
 		netif_dbg(dev, rx_err, dev->net,
 			  "netif_rx status %d\n", status);
+<<<<<<< HEAD
 #ifdef FD_WAKELOCK
 	if (dev->udev->descriptor.idProduct == 0x9048 ||
 		dev->udev->descriptor.idProduct == 0x904c) {
@@ -273,6 +287,8 @@ void usbnet_skb_return (struct usbnet *dev, struct sk_buff *skb)
 	}
 #endif
 
+=======
+>>>>>>> cm/cm-11.0
 }
 EXPORT_SYMBOL_GPL(usbnet_skb_return);
 
@@ -354,21 +370,35 @@ void usbnet_defer_kevent (struct usbnet *dev, int work)
 	set_bit (work, &dev->flags);
 	if (!schedule_work (&dev->kevent)) {
 		if (net_ratelimit())
+<<<<<<< HEAD
 		netdev_err(dev->net, "kevent %d may have been dropped\n", work);
 	} else {
 		netdev_dbg(dev->net, "kevent %d scheduled\n", work);
         }
+=======
+			netdev_err(dev->net, "kevent %d may have been dropped\n", work);
+	} else {
+		netdev_dbg(dev->net, "kevent %d scheduled\n", work);
+	}
+>>>>>>> cm/cm-11.0
 }
 EXPORT_SYMBOL_GPL(usbnet_defer_kevent);
 
 /*-------------------------------------------------------------------------*/
 
+<<<<<<< HEAD
 static void rx_complete (struct urb *urb);
 
+=======
+>>>>>>> cm/cm-11.0
 static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
 {
 	struct sk_buff		*skb;
 	struct skb_data		*entry;
+<<<<<<< HEAD
+=======
+	usb_complete_t		complete_fn;
+>>>>>>> cm/cm-11.0
 	int			retval = 0;
 	unsigned long		lockflags;
 	size_t			size = dev->rx_urb_size;
@@ -389,8 +419,18 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
 	entry->dev = dev;
 	entry->length = 0;
 
+<<<<<<< HEAD
 	usb_fill_bulk_urb (urb, dev->udev, dev->in,
 		skb->data, size, rx_complete, skb);
+=======
+	if (dev->driver_info->rx_complete)
+		complete_fn = dev->driver_info->rx_complete;
+	else
+		complete_fn = rx_complete;
+
+	usb_fill_bulk_urb (urb, dev->udev, dev->in,
+		skb->data, size, complete_fn, skb);
+>>>>>>> cm/cm-11.0
 
 	spin_lock_irqsave (&dev->rxq.lock, lockflags);
 
@@ -464,7 +504,11 @@ done:
 
 /*-------------------------------------------------------------------------*/
 
+<<<<<<< HEAD
 static void rx_complete (struct urb *urb)
+=======
+void rx_complete(struct urb *urb)
+>>>>>>> cm/cm-11.0
 {
 	struct sk_buff		*skb = (struct sk_buff *) urb->context;
 	struct skb_data		*entry = (struct skb_data *) skb->cb;
@@ -550,6 +594,10 @@ block:
 	}
 	netif_dbg(dev, rx_err, dev->net, "no read resubmitted\n");
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(rx_complete);
+>>>>>>> cm/cm-11.0
 
 static void intr_complete (struct urb *urb)
 {
@@ -685,7 +733,11 @@ EXPORT_SYMBOL_GPL(usbnet_unlink_rx_urbs);
 /*-------------------------------------------------------------------------*/
 
 // precondition: never called in_interrupt
+<<<<<<< HEAD
 static void usbnet_terminate_urbs(struct usbnet *dev)
+=======
+void usbnet_terminate_urbs(struct usbnet *dev)
+>>>>>>> cm/cm-11.0
 {
 	DECLARE_WAITQUEUE(wait, current);
 	int temp;
@@ -710,6 +762,10 @@ static void usbnet_terminate_urbs(struct usbnet *dev)
 	dev->wait = NULL;
 	remove_wait_queue(&unlink_wakeup, &wait);
 }
+<<<<<<< HEAD
+=======
+EXPORT_SYMBOL_GPL(usbnet_terminate_urbs);
+>>>>>>> cm/cm-11.0
 
 int usbnet_stop (struct net_device *net)
 {
@@ -1059,6 +1115,7 @@ static void tx_complete (struct urb *urb)
 		if (!(dev->driver_info->flags & FLAG_MULTI_PACKET))
 			dev->net->stats.tx_packets++;
 		dev->net->stats.tx_bytes += entry->length;
+<<<<<<< HEAD
 #ifdef FD_WAKELOCK
 		if (dev->udev->descriptor.idProduct == 0x9048 ||
 			dev->udev->descriptor.idProduct == 0x904c) {
@@ -1066,6 +1123,8 @@ static void tx_complete (struct urb *urb)
 			wake_lock_timeout(&fd_wakelock, fdwakelock_time);
 		}
 #endif
+=======
+>>>>>>> cm/cm-11.0
 	} else {
 		dev->net->stats.tx_errors++;
 
@@ -1628,6 +1687,7 @@ EXPORT_SYMBOL_GPL(usbnet_resume);
 
 
 /*-------------------------------------------------------------------------*/
+<<<<<<< HEAD
 #ifdef FD_WAKELOCK
 	struct device *fdwakelock_dev;
 
@@ -1662,6 +1722,8 @@ static ssize_t store_waketime(struct device *dev,
 
 static DEVICE_ATTR(waketime, 0660, show_waketime, store_waketime);
 #endif
+=======
+>>>>>>> cm/cm-11.0
 
 static int __init usbnet_init(void)
 {
@@ -1677,6 +1739,7 @@ static int __init usbnet_init(void)
 		return -ENOMEM;
 	}
 
+<<<<<<< HEAD
 #ifdef FD_WAKELOCK
 	fdwakelock_dev = device_create(sec_class, NULL, 0, NULL, "mdm_hsic_pm");
 	if (IS_ERR(fdwakelock_dev))
@@ -1691,6 +1754,8 @@ static int __init usbnet_init(void)
 	wake_lock_init(&fd_wakelock, WAKE_LOCK_SUSPEND, "fast_dormancy");
 #endif
 
+=======
+>>>>>>> cm/cm-11.0
 	return 0;
 }
 module_init(usbnet_init);

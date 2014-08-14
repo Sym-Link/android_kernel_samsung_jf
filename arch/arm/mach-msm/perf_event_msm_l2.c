@@ -38,9 +38,17 @@
  */
 struct pmu_constraints {
 	u64 pmu_bitmap;
+<<<<<<< HEAD
 	raw_spinlock_t lock;
 } l2_pmu_constraints = {
 	.pmu_bitmap = 0,
+=======
+	u8 codes[64];
+	raw_spinlock_t lock;
+} l2_pmu_constraints = {
+	.pmu_bitmap = 0,
+	.codes = {-1},
+>>>>>>> cm/cm-11.0
 	.lock = __RAW_SPIN_LOCK_UNLOCKED(l2_pmu_constraints.lock),
 };
 
@@ -667,9 +675,17 @@ static int scorpion_l2_get_event_idx(struct pmu_hw_events *cpuc,
 	int ctr = 0;
 
 	if (hwc->config_base == SCORPION_L2CYCLE_CTR_RAW_CODE) {
+<<<<<<< HEAD
 		if (!test_and_set_bit(l2_cycle_ctr_idx,
 					cpuc->used_mask))
 			return l2_cycle_ctr_idx;
+=======
+		if (test_and_set_bit(l2_cycle_ctr_idx,
+					cpuc->used_mask))
+			return -EAGAIN;
+
+		return l2_cycle_ctr_idx;
+>>>>>>> cm/cm-11.0
 	}
 
 	for (ctr = 0; ctr < total_l2_ctrs - 1; ctr++) {
@@ -792,6 +808,7 @@ static int msm_l2_test_set_ev_constraint(struct perf_event *event)
 	u8 prefix = (evt_type & 0xF0000) >> 16;
 	u8 reg   = (evt_type & 0x0F000) >> 12;
 	u8 group =  evt_type & 0x0000F;
+<<<<<<< HEAD
 	unsigned long flags;
 	u32 err = 0;
 	u64 bitmap_t;
@@ -811,6 +828,52 @@ static int msm_l2_test_set_ev_constraint(struct perf_event *event)
 	/* Bit is already set. Constraint failed. */
 	err = -EPERM;
 
+=======
+	u8 code = (evt_type & 0x00FF0) >> 4;
+	unsigned long flags;
+	u32 err = 0;
+	u64 bitmap_t;
+	u32 shift_idx;
+
+	if (!prefix)
+		return 0;
+	/*
+	 * Cycle counter collision is detected in
+	 * get_event_idx().
+	 */
+	if (evt_type == SCORPION_L2CYCLE_CTR_RAW_CODE)
+		return err;
+
+	raw_spin_lock_irqsave(&l2_pmu_constraints.lock, flags);
+
+	shift_idx = ((reg * 4) + group);
+
+	bitmap_t = 1 << shift_idx;
+
+	if (!(l2_pmu_constraints.pmu_bitmap & bitmap_t)) {
+		l2_pmu_constraints.pmu_bitmap |= bitmap_t;
+		l2_pmu_constraints.codes[shift_idx] = code;
+		goto out;
+	} else {
+		/*
+		 * If NRCCG's are identical,
+		 * its not column exclusion.
+		 */
+		if (l2_pmu_constraints.codes[shift_idx] != code)
+			err = -EPERM;
+		else
+			/*
+			 * If the event is counted in syswide mode
+			 * then we want to count only on one CPU
+			 * and set its filter to count from all.
+			 * This sets the event OFF on all but one
+			 * CPU.
+			 */
+			if (!(event->cpu < 0))
+				event->state = PERF_EVENT_STATE_OFF;
+	}
+
+>>>>>>> cm/cm-11.0
 out:
 	raw_spin_unlock_irqrestore(&l2_pmu_constraints.lock, flags);
 	return err;
@@ -824,13 +887,23 @@ static int msm_l2_clear_ev_constraint(struct perf_event *event)
 	u8 group =  evt_type & 0x0000F;
 	unsigned long flags;
 	u64 bitmap_t;
+<<<<<<< HEAD
+=======
+	u32 shift_idx;
+>>>>>>> cm/cm-11.0
 
 	if (!prefix)
 		return 0;
 
 	raw_spin_lock_irqsave(&l2_pmu_constraints.lock, flags);
 
+<<<<<<< HEAD
 	bitmap_t = 1 << ((reg * 4) + group);
+=======
+	shift_idx = ((reg * 4) + group);
+
+	bitmap_t = 1 << shift_idx;
+>>>>>>> cm/cm-11.0
 
 	/* Clear constraint bit. */
 	l2_pmu_constraints.pmu_bitmap &= ~bitmap_t;

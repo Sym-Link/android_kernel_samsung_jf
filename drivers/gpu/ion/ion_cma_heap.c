@@ -115,6 +115,10 @@ static void ion_cma_free(struct ion_buffer *buffer)
 	dev_dbg(dev, "Release buffer %p\n", buffer);
 	/* release memory */
 	dma_free_coherent(dev, buffer->size, info->cpu_addr, info->handle);
+<<<<<<< HEAD
+=======
+	sg_free_table(info->table);
+>>>>>>> cm/cm-11.0
 	/* release sg table */
 	kfree(info->table);
 	kfree(info);
@@ -228,9 +232,14 @@ int ion_cma_map_iommu(struct ion_buffer *buffer,
 
 	extra_iova_addr = data->iova_addr + buffer->size;
 	if (extra) {
+<<<<<<< HEAD
 		unsigned long phys_addr = sg_phys(table->sgl);
 		ret = msm_iommu_map_extra(domain, extra_iova_addr, phys_addr,
 					extra, SZ_4K, prot);
+=======
+		ret = msm_iommu_map_extra(domain, extra_iova_addr, extra, SZ_4K,
+						prot);
+>>>>>>> cm/cm-11.0
 		if (ret)
 			goto out2;
 	}
@@ -320,6 +329,7 @@ int ion_cma_cache_ops(struct ion_heap *heap,
 	return 0;
 }
 
+<<<<<<< HEAD
 static int ion_cma_print_debug(struct ion_heap *heap, struct seq_file *s,
 			const struct rb_root *mem_map)
 {
@@ -349,6 +359,8 @@ static int ion_cma_print_debug(struct ion_heap *heap, struct seq_file *s,
 	return 0;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static struct ion_heap_ops ion_cma_ops = {
 	.allocate = ion_cma_allocate,
 	.free = ion_cma_free,
@@ -361,7 +373,10 @@ static struct ion_heap_ops ion_cma_ops = {
 	.map_iommu = ion_cma_map_iommu,
 	.unmap_iommu = ion_cma_unmap_iommu,
 	.cache_op = ion_cma_cache_ops,
+<<<<<<< HEAD
 	.print_debug = ion_cma_print_debug,
+=======
+>>>>>>> cm/cm-11.0
 };
 
 struct ion_heap *ion_cma_heap_create(struct ion_platform_heap *data)

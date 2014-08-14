@@ -67,7 +67,11 @@ static int s_show(struct seq_file *m, void *p)
 	struct rb_node *r = p;
 	struct alloc *node = rb_entry(r, struct alloc, rb_node);
 
+<<<<<<< HEAD
 	seq_printf(m, "0x%pa 0x%pa %ld %u %pS\n", &node->paddr, &node->vaddr,
+=======
+	seq_printf(m, "0x%lx 0x%p %ld %u %pS\n", node->paddr, node->vaddr,
+>>>>>>> cm/cm-11.0
 		   node->len, node->mpool->id, node->caller);
 	return 0;
 }
@@ -84,7 +88,11 @@ static int mempool_open(struct inode *inode, struct file *file)
 	return seq_open(file, &mempool_op);
 }
 
+<<<<<<< HEAD
 static struct alloc *find_alloc(phys_addr_t addr)
+=======
+static struct alloc *find_alloc(void *addr)
+>>>>>>> cm/cm-11.0
 {
 	struct rb_root *root = &alloc_root;
 	struct rb_node *p = root->rb_node;
@@ -126,7 +134,11 @@ static int add_alloc(struct alloc *node)
 		else if (node->vaddr > tmp->vaddr)
 			p = &(*p)->rb_right;
 		else {
+<<<<<<< HEAD
 			WARN(1, "memory at %pa already allocated", &tmp->vaddr);
+=======
+			WARN(1, "memory at %p already allocated", tmp->vaddr);
+>>>>>>> cm/cm-11.0
 			mutex_unlock(&alloc_mutex);
 			return -EINVAL;
 		}
@@ -149,7 +161,11 @@ static int remove_alloc(struct alloc *victim_node)
 	return 0;
 }
 
+<<<<<<< HEAD
 static struct gen_pool *initialize_gpool(phys_addr_t start,
+=======
+static struct gen_pool *initialize_gpool(unsigned long start,
+>>>>>>> cm/cm-11.0
 	unsigned long size)
 {
 	struct gen_pool *gpool;
@@ -194,12 +210,16 @@ static void *__alloc(struct mem_pool *mpool, unsigned long size,
 	if (!vaddr)
 		goto out_kfree;
 
+<<<<<<< HEAD
 	/*
 	 * Just cast to an unsigned long to avoid warnings about casting from a
 	 * pointer to an integer of different size. The pointer is only 32-bits
 	 * so we lose no data.
 	 */
 	node->vaddr = (unsigned long)vaddr;
+=======
+	node->vaddr = vaddr;
+>>>>>>> cm/cm-11.0
 	node->paddr = paddr;
 	node->len = aligned_size;
 	node->mpool = mpool;
@@ -221,12 +241,17 @@ out:
 
 static void __free(void *vaddr, bool unmap)
 {
+<<<<<<< HEAD
 	struct alloc *node = find_alloc((unsigned long)vaddr);
+=======
+	struct alloc *node = find_alloc(vaddr);
+>>>>>>> cm/cm-11.0
 
 	if (!node)
 		return;
 
 	if (unmap)
+<<<<<<< HEAD
 		/*
 		 * We need the double cast because otherwise gcc complains about
 		 * cast to pointer of different size. This is technically a down
@@ -234,6 +259,9 @@ static void __free(void *vaddr, bool unmap)
 		 * actual 32-bit pointer anyway.
 		 */
 		iounmap((void *)(unsigned long)node->vaddr);
+=======
+		iounmap(node->vaddr);
+>>>>>>> cm/cm-11.0
 
 	gen_pool_free(node->mpool->gpool, node->paddr, node->len);
 	node->mpool->free += node->len;
@@ -259,7 +287,11 @@ static struct mem_pool *mem_type_to_memory_pool(int mem_type)
 	return mpool;
 }
 
+<<<<<<< HEAD
 struct mem_pool *initialize_memory_pool(phys_addr_t start,
+=======
+struct mem_pool *initialize_memory_pool(unsigned long start,
+>>>>>>> cm/cm-11.0
 	unsigned long size, int mem_type)
 {
 	int id = mem_type;
@@ -275,8 +307,13 @@ struct mem_pool *initialize_memory_pool(phys_addr_t start,
 	mpools[id].id = id;
 	mutex_unlock(&mpools[id].pool_mutex);
 
+<<<<<<< HEAD
 	pr_info("memory pool %d (start %pa size %lx) initialized\n",
 		id, &start, size);
+=======
+	pr_info("memory pool %d (start %lx size %lx) initialized\n",
+		id, start, size);
+>>>>>>> cm/cm-11.0
 	return &mpools[id];
 }
 EXPORT_SYMBOL_GPL(initialize_memory_pool);
@@ -296,10 +333,17 @@ void *allocate_contiguous_memory(unsigned long size,
 }
 EXPORT_SYMBOL_GPL(allocate_contiguous_memory);
 
+<<<<<<< HEAD
 phys_addr_t _allocate_contiguous_memory_nomap(unsigned long size,
 	int mem_type, unsigned long align, void *caller)
 {
 	phys_addr_t paddr;
+=======
+unsigned long _allocate_contiguous_memory_nomap(unsigned long size,
+	int mem_type, unsigned long align, void *caller)
+{
+	unsigned long paddr;
+>>>>>>> cm/cm-11.0
 	unsigned long aligned_size;
 
 	struct alloc *node;
@@ -328,7 +372,11 @@ phys_addr_t _allocate_contiguous_memory_nomap(unsigned long size,
 	 * are disjoint, so there won't be any chance of
 	 * a duplicate node->vaddr value.
 	 */
+<<<<<<< HEAD
 	node->vaddr = paddr;
+=======
+	node->vaddr = (void *)paddr;
+>>>>>>> cm/cm-11.0
 	node->len = aligned_size;
 	node->mpool = mpool;
 	node->caller = caller;
@@ -345,7 +393,11 @@ out:
 }
 EXPORT_SYMBOL_GPL(_allocate_contiguous_memory_nomap);
 
+<<<<<<< HEAD
 phys_addr_t allocate_contiguous_memory_nomap(unsigned long size,
+=======
+unsigned long allocate_contiguous_memory_nomap(unsigned long size,
+>>>>>>> cm/cm-11.0
 	int mem_type, unsigned long align)
 {
 	return _allocate_contiguous_memory_nomap(size, mem_type, align,
@@ -362,18 +414,32 @@ void free_contiguous_memory(void *addr)
 }
 EXPORT_SYMBOL_GPL(free_contiguous_memory);
 
+<<<<<<< HEAD
 void free_contiguous_memory_by_paddr(phys_addr_t paddr)
 {
 	if (!paddr)
 		return;
 	__free((void *)(unsigned long)paddr, false);
+=======
+void free_contiguous_memory_by_paddr(unsigned long paddr)
+{
+	if (!paddr)
+		return;
+	__free((void *)paddr, false);
+>>>>>>> cm/cm-11.0
 	return;
 }
 EXPORT_SYMBOL_GPL(free_contiguous_memory_by_paddr);
 
+<<<<<<< HEAD
 phys_addr_t memory_pool_node_paddr(void *vaddr)
 {
 	struct alloc *node = find_alloc((unsigned long)vaddr);
+=======
+unsigned long memory_pool_node_paddr(void *vaddr)
+{
+	struct alloc *node = find_alloc(vaddr);
+>>>>>>> cm/cm-11.0
 
 	if (!node)
 		return -EINVAL;
@@ -384,7 +450,11 @@ EXPORT_SYMBOL_GPL(memory_pool_node_paddr);
 
 unsigned long memory_pool_node_len(void *vaddr)
 {
+<<<<<<< HEAD
 	struct alloc *node = find_alloc((unsigned long)vaddr);
+=======
+	struct alloc *node = find_alloc(vaddr);
+>>>>>>> cm/cm-11.0
 
 	if (!node)
 		return -EINVAL;

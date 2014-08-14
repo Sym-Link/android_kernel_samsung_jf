@@ -80,7 +80,11 @@ extern struct mutex sched_domains_mutex;
 struct cfs_rq;
 struct rt_rq;
 
+<<<<<<< HEAD
 static LIST_HEAD(task_groups);
+=======
+extern struct list_head task_groups;
+>>>>>>> cm/cm-11.0
 
 struct cfs_bandwidth {
 #ifdef CONFIG_CFS_BANDWIDTH
@@ -526,6 +530,10 @@ static inline struct sched_domain *highest_flag_domain(int cpu, int flag)
 }
 
 DECLARE_PER_CPU(struct sched_domain *, sd_llc);
+<<<<<<< HEAD
+=======
+DECLARE_PER_CPU(int, sd_llc_size);
+>>>>>>> cm/cm-11.0
 DECLARE_PER_CPU(int, sd_llc_id);
 
 #endif /* CONFIG_SMP */
@@ -876,7 +884,10 @@ extern void sysrq_sched_debug_show(void);
 extern void sched_init_granularity(void);
 extern void update_max_interval(void);
 extern void update_group_power(struct sched_domain *sd, int cpu);
+<<<<<<< HEAD
 extern int update_runtime(struct notifier_block *nfb, unsigned long action, void *hcpu);
+=======
+>>>>>>> cm/cm-11.0
 extern void init_sched_rt_class(void);
 extern void init_sched_fair_class(void);
 

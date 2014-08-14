@@ -220,7 +220,11 @@ static int expand_fdtable(struct files_struct *files, int nr)
 	 */
 	if (unlikely(new_fdt->max_fds <= nr)) {
 		__free_fdtable(new_fdt);
+<<<<<<< HEAD
 		printk("[expand_fdtable] EMFILE : unlikely(new_fdt->max_fds <= nr\n)"); 
+=======
+		printk("[expand_fdtable] EMFILE : unlikely(new_fdt->max_fds <= nr\n)");
+>>>>>>> cm/cm-11.0
 		return -EMFILE;
 	}
 	/*

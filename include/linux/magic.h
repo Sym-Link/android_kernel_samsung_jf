@@ -69,5 +69,9 @@
 #define MTD_INODE_FS_MAGIC      0x11307854
 #define ANON_INODE_FS_MAGIC	0x09041934
 
+<<<<<<< HEAD
+=======
+#define SDCARDFS_SUPER_MAGIC    0xb550ca10
+>>>>>>> cm/cm-11.0
 
 #endif /* __LINUX_MAGIC_H__ */

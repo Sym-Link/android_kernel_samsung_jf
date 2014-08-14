@@ -82,6 +82,15 @@ static int msm_gesture_proc_ctrl_cmd(struct msm_gesture_ctrl *p_gesture_ctrl,
 	}
 	uptr_cmd = (void __user *)ctrl->value;
 	uptr_value = (void __user *)tmp_cmd->value;
+<<<<<<< HEAD
+=======
+
+	if(tmp_cmd->length > 0xffff) {
+                pr_err("%s Integer Overflow occurred \n",__func__);
+                rc = -EINVAL;
+                goto end;
+       }
+>>>>>>> cm/cm-11.0
 	value_len = tmp_cmd->length;
 
 	D("%s: cmd type = %d, up1=0x%x, ulen1=%d, up2=0x%x, ulen2=%d\n",

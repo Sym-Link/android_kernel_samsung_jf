@@ -14,6 +14,7 @@
  */
 #include <linux/kernel.h>
 #include "../ssp.h"
+<<<<<<< HEAD
 
 #if defined(CONFIG_MACH_JF_ATT) || defined(CONFIG_MACH_JF_TMO) || \
 	defined(CONFIG_MACH_JF_EUR) || defined(CONFIG_MACH_JF_USC) || \
@@ -27,6 +28,9 @@
 #elif defined(CONFIG_MACH_JACTIVE_EUR)
 #define K330_REV	12
 #endif
+=======
+#include "../../../arch/arm/mach-msm/board-8064.h"
+>>>>>>> cm/cm-11.0
 
 /*************************************************************************/
 /* factory Sysfs                                                         */
@@ -50,6 +54,7 @@
 #define DEF_RMS_SCALE_FOR_RMS (10000)
 #define DEF_SQRT_SCALE_FOR_RMS (100)
 
+<<<<<<< HEAD
 static ssize_t gyro_vendor_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
@@ -71,11 +76,34 @@ static ssize_t gyro_vendor_show(struct device *dev,
 #else
 	return sprintf(buf, "%s\n", VENDOR);
 #endif
+=======
+static int k330_rev = 0;
+
+static ssize_t gyro_vendor_show(struct device *dev,
+	struct device_attribute *attr, char *buf)
+{
+	struct ssp_data *data = dev_get_drvdata(dev);
+
+	if (system_rev <= 10) {
+		if (data->ap_rev == 13)
+			return sprintf(buf, "%s\n", VENDOR);
+		else if (data->ap_rev >= k330_rev)
+			return sprintf(buf, "%s\n", VENDOR_K330);
+		else
+			return sprintf(buf, "%s\n", VENDOR);
+	} else {
+		if (data->ap_rev >= k330_rev)
+			return sprintf(buf, "%s\n", VENDOR_K330);
+		else
+			return sprintf(buf, "%s\n", VENDOR);
+	}
+>>>>>>> cm/cm-11.0
 }
 
 static ssize_t gyro_name_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
+<<<<<<< HEAD
 #ifdef K330_REV
 	struct ssp_data *data = dev_get_drvdata(dev);
 #if defined(CONFIG_MACH_JF_EUR)
@@ -94,6 +122,23 @@ static ssize_t gyro_name_show(struct device *dev,
 #else
 	return sprintf(buf, "%s\n", CHIP_ID);
 #endif
+=======
+	struct ssp_data *data = dev_get_drvdata(dev);
+
+	if (system_rev <= 10) {
+		if (data->ap_rev == 13)
+			return sprintf(buf, "%s\n", CHIP_ID);
+		else if (data->ap_rev >= k330_rev)
+			return sprintf(buf, "%s\n", CHIP_ID_K330);
+		else
+			return sprintf(buf, "%s\n", CHIP_ID);
+	} else {
+		if (data->ap_rev >= k330_rev)
+			return sprintf(buf, "%s\n", CHIP_ID_K330);
+		else
+			return sprintf(buf, "%s\n", CHIP_ID);
+	}
+>>>>>>> cm/cm-11.0
 }
 
 int gyro_open_calibration(struct ssp_data *data)
@@ -252,6 +297,7 @@ static ssize_t gyro_get_temp(struct device *dev,
 {
 	short temperature = 0;
 	struct ssp_data *data = dev_get_drvdata(dev);
+<<<<<<< HEAD
 #ifdef K330_REV
 #if defined(CONFIG_MACH_JF_EUR)
 	if (data->ap_rev == 13)
@@ -269,6 +315,23 @@ static ssize_t gyro_get_temp(struct device *dev,
 #else
 	temperature = mpu6500_gyro_get_temp(data);
 #endif
+=======
+
+	if (system_rev <= 10) {
+		if (data->ap_rev == 13)
+			temperature = mpu6500_gyro_get_temp(data);
+		else if (data->ap_rev >= k330_rev)
+			temperature = (short)k330_gyro_get_temp(data);
+		else
+			temperature = mpu6500_gyro_get_temp(data);
+	} else {
+		if (data->ap_rev >= k330_rev)
+			temperature = (short)k330_gyro_get_temp(data);
+		else
+			temperature = mpu6500_gyro_get_temp(data);
+	}
+
+>>>>>>> cm/cm-11.0
 	return sprintf(buf, "%d\n", temperature);
 }
 
@@ -642,6 +705,7 @@ static ssize_t gyro_selftest_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
 	struct ssp_data *data = dev_get_drvdata(dev);
+<<<<<<< HEAD
 #ifdef K330_REV
 #if defined(CONFIG_MACH_JF_EUR)
 	if (data->ap_rev == 13)
@@ -659,6 +723,22 @@ static ssize_t gyro_selftest_show(struct device *dev,
 #else
 	return mpu6500_gyro_selftest(buf, data);
 #endif
+=======
+
+	if (system_rev <= 10) {
+		if (data->ap_rev == 13)
+			return mpu6500_gyro_selftest(buf, data);
+		else if (data->ap_rev >= k330_rev)
+			return k330_gyro_selftest(buf, data);
+		else
+			return mpu6500_gyro_selftest(buf, data);
+	} else {
+		if (data->ap_rev >= k330_rev)
+			return k330_gyro_selftest(buf, data);
+		else
+			return mpu6500_gyro_selftest(buf, data);
+	}
+>>>>>>> cm/cm-11.0
 }
 
 static ssize_t gyro_selftest_dps_store(struct device *dev,
@@ -745,6 +825,14 @@ static struct device_attribute *gyro_attrs[] = {
 
 void initialize_gyro_factorytest(struct ssp_data *data)
 {
+<<<<<<< HEAD
+=======
+        if (system_rev <= 10)
+                k330_rev = 10;
+        else
+                k330_rev = 11;
+
+>>>>>>> cm/cm-11.0
 	sensors_register(data->gyro_device, data, gyro_attrs, "gyro_sensor");
 }
 

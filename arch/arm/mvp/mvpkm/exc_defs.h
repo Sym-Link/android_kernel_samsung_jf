@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -60,8 +64,16 @@
 #define EXC_THUMB_IRQ_SAVED_PC_OFFSET              4
 #define EXC_THUMB_FIQ_SAVED_PC_OFFSET              4
 
+<<<<<<< HEAD
 #define EXC_SAVED_PC_OFFSET(exc, cpsr) \
    (((cpsr) & ARM_PSR_T) ? EXC_THUMB_##exc##_SAVED_PC_OFFSET : \
                            EXC_ARM_##exc##_SAVED_PC_OFFSET)
 
 #endif /// _EXC_DEFS_H_
+=======
+#define EXC_SAVED_PC_OFFSET(exc, cpsr)					\
+	(((cpsr) & ARM_PSR_T) ? EXC_THUMB_##exc##_SAVED_PC_OFFSET :	\
+				EXC_ARM_##exc##_SAVED_PC_OFFSET)
+
+#endif /* _EXC_DEFS_H_ */
+>>>>>>> cm/cm-11.0

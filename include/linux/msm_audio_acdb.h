@@ -39,8 +39,15 @@
 			(AUDIO_MAX_COMMON_IOCTL_NUM+16), unsigned)
 #define AUDIO_SET_AFE_RX_CAL		_IOW(AUDIO_IOCTL_MAGIC, \
 			(AUDIO_MAX_COMMON_IOCTL_NUM+17), unsigned)
+<<<<<<< HEAD
 
 
+=======
+#define AUDIO_SET_HW_DELAY_RX	_IOW(AUDIO_IOCTL_MAGIC, \
+			(AUDIO_MAX_COMMON_IOCTL_NUM+18), struct hw_delay)
+#define AUDIO_SET_HW_DELAY_TX	_IOW(AUDIO_IOCTL_MAGIC, \
+			(AUDIO_MAX_COMMON_IOCTL_NUM+19), struct hw_delay)
+>>>>>>> cm/cm-11.0
 #define	AUDIO_MAX_ACDB_IOCTL	(AUDIO_MAX_COMMON_IOCTL_NUM+30)
 
 /* ACDB structures */
@@ -54,6 +61,13 @@ struct sidetone_cal {
 	uint16_t	gain;
 };
 
+<<<<<<< HEAD
+=======
+struct hw_delay {
+	uint32_t num_entries;
+	void *delay_info;
+};
+>>>>>>> cm/cm-11.0
 /* For Real-Time Audio Calibration */
 #define AUDIO_GET_RTAC_ADM_INFO		_IOR(AUDIO_IOCTL_MAGIC, \
 			(AUDIO_MAX_ACDB_IOCTL+1), unsigned)

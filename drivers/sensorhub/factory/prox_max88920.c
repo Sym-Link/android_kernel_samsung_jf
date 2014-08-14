@@ -27,7 +27,11 @@
 #define LDI_GRAY	'1'
 #define LDI_WHITE	'2'
 
+<<<<<<< HEAD
 #if defined(CONFIG_MACH_JACTIVE_EUR)
+=======
+#if defined(CONFIG_MACH_JACTIVE_EUR) || defined(CONFIG_MACH_JACTIVE_ATT)
+>>>>>>> cm/cm-11.0
 #define DEFUALT_HIGH_THRESHOLD	45
 #define DEFUALT_LOW_THRESHOLD	30
 #define TBD_HIGH_THRESHOLD		45

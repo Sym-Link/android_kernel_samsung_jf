@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -43,13 +47,19 @@
  *
  * @param n unsigned 32-bit integer.
  *
+<<<<<<< HEAD
  * @return 32 if n == 0 otherwise 31 - the bit position of the most significant 1
  *         in n.
+=======
+ * @return 32 if n == 0 otherwise 31 - the bit position of the most
+ * significant 1 in n.
+>>>>>>> cm/cm-11.0
  */
 #ifdef __COVERITY__
 static inline int
 CLZ(unsigned int n)
 {
+<<<<<<< HEAD
    unsigned int r = 0;
 
    while (n) {
@@ -58,17 +68,36 @@ CLZ(unsigned int n)
    }
 
    return 32 - r;
+=======
+	unsigned int r = 0;
+
+	while (n) {
+		r++;
+		n >>= 1;
+	}
+
+	return 32 - r;
+>>>>>>> cm/cm-11.0
 }
 #else
 #define CLZ(n) __builtin_clz(n)
 #endif
 
+<<<<<<< HEAD
 #define PACKED __attribute__ ((packed))
 #define ALLOC  __attribute__ ((malloc, warn_unused_result))
 #define UNUSED __attribute__ ((unused))
 #define PURE   __attribute__ ((pure))
 #define WARN_UNUSED_RESULT __attribute__ ((warn_unused_result))
 #define FORMAT(x,y,z) __attribute__ ((format(x,y,z)))
+=======
+#define PACKED __attribute__((packed))
+#define ALLOC  __attribute__((malloc, warn_unused_result))
+#define UNUSED __attribute__((unused))
+#define PURE   __attribute__((pure))
+#define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#define FORMAT(x, y, z) __attribute__((format(x, y, z)))
+>>>>>>> cm/cm-11.0
 #define LIKELY(x)       __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)     __builtin_expect((x), 0)
 

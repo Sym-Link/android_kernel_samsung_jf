@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -21,6 +25,10 @@
 #include <linux/debugfs.h>
 #include <linux/bitops.h>
 #include <linux/smux.h>
+<<<<<<< HEAD
+=======
+#include <linux/completion.h>
+>>>>>>> cm/cm-11.0
 
 #include <mach/usb_gadget_xport.h>
 
@@ -73,6 +81,10 @@ module_param(ghsuart_data_tx_intr_thld, uint, S_IRUGO | S_IWUSR);
 
 #define CH_OPENED 0
 #define CH_READY 1
+<<<<<<< HEAD
+=======
+#define CH_CONNECTED 2
+>>>>>>> cm/cm-11.0
 
 struct ghsuart_data_port {
 	/* port */
@@ -87,6 +99,10 @@ struct ghsuart_data_port {
 	spinlock_t		port_lock;
 	void *port_usb;
 
+<<<<<<< HEAD
+=======
+	struct completion	close_complete;
+>>>>>>> cm/cm-11.0
 	/* data transfer queues */
 	unsigned int		tx_q_size;
 	struct list_head	tx_idle;
@@ -503,8 +519,17 @@ static void ghsuart_notify_event(void *priv, int event_type,
 
 	pr_debug("%s: event type: %s ", __func__, event_string(event_type));
 	switch (event_type) {
+<<<<<<< HEAD
 	case SMUX_CONNECTED:
 		set_bit(CH_OPENED, &port->channel_sts);
+=======
+	case SMUX_LOCAL_CLOSED:
+		clear_bit(CH_OPENED, &port->channel_sts);
+		complete(&port->close_complete);
+		break;
+	case SMUX_CONNECTED:
+		set_bit(CH_CONNECTED, &port->channel_sts);
+>>>>>>> cm/cm-11.0
 		if (port->gtype == USB_GADGET_SERIAL) {
 			cbits = msm_smux_tiocm_get(port->ch_id);
 			if (cbits & ACM_CTRL_DCD) {
@@ -516,7 +541,11 @@ static void ghsuart_notify_event(void *priv, int event_type,
 		ghsuart_data_start_io(port);
 		break;
 	case SMUX_DISCONNECTED:
+<<<<<<< HEAD
 		clear_bit(CH_OPENED, &port->channel_sts);
+=======
+		clear_bit(CH_CONNECTED, &port->channel_sts);
+>>>>>>> cm/cm-11.0
 		break;
 	case SMUX_READ_DONE:
 		skb = meta_read->pkt_priv;
@@ -590,6 +619,17 @@ static void ghsuart_data_connect_w(struct work_struct *w)
 
 	pr_debug("%s: port:%p\n", __func__, port);
 
+<<<<<<< HEAD
+=======
+	if (test_bit(CH_OPENED, &port->channel_sts)) {
+		ret = wait_for_completion_timeout(
+				&port->close_complete, 3 * HZ);
+		if (ret == 0) {
+			pr_err("%s: smux close timedout\n", __func__);
+			return;
+		}
+	}
+>>>>>>> cm/cm-11.0
 	ret = msm_smux_open(port->ch_id, port, &ghsuart_notify_event,
 				&ghsuart_get_rx_buffer);
 	if (ret) {
@@ -597,6 +637,10 @@ static void ghsuart_data_connect_w(struct work_struct *w)
 				__func__, port->ch_id, ret);
 		return;
 	}
+<<<<<<< HEAD
+=======
+	set_bit(CH_OPENED, &port->channel_sts);
+>>>>>>> cm/cm-11.0
 }
 
 static void ghsuart_data_disconnect_w(struct work_struct *w)
@@ -607,8 +651,14 @@ static void ghsuart_data_disconnect_w(struct work_struct *w)
 	if (!test_bit(CH_OPENED, &port->channel_sts))
 		return;
 
+<<<<<<< HEAD
 	msm_smux_close(port->ch_id);
 	clear_bit(CH_OPENED, &port->channel_sts);
+=======
+	INIT_COMPLETION(port->close_complete);
+	msm_smux_close(port->ch_id);
+	clear_bit(CH_CONNECTED, &port->channel_sts);
+>>>>>>> cm/cm-11.0
 }
 
 static void ghsuart_data_free_buffers(struct ghsuart_data_port *port)
@@ -711,6 +761,10 @@ static int ghsuart_data_remove(struct platform_device *pdev)
 
 	clear_bit(CH_READY, &port->channel_sts);
 	clear_bit(CH_OPENED, &port->channel_sts);
+<<<<<<< HEAD
+=======
+	clear_bit(CH_CONNECTED, &port->channel_sts);
+>>>>>>> cm/cm-11.0
 
 	return 0;
 }
@@ -748,7 +802,11 @@ ghsuart_send_controlbits_tomodem(void *gptr, u8 portno, int cbits)
 
 	port->cbits_tomodem = cbits;
 
+<<<<<<< HEAD
 	if (!test_bit(CH_OPENED, &port->channel_sts))
+=======
+	if (!test_bit(CH_CONNECTED, &port->channel_sts))
+>>>>>>> cm/cm-11.0
 		return;
 
 	/* if DTR is high, update latest modem info to Host */
@@ -787,6 +845,10 @@ static int ghsuart_data_port_alloc(unsigned port_num, enum gadget_type gtype)
 	spin_lock_init(&port->rx_lock);
 	spin_lock_init(&port->tx_lock);
 
+<<<<<<< HEAD
+=======
+	init_completion(&port->close_complete);
+>>>>>>> cm/cm-11.0
 	INIT_WORK(&port->connect_w, ghsuart_data_connect_w);
 	INIT_WORK(&port->disconnect_w, ghsuart_data_disconnect_w);
 	INIT_WORK(&port->write_tohost_w, ghsuart_data_write_tohost);
@@ -995,6 +1057,10 @@ static ssize_t ghsuart_data_read_stats(struct file *file,
 				"#PORT:%d port#:   %p\n"
 				"data_ch_open:	   %d\n"
 				"data_ch_ready:    %d\n"
+<<<<<<< HEAD
+=======
+				"data_ch_connected: %d\n"
+>>>>>>> cm/cm-11.0
 				"\n******UL INFO*****\n\n"
 				"dpkts_to_modem:   %lu\n"
 				"tomodem_drp_cnt:  %u\n"
@@ -1004,6 +1070,10 @@ static ssize_t ghsuart_data_read_stats(struct file *file,
 				i, port,
 				test_bit(CH_OPENED, &port->channel_sts),
 				test_bit(CH_READY, &port->channel_sts),
+<<<<<<< HEAD
+=======
+				test_bit(CH_CONNECTED, &port->channel_sts),
+>>>>>>> cm/cm-11.0
 				port->to_modem,
 				port->tomodem_drp_cnt,
 				port->rx_skb_q.qlen,

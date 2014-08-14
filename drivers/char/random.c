@@ -270,14 +270,30 @@
  * The minimum number of bits of entropy before we wake up a read on
  * /dev/random.  Should be enough to do a significant reseed.
  */
+<<<<<<< HEAD
 static int random_read_wakeup_thresh = 64;
 
+=======
+#ifdef CONFIG_CRYPTO_FIPS
+static int random_read_wakeup_thresh = 256;
+#else
+static int random_read_wakeup_thresh = 64;
+#endif
+>>>>>>> cm/cm-11.0
 /*
  * If the entropy count falls under this number of bits, then we
  * should wake up processes which are selecting or polling on write
  * access to /dev/random.
  */
+<<<<<<< HEAD
 static int random_write_wakeup_thresh = 128;
+=======
+#ifdef CONFIG_CRYPTO_FIPS
+static int random_write_wakeup_thresh = 320;
+#else
+static int random_write_wakeup_thresh = 128;
+#endif
+>>>>>>> cm/cm-11.0
 
 /*
  * When the input pool goes over trickle_thresh, start dropping most

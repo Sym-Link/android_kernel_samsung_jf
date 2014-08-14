@@ -90,8 +90,13 @@ unsigned ext4_num_overhead_clusters(struct super_block *sb,
 	 * unusual file system layouts.
 	 */
 	if (ext4_block_in_group(sb, ext4_block_bitmap(sb, gdp), block_group)) {
+<<<<<<< HEAD
 		block_cluster = EXT4_B2C(sbi,
 					 ext4_block_bitmap(sb, gdp) - start);
+=======
+		block_cluster = EXT4_B2C(sbi, (start -
+					       ext4_block_bitmap(sb, gdp)));
+>>>>>>> cm/cm-11.0
 		if (block_cluster < num_clusters)
 			block_cluster = -1;
 		else if (block_cluster == num_clusters) {
@@ -102,7 +107,11 @@ unsigned ext4_num_overhead_clusters(struct super_block *sb,
 
 	if (ext4_block_in_group(sb, ext4_inode_bitmap(sb, gdp), block_group)) {
 		inode_cluster = EXT4_B2C(sbi,
+<<<<<<< HEAD
 					 ext4_inode_bitmap(sb, gdp) - start);
+=======
+					 start - ext4_inode_bitmap(sb, gdp));
+>>>>>>> cm/cm-11.0
 		if (inode_cluster < num_clusters)
 			inode_cluster = -1;
 		else if (inode_cluster == num_clusters) {
@@ -114,7 +123,11 @@ unsigned ext4_num_overhead_clusters(struct super_block *sb,
 	itbl_blk = ext4_inode_table(sb, gdp);
 	for (i = 0; i < sbi->s_itb_per_group; i++) {
 		if (ext4_block_in_group(sb, itbl_blk + i, block_group)) {
+<<<<<<< HEAD
 			c = EXT4_B2C(sbi, itbl_blk + i - start);
+=======
+			c = EXT4_B2C(sbi, start - itbl_blk + i);
+>>>>>>> cm/cm-11.0
 			if ((c < num_clusters) || (c == inode_cluster) ||
 			    (c == block_cluster) || (c == itbl_cluster))
 				continue;
@@ -326,7 +339,11 @@ err_out:
 	return 0;
 }
 /**
+<<<<<<< HEAD
  * ext4_read_block_bitmap_nowait()
+=======
+ * ext4_read_block_bitmap()
+>>>>>>> cm/cm-11.0
  * @sb:			super block
  * @block_group:	given block group
  *
@@ -422,8 +439,11 @@ ext4_read_block_bitmap(struct super_block *sb, ext4_group_t block_group)
 	struct buffer_head *bh;
 
 	bh = ext4_read_block_bitmap_nowait(sb, block_group);
+<<<<<<< HEAD
 	if (!bh)
 		return NULL;
+=======
+>>>>>>> cm/cm-11.0
 	if (ext4_wait_block_bitmap(sb, block_group, bh)) {
 		put_bh(bh);
 		return NULL;
@@ -449,6 +469,7 @@ static int ext4_has_free_clusters(struct ext4_sb_info *sbi,
 
 	free_clusters  = percpu_counter_read_positive(fcc);
 	dirty_clusters = percpu_counter_read_positive(dcc);
+<<<<<<< HEAD
 
 	/*
 	 * r_blocks_count should always be multiple of the cluster ratio so
@@ -459,6 +480,13 @@ static int ext4_has_free_clusters(struct ext4_sb_info *sbi,
 	if (free_clusters - (nclusters + root_clusters + dirty_clusters) <
 					EXT4_FREECLUSTERS_WATERMARK) {
 		free_clusters  = percpu_counter_sum_positive(fcc);
+=======
+	root_clusters = EXT4_B2C(sbi, ext4_r_blocks_count(sbi->s_es));
+
+	if (free_clusters - (nclusters + root_clusters + dirty_clusters) <
+					EXT4_FREECLUSTERS_WATERMARK) {
+		free_clusters  = EXT4_C2B(sbi, percpu_counter_sum_positive(fcc));
+>>>>>>> cm/cm-11.0
 		dirty_clusters = percpu_counter_sum_positive(dcc);
 	}
 	/* Check whether we have space after accounting for current
@@ -591,8 +619,12 @@ ext4_fsblk_t ext4_count_free_clusters(struct super_block *sb)
 		if (bitmap_bh == NULL)
 			continue;
 
+<<<<<<< HEAD
 		x = ext4_count_free(bitmap_bh->b_data,
 				    EXT4_BLOCKS_PER_GROUP(sb) / 8);
+=======
+		x = ext4_count_free(bitmap_bh, sb->s_blocksize);
+>>>>>>> cm/cm-11.0
 		printk(KERN_DEBUG "group %u: stored = %d, counted = %u\n",
 			i, ext4_free_group_clusters(sb, gdp), x);
 		bitmap_count += x;
@@ -600,7 +632,11 @@ ext4_fsblk_t ext4_count_free_clusters(struct super_block *sb)
 	brelse(bitmap_bh);
 	printk(KERN_DEBUG "ext4_count_free_clusters: stored = %llu"
 	       ", computed = %llu, %llu\n",
+<<<<<<< HEAD
 	       EXT4_NUM_B2C(EXT4_SB(sb), ext4_free_blocks_count(es)),
+=======
+	       EXT4_B2C(EXT4_SB(sb), ext4_free_blocks_count(es)),
+>>>>>>> cm/cm-11.0
 	       desc_count, bitmap_count);
 	return bitmap_count;
 #else

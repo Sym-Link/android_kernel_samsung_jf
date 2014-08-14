@@ -156,6 +156,7 @@ struct kgsl_device {
 	unsigned int ver_minor;
 	uint32_t flags;
 	enum kgsl_deviceid id;
+<<<<<<< HEAD
 
 	/* Starting physical address for GPU registers */
 	unsigned long reg_phys;
@@ -177,13 +178,26 @@ struct kgsl_device {
 	struct kgsl_memdesc memstore;
 	const char *iomemname;
 	const char *shadermemname;
+=======
+	unsigned long reg_phys;
+	void *reg_virt;
+	unsigned int reg_len;
+	struct kgsl_memdesc memstore;
+	const char *iomemname;
+>>>>>>> cm/cm-11.0
 
 	struct kgsl_mh mh;
 	struct kgsl_mmu mmu;
 	struct completion hwaccess_gate;
 	const struct kgsl_functable *ftbl;
 	struct work_struct idle_check_ws;
+<<<<<<< HEAD
 	struct timer_list idle_timer;
+=======
+	struct work_struct hang_check_ws;
+	struct timer_list idle_timer;
+	struct timer_list hang_timer;
+>>>>>>> cm/cm-11.0
 	struct kgsl_pwrctrl pwrctrl;
 	int open_count;
 
@@ -201,6 +215,10 @@ struct kgsl_device {
 	struct dentry *d_debugfs;
 	struct idr context_idr;
 	struct early_suspend display_off;
+<<<<<<< HEAD
+=======
+	rwlock_t context_lock;
+>>>>>>> cm/cm-11.0
 
 	void *snapshot;		/* Pointer to the snapshot memory region */
 	int snapshot_maxsize;   /* Max size of the snapshot region */
@@ -249,6 +267,11 @@ void kgsl_check_fences(struct work_struct *work);
 	.ft_gate = COMPLETION_INITIALIZER((_dev).ft_gate),\
 	.idle_check_ws = __WORK_INITIALIZER((_dev).idle_check_ws,\
 			kgsl_idle_check),\
+<<<<<<< HEAD
+=======
+	.hang_check_ws = __WORK_INITIALIZER((_dev).hang_check_ws,\
+			kgsl_hang_check),\
+>>>>>>> cm/cm-11.0
 	.ts_expired_ws  = __WORK_INITIALIZER((_dev).ts_expired_ws,\
 			kgsl_process_events),\
 	.context_idr = IDR_INIT((_dev).context_idr),\
@@ -288,8 +311,28 @@ struct kgsl_context {
 	struct list_head events_list;
 };
 
+<<<<<<< HEAD
 struct kgsl_process_private {
 	unsigned int refcnt;
+=======
+/**
+ * struct kgsl_process_private -  Private structure for a KGSL process (across
+ * all devices)
+ * @priv: Internal flags, use KGSL_PROCESS_* values
+ * @pid: ID for the task owner of the process
+ * @mem_lock: Spinlock to protect the process memory lists
+ * @refcount: kref object for reference counting the process
+ * @process_private_mutex: Mutex to synchronize access to the process struct
+ * @mem_rb: RB tree node for the memory owned by this process
+ * @idr: Iterator for assigning IDs to memory allocations
+ * @pagetable: Pointer to the pagetable owned by this process
+ * @kobj: Pointer to a kobj for the sysfs directory for this process
+ * @debug_root: Pointer to the debugfs root for this process
+ * @stats: Memory allocation statistics for this process
+ */
+struct kgsl_process_private {
+	unsigned long priv;
+>>>>>>> cm/cm-11.0
 	pid_t pid;
 	spinlock_t mem_lock;
 
@@ -311,6 +354,17 @@ struct kgsl_process_private {
 	} stats[KGSL_MEM_ENTRY_MAX];
 };
 
+<<<<<<< HEAD
+=======
+/**
+ * enum kgsl_process_priv_flags - Private flags for kgsl_process_private
+ * @KGSL_PROCESS_INIT: Set if the process structure has been set up
+ */
+enum kgsl_process_priv_flags {
+	KGSL_PROCESS_INIT = 0,
+};
+
+>>>>>>> cm/cm-11.0
 struct kgsl_device_private {
 	struct kgsl_device *device;
 	struct kgsl_process_private *process_priv;
@@ -481,12 +535,22 @@ static inline struct kgsl_context *kgsl_context_get(struct kgsl_device *device,
 {
 	struct kgsl_context *context = NULL;
 
+<<<<<<< HEAD
 	rcu_read_lock();
+=======
+	read_lock(&device->context_lock);
+
+>>>>>>> cm/cm-11.0
 	context = idr_find(&device->context_idr, id);
 
 	_kgsl_context_get(context);
 
+<<<<<<< HEAD
 	rcu_read_unlock();
+=======
+	read_unlock(&device->context_lock);
+
+>>>>>>> cm/cm-11.0
 	return context;
 }
 
@@ -537,4 +601,26 @@ static inline void kgsl_cancel_events_timestamp(struct kgsl_device *device,
 	kgsl_signal_event(device, context, timestamp, KGSL_EVENT_CANCELLED);
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * kgsl_sysfs_store() - parse a string from a sysfs store function
+ * @buf: Incoming string to parse
+ * @ptr: Pointer to an unsigned int to store the value
+ */
+static inline int kgsl_sysfs_store(const char *buf, unsigned int *ptr)
+{
+	unsigned int val;
+	int rc;
+
+	rc = kstrtou32(buf, 0, &val);
+	if (rc)
+		return rc;
+
+	if (ptr)
+		*ptr = val;
+
+	return 0;
+}
+>>>>>>> cm/cm-11.0
 #endif  /* __KGSL_DEVICE_H */

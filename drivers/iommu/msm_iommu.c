@@ -53,6 +53,12 @@ __asm__ __volatile__ (							\
 static int msm_iommu_unmap_range(struct iommu_domain *domain, unsigned int va,
 				 unsigned int len);
 
+<<<<<<< HEAD
+=======
+static int msm_iommu_unmap_range(struct iommu_domain *domain, unsigned int va,
+				 unsigned int len);
+
+>>>>>>> cm/cm-11.0
 static inline void clean_pte(unsigned long *start, unsigned long *end,
 			     int redirect)
 {
@@ -856,11 +862,67 @@ static inline int is_fully_aligned(unsigned int va, phys_addr_t pa, size_t len,
 		&& (len >= align);
 }
 
+<<<<<<< HEAD
+=======
+static int check_range(unsigned long *fl_table, unsigned int va,
+				 unsigned int len)
+{
+	unsigned int offset = 0;
+	unsigned long *fl_pte;
+	unsigned long fl_offset;
+	unsigned long *sl_table;
+	unsigned long sl_start, sl_end;
+	int i;
+
+	fl_offset = FL_OFFSET(va);	/* Upper 12 bits */
+	fl_pte = fl_table + fl_offset;	/* int pointers, 4 bytes */
+
+	while (offset < len) {
+		if (*fl_pte & FL_TYPE_TABLE) {
+			sl_start = SL_OFFSET(va);
+			sl_table =  __va(((*fl_pte) & FL_BASE_MASK));
+			sl_end = ((len - offset) / SZ_4K) + sl_start;
+
+			if (sl_end > NUM_SL_PTE)
+				sl_end = NUM_SL_PTE;
+
+			for (i = sl_start; i < sl_end; i++) {
+				if (sl_table[i] != 0) {
+					pr_err("%08x - %08x already mapped\n",
+						va, va + SZ_4K);
+					return -EBUSY;
+				}
+				offset += SZ_4K;
+				va += SZ_4K;
+			}
+
+
+			sl_start = 0;
+		} else {
+			if (*fl_pte != 0) {
+				pr_err("%08x - %08x already mapped\n",
+				       va, va + SZ_1M);
+				return -EBUSY;
+			}
+			va += SZ_1M;
+			offset += SZ_1M;
+			sl_start = 0;
+		}
+		fl_pte++;
+	}
+	return 0;
+}
+
+>>>>>>> cm/cm-11.0
 static int msm_iommu_map_range(struct iommu_domain *domain, unsigned int va,
 			       struct scatterlist *sg, unsigned int len,
 			       int prot)
 {
 	unsigned int pa;
+<<<<<<< HEAD
+=======
+	unsigned int start_va = va;
+>>>>>>> cm/cm-11.0
 	unsigned int offset = 0;
 	unsigned long *fl_table;
 	unsigned long *fl_pte;
@@ -888,6 +950,12 @@ static int msm_iommu_map_range(struct iommu_domain *domain, unsigned int va,
 		ret = -EINVAL;
 		goto fail;
 	}
+<<<<<<< HEAD
+=======
+	ret = check_range(fl_table, va, len);
+	if (ret)
+		goto fail;
+>>>>>>> cm/cm-11.0
 
 	fl_offset = FL_OFFSET(va);	/* Upper 12 bits */
 	fl_pte = fl_table + fl_offset;	/* int pointers, 4 bytes */
@@ -929,12 +997,15 @@ static int msm_iommu_map_range(struct iommu_domain *domain, unsigned int va,
 				chunk_offset = 0;
 				sg = sg_next(sg);
 				pa = get_phys_addr(sg);
+<<<<<<< HEAD
 				if (pa == 0) {
 					pr_debug("No dma address for sg %p\n",
 							sg);
 					ret = -EINVAL;
 					goto fail;
 				}
+=======
+>>>>>>> cm/cm-11.0
 			}
 			continue;
 		}
@@ -988,12 +1059,15 @@ static int msm_iommu_map_range(struct iommu_domain *domain, unsigned int va,
 				chunk_offset = 0;
 				sg = sg_next(sg);
 				pa = get_phys_addr(sg);
+<<<<<<< HEAD
 				if (pa == 0) {
 					pr_debug("No dma address for sg %p\n",
 							sg);
 					ret = -EINVAL;
 					goto fail;
 				}
+=======
+>>>>>>> cm/cm-11.0
 			}
 		}
 
@@ -1006,6 +1080,11 @@ static int msm_iommu_map_range(struct iommu_domain *domain, unsigned int va,
 	__flush_iotlb(domain);
 fail:
 	mutex_unlock(&msm_iommu_lock);
+<<<<<<< HEAD
+=======
+	if (ret && offset > 0)
+		msm_iommu_unmap_range(domain, start_va, offset);
+>>>>>>> cm/cm-11.0
 	return ret;
 }
 
@@ -1215,7 +1294,16 @@ irqreturn_t msm_iommu_fault_handler(int irq, void *dev_id)
 		}
 
 		SET_FSR(base, num, fsr);
+<<<<<<< HEAD
 		SET_RESUME(base, num, 1);
+=======
+		/*
+		 * Only resume fetches if the registered fault handler
+		 * allows it
+		 */
+		if (ret != -EBUSY)
+			SET_RESUME(base, num, 1);
+>>>>>>> cm/cm-11.0
 
 		ret = IRQ_HANDLED;
 	} else

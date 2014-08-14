@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -43,6 +47,7 @@
  * @brief ARM level 1 page table descriptor. See B3-8 ARM DDI 0406B.
  */
 typedef union {
+<<<<<<< HEAD
    uint32 u;
 
    struct {
@@ -92,12 +97,64 @@ typedef union {
       uint32  xbase1  : 4;
       uint32  base    : 8;
    } supersection;
+=======
+	uint32 u;
+
+	struct {
+		uint32  type:2;
+		uint32  xx:30;
+	} x;
+
+	struct {
+		uint32  type:2;
+		uint32  sbz1:1;
+		uint32  ns:1;
+		uint32  sbz2:1;
+		uint32  domain:4;
+		uint32  imp:1;
+		uint32  base:22;
+	} coarse;
+
+	struct {
+		uint32  type:2;
+		uint32  cb:2;
+		uint32  xn:1;
+		uint32  domain:4;
+		uint32  imp:1;
+		uint32  ap:2;
+		uint32  tex:3;
+		uint32  apx:1;
+		uint32  s:1;
+		uint32  ng:1;
+		uint32  sbz:1;
+		uint32  ns:1;
+		uint32  base:12;
+	} section;
+
+	struct {
+		uint32  type:2;
+		uint32  cb:2;
+		uint32  xn:1;
+		uint32  xbase2:4;
+		uint32  imp:1;
+		uint32  ap:2;
+		uint32  tex:3;
+		uint32  apx:1;
+		uint32  s:1;
+		uint32  ng:1;
+		uint32  sbo:1;
+		uint32  ns:1;
+		uint32  xbase1:4;
+		uint32  base:8;
+	} supersection;
+>>>>>>> cm/cm-11.0
 } ARM_L1D;
 
 /**
  * @brief ARM level 2 page table descriptor. See B3-10 ARM DDI 0406B.
  */
 typedef union {
+<<<<<<< HEAD
    uint32   u;
 
    struct {
@@ -130,6 +187,40 @@ typedef union {
       uint32  ng      : 1;
       uint32  base    : 20;
    } small;
+=======
+	uint32   u;
+
+	struct {
+		uint32  type:2;
+		uint32  cb:2;
+		uint32  xx:28;
+	} x;
+
+	struct {
+		uint32  type:2;
+		uint32  cb:2;
+		uint32  ap:2;
+		uint32  sbz:3;
+		uint32  apx:1;
+		uint32  s:1;
+		uint32  ng:1;
+		uint32  tex:3;
+		uint32  xn:1;
+		uint32  base:16;
+	} large;
+
+	struct {
+		uint32  xn:1;
+		uint32  type:1;
+		uint32  cb:2;
+		uint32  ap:2;
+		uint32  tex:3;
+		uint32  apx:1;
+		uint32  s:1;
+		uint32  ng:1;
+		uint32  base:20;
+	} small;
+>>>>>>> cm/cm-11.0
 } ARM_L2D;
 
 /**
@@ -142,17 +233,28 @@ typedef union {
 static inline uint8
 ARM_L2DSimpleAP(ARM_L2D l2D)
 {
+<<<<<<< HEAD
    ASSERT(l2D.small.type == ARM_L2D_TYPE_SMALL);
    return (l2D.small.apx << 1) | (l2D.small.ap >> 1);
+=======
+	ASSERT(l2D.small.type == ARM_L2D_TYPE_SMALL);
+	return (l2D.small.apx << 1) | (l2D.small.ap >> 1);
+>>>>>>> cm/cm-11.0
 }
 
 /**
  * @brief Permissions for a page - intermediate format.
  */
 typedef struct {
+<<<<<<< HEAD
    uint8 ap  : 2;
    uint8 apx : 1;
    uint8 xn  : 1;
+=======
+	uint8 ap:2;
+	uint8 apx:1;
+	uint8 xn:1;
+>>>>>>> cm/cm-11.0
 } ARM_AccessPerms;
 
 /**
@@ -180,10 +282,17 @@ typedef uint32 ARM_ASID;
  * LPAE encoding, see p8 ARM PRD03-GENC-008469 11.0.
  */
 typedef enum {
+<<<<<<< HEAD
    ARM_SHARE_ATTR_NONE,
    ARM_SHARE_ATTR_RESERVED,
    ARM_SHARE_ATTR_OUTER,
    ARM_SHARE_ATTR_INNER,
+=======
+	ARM_SHARE_ATTR_NONE,
+	ARM_SHARE_ATTR_RESERVED,
+	ARM_SHARE_ATTR_OUTER,
+	ARM_SHARE_ATTR_INNER,
+>>>>>>> cm/cm-11.0
 } PACKED ARM_ShareAttr;
 
 /**
@@ -192,10 +301,17 @@ typedef enum {
  * ARM C/B bits, see B4.4.1 ARM DDI 0100I.
  */
 typedef enum {
+<<<<<<< HEAD
    ARM_CB_UNBUFFERED   = 0,
    ARM_CB_UNCACHED     = 1,
    ARM_CB_WRITETHROUGH = 2,
    ARM_CB_WRITEBACK    = 3
+=======
+	ARM_CB_UNBUFFERED   = 0,
+	ARM_CB_UNCACHED     = 1,
+	ARM_CB_WRITETHROUGH = 2,
+	ARM_CB_WRITEBACK    = 3
+>>>>>>> cm/cm-11.0
 } PACKED ARM_CB;
 
 /**
@@ -204,10 +320,17 @@ typedef enum {
  * NMRR encoding, see B3-146 ARM DDI 0406B.
  */
 typedef enum {
+<<<<<<< HEAD
    ARM_CACHE_ATTR_NORMAL_NONE,
    ARM_CACHE_ATTR_NORMAL_WB_WALLOC,
    ARM_CACHE_ATTR_NORMAL_WT,
    ARM_CACHE_ATTR_NORMAL_WB
+=======
+	ARM_CACHE_ATTR_NORMAL_NONE,
+	ARM_CACHE_ATTR_NORMAL_WB_WALLOC,
+	ARM_CACHE_ATTR_NORMAL_WT,
+	ARM_CACHE_ATTR_NORMAL_WB
+>>>>>>> cm/cm-11.0
 } PACKED ARM_CacheAttrNormal;
 
 /**
@@ -218,9 +341,18 @@ typedef enum {
  * cacheability attributes.
  */
 typedef struct {
+<<<<<<< HEAD
    ARM_ShareAttr share;
    ARM_CacheAttrNormal innerCache;
    ARM_CacheAttrNormal outerCache;
 } ARM_MemAttrNormal;
 
 #endif /// _MMU_TYPES_H_
+=======
+	ARM_ShareAttr share;
+	ARM_CacheAttrNormal innerCache;
+	ARM_CacheAttrNormal outerCache;
+} ARM_MemAttrNormal;
+
+#endif /* _MMU_TYPES_H_ */
+>>>>>>> cm/cm-11.0

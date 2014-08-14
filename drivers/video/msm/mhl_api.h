@@ -13,7 +13,10 @@
  */
 #ifndef __MHL_API_H__
 #define __MHL_API_H__
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_FB_MSM_HDMI_MHL_8334
 bool mhl_is_connected(void);
 #else
@@ -22,5 +25,8 @@ static bool mhl_is_connected(void)
 	return false;
 }
 #endif
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 #endif /* __MHL_API_H__ */

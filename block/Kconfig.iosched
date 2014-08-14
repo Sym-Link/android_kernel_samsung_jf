@@ -67,7 +67,11 @@ config CFQ_GROUP_IOSCHED
 
 choice
 	prompt "Default I/O scheduler"
+<<<<<<< HEAD
 	default DEFAULT_DEADLINE
+=======
+	default DEFAULT_CFQ
+>>>>>>> cm/cm-11.0
 	help
 	  Select the I/O scheduler which will be used by default for all
 	  block devices.

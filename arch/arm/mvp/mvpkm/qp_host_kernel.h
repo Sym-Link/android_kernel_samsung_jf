@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -33,10 +37,18 @@
 #include "include_check.h"
 
 void  QP_HostInit(void);
+<<<<<<< HEAD
 int32 QP_GuestAttachRequest(MvpkmVM *vm,
                             QPInitArgs *args,
                             MPN base,
                             uint32 nr_pages);
+=======
+int32
+QP_GuestAttachRequest(struct MvpkmVM *vm,
+		      QPInitArgs *args,
+		      MPN base,
+		      uint32 nr_pages);
+>>>>>>> cm/cm-11.0
 int32 QP_GuestDetachRequest(QPId id);
 void  QP_DetachAll(Mksck_VmId vmID);
 int32 QP_NotifyListener(QPInitArgs *args);

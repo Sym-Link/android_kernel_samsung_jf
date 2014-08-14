@@ -345,7 +345,11 @@ int unwind_frame(struct stackframe *frame)
 
 	idx = unwind_find_idx(frame->pc);
 	if (!idx) {
+<<<<<<< HEAD
 		pr_debug("unwind: Index not found %08lx\n", frame->pc);
+=======
+		pr_warning("unwind: Index not found %08lx\n", frame->pc);
+>>>>>>> cm/cm-11.0
 		return -URC_FAILURE;
 	}
 

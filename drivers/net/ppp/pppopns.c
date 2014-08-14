@@ -119,7 +119,12 @@ static int pppopns_recv_core(struct sock *sk_raw, struct sk_buff *skb)
 		goto drop;
 
 	/* Perform reordering if sequencing is enabled. */
+<<<<<<< HEAD
 	if (hdr->bits & PPTP_GRE_SEQ_BIT) {
+=======
+	if ((opt->ppp_flags & SC_GRE_SEQ_CHK) && 
+	    (hdr->bits & PPTP_GRE_SEQ_BIT)) {
+>>>>>>> cm/cm-11.0
 		struct sk_buff *skb1;
 
 		/* Insert the packet into receive queue in order. */
@@ -378,6 +383,11 @@ static struct proto_ops pppopns_proto_ops = {
 static int pppopns_create(struct net *net, struct socket *sock)
 {
 	struct sock *sk;
+<<<<<<< HEAD
+=======
+	struct pppox_sock *po;
+	struct pppopns_opt *opt;
+>>>>>>> cm/cm-11.0
 
 	sk = sk_alloc(net, PF_PPPOX, GFP_KERNEL, &pppopns_proto);
 	if (!sk)
@@ -388,13 +398,58 @@ static int pppopns_create(struct net *net, struct socket *sock)
 	sock->ops = &pppopns_proto_ops;
 	sk->sk_protocol = PX_PROTO_OPNS;
 	sk->sk_state = PPPOX_NONE;
+<<<<<<< HEAD
 	return 0;
 }
 
+=======
+
+	po = pppox_sk(sk);
+	opt = &po->proto.pns;
+	opt->ppp_flags = SC_GRE_SEQ_CHK;
+
+	return 0;
+}
+
+static int pppopns_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+{
+
+        struct sock *sk = sock->sk;
+	struct pppox_sock *po = pppox_sk(sk);
+	struct pppopns_opt *opt = &po->proto.pns;
+	void __user *argp = (void __user *)arg;
+	int __user *p = argp;
+	int err = -ENOTTY, val;
+
+	switch (cmd) {
+	case PPPIOCGFLAGS:
+		printk("Getting pppopns socket flags.\n");
+		val = opt->ppp_flags;
+		if (put_user(val, p))
+			break;
+		err = 0;
+		break;
+	case PPPIOCSFLAGS:
+		printk("Setting pppopns socket flags.\n");
+		if (get_user(val, p))
+			break;
+		opt->ppp_flags = val;
+		err = 0;
+		break;
+	}
+       
+	return err;
+}
+
+>>>>>>> cm/cm-11.0
 /******************************************************************************/
 
 static struct pppox_proto pppopns_pppox_proto = {
 	.create = pppopns_create,
+<<<<<<< HEAD
+=======
+	.ioctl = pppopns_ioctl,
+>>>>>>> cm/cm-11.0
 	.owner = THIS_MODULE,
 };
 

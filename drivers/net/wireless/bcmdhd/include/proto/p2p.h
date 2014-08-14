@@ -1,6 +1,10 @@
 /*
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -374,9 +378,15 @@ typedef struct wifi_p2p_pub_act_frame wifi_p2p_pub_act_frame_t;
 #define P2P_PAF_INVITE_RSP	4	
 #define P2P_PAF_DEVDIS_REQ	5	
 #define P2P_PAF_DEVDIS_RSP	6	
+<<<<<<< HEAD
 #define P2P_PAF_PROVDIS_REQ	7	
 #define P2P_PAF_PROVDIS_RSP	8	
 #define P2P_PAF_SUBTYPE_INVALID	255	
+=======
+#define P2P_PAF_PROVDIS_REQ	7
+#define P2P_PAF_PROVDIS_RSP	8
+#define P2P_PAF_SUBTYPE_INVALID	255
+>>>>>>> cm/cm-11.0
 
 
 #define P2P_TYPE_MNREQ		P2P_PAF_GON_REQ
@@ -403,12 +413,21 @@ typedef struct wifi_p2p_noa_se wifi_p2p_noa_se_t;
 
 #define P2P_NOA_SE_FIXED_LEN	5
 
+<<<<<<< HEAD
 #define P2P_NOA_SE_MAX_DESC	2	
 
 
 #define P2P_NOA_DESC_CNT_RESERVED	0	
 #define P2P_NOA_DESC_CNT_REPEAT		255	
 #define P2P_NOA_DESC_TYPE_PREFERRED	1	
+=======
+#define P2P_NOA_SE_MAX_DESC	2
+
+
+#define P2P_NOA_DESC_CNT_RESERVED	0
+#define P2P_NOA_DESC_CNT_REPEAT		255
+#define P2P_NOA_DESC_TYPE_PREFERRED	1
+>>>>>>> cm/cm-11.0
 #define P2P_NOA_DESC_TYPE_ACCEPTABLE	2	
 
 

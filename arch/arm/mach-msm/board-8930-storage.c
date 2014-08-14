@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -63,11 +67,17 @@ static struct msm_mmc_reg_data mmc_vdd_reg_data[MAX_SDCC_CONTROLLER] = {
 		 * hardware revisions - maybe once that is done, this can be
 		 * reverted.
 		 */
+<<<<<<< HEAD
 		.always_on = 1,
 		.lpm_sup = 1,
 		.hpm_uA = 800000, /* 800mA */
 		.lpm_uA = 9000,
 		.reset_at_init = true,
+=======
+		.lpm_sup = 1,
+		.hpm_uA = 800000, /* 800mA */
+		.lpm_uA = 9000,
+>>>>>>> cm/cm-11.0
 	},
 };
 
@@ -302,6 +312,10 @@ void __init msm8930_init_mmc(void)
 					       MMC_CAP_UHS_DDR50);
 	/* SDC1 : eMMC card connected */
 	msm_add_sdcc(1, &msm8960_sdc1_data);
+<<<<<<< HEAD
+=======
+	msm_add_uio();
+>>>>>>> cm/cm-11.0
 #endif
 #ifdef CONFIG_MMC_MSM_SDC3_SUPPORT
 	/*
@@ -312,6 +326,7 @@ void __init msm8930_init_mmc(void)
 	 * This change to the boards will be true for newer versions of the SoC
 	 * as well.
 	 */
+<<<<<<< HEAD
 	if ((SOCINFO_VERSION_MAJOR(socinfo_get_version()) >= 1 &&
 			SOCINFO_VERSION_MINOR(socinfo_get_version()) >= 2) ||
 			machine_is_msm8930_cdp()) {
@@ -319,12 +334,27 @@ void __init msm8930_init_mmc(void)
 		msm8960_sdc3_data.vreg_data->vdd_data->reset_at_init = false;
 	}
 
+=======
+	if (SOCINFO_VERSION_MAJOR(socinfo_get_version()) == 1 &&
+			SOCINFO_VERSION_MINOR(socinfo_get_version()) < 2) {
+		msm8960_sdc3_data.vreg_data->vdd_data->always_on = true;
+		msm8960_sdc3_data.vreg_data->vdd_data->reset_at_init = true;
+	}
+>>>>>>> cm/cm-11.0
 	/* SDC3: External card slot */
 	if (!machine_is_msm8930_cdp()) {
 		msm8960_sdc3_data.wpswitch_gpio = 0;
 		msm8960_sdc3_data.is_wpswitch_active_low = false;
 	}
 
+<<<<<<< HEAD
+=======
+	if (machine_is_msm8930_evt()) {
+		msm8960_sdc3_data.status_gpio = 90;
+		msm8960_sdc3_data.status_irq = MSM_GPIO_TO_INT(90);
+	}
+
+>>>>>>> cm/cm-11.0
 	msm_add_sdcc(3, &msm8960_sdc3_data);
 #endif
 }

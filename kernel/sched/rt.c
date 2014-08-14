@@ -444,6 +444,7 @@ static void sched_rt_rq_dequeue(struct rt_rq *rt_rq)
 		dequeue_rt_entity(rt_se);
 }
 
+<<<<<<< HEAD
 int unthrottle_rt_rq(struct rq *rq)
 {
 	/* if requested from the migration task we will 
@@ -459,6 +460,8 @@ int unthrottle_rt_rq(struct rq *rq)
 	return 0;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static inline int rt_rq_throttled(struct rt_rq *rt_rq)
 {
 	return rt_rq->rt_throttled && !rt_rq->rt_nr_boosted;
@@ -706,6 +709,7 @@ balanced:
 	}
 }
 
+<<<<<<< HEAD
 static void disable_runtime(struct rq *rq)
 {
 	unsigned long flags;
@@ -715,6 +719,8 @@ static void disable_runtime(struct rq *rq)
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static void __enable_runtime(struct rq *rq)
 {
 	rt_rq_iter_t iter;
@@ -739,6 +745,7 @@ static void __enable_runtime(struct rq *rq)
 	}
 }
 
+<<<<<<< HEAD
 static void enable_runtime(struct rq *rq)
 {
 	unsigned long flags;
@@ -770,6 +777,8 @@ int update_runtime(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	}
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static int balance_runtime(struct rt_rq *rt_rq)
 {
 	int more = 0;
@@ -1277,8 +1286,12 @@ select_task_rq_rt(struct task_struct *p, int sd_flag, int flags)
 	 */
 	if (curr && unlikely(rt_task(curr)) &&
 	    (curr->rt.nr_cpus_allowed < 2 ||
+<<<<<<< HEAD
 	     curr->prio <= p->prio) &&
 	    (p->rt.nr_cpus_allowed > 1)) {
+=======
+		curr->prio <= p->prio)) {
+>>>>>>> cm/cm-11.0
 		int target = find_lowest_rq(p);
 
 		if (target != -1)

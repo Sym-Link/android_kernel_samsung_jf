@@ -19,8 +19,11 @@
 #include <linux/pipe_fs_i.h>
 #include <linux/swap.h>
 #include <linux/splice.h>
+<<<<<<< HEAD
 #include <linux/iocontext.h>
 #include <linux/ioprio.h>
+=======
+>>>>>>> cm/cm-11.0
 #include <linux/freezer.h>
 
 MODULE_ALIAS_MISCDEV(FUSE_MINOR);
@@ -240,6 +243,7 @@ static u64 fuse_get_unique(struct fuse_conn *fc)
 	return fc->reqctr;
 }
 
+<<<<<<< HEAD
 static inline int is_rt(struct fuse_conn *fc)
 {
 	/* Returns 1 if request is RT class                     */
@@ -266,17 +270,27 @@ static inline int is_rt(struct fuse_conn *fc)
 	return ret;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static void queue_request(struct fuse_conn *fc, struct fuse_req *req)
 {
 	req->in.h.len = sizeof(struct fuse_in_header) +
 		len_args(req->in.numargs, (struct fuse_arg *) req->in.args);
+<<<<<<< HEAD
 	list_add_tail(&req->list, &fc->pending[is_rt(fc)]);
+=======
+	list_add_tail(&req->list, &fc->pending);
+>>>>>>> cm/cm-11.0
 	req->state = FUSE_REQ_PENDING;
 	if (!req->waiting) {
 		req->waiting = 1;
 		atomic_inc(&fc->num_waiting);
 	}
+<<<<<<< HEAD
 	wake_up(&fc->waitq[is_rt(fc)]);
+=======
+	wake_up(&fc->waitq);
+>>>>>>> cm/cm-11.0
 	kill_fasync(&fc->fasync, SIGIO, POLL_IN);
 }
 
@@ -290,7 +304,11 @@ void fuse_queue_forget(struct fuse_conn *fc, struct fuse_forget_link *forget,
 	if (fc->connected) {
 		fc->forget_list_tail->next = forget;
 		fc->forget_list_tail = forget;
+<<<<<<< HEAD
 		wake_up(&fc->waitq[is_rt(fc)]);
+=======
+		wake_up(&fc->waitq);
+>>>>>>> cm/cm-11.0
 		kill_fasync(&fc->fasync, SIGIO, POLL_IN);
 	} else {
 		kfree(forget);
@@ -366,8 +384,13 @@ __acquires(fc->lock)
 
 static void queue_interrupt(struct fuse_conn *fc, struct fuse_req *req)
 {
+<<<<<<< HEAD
 	list_add_tail(&req->intr_entry, &fc->interrupts[is_rt(fc)]);
 	wake_up(&fc->waitq[is_rt(fc)]);
+=======
+	list_add_tail(&req->intr_entry, &fc->interrupts);
+	wake_up(&fc->waitq);
+>>>>>>> cm/cm-11.0
 	kill_fasync(&fc->fasync, SIGIO, POLL_IN);
 }
 
@@ -945,8 +968,13 @@ static int forget_pending(struct fuse_conn *fc)
 
 static int request_pending(struct fuse_conn *fc)
 {
+<<<<<<< HEAD
 	return !list_empty(&fc->pending[is_rt(fc)]) ||
 		!list_empty(&fc->interrupts[is_rt(fc)]) || forget_pending(fc);
+=======
+	return !list_empty(&fc->pending) || !list_empty(&fc->interrupts) ||
+		forget_pending(fc);
+>>>>>>> cm/cm-11.0
 }
 
 /* Wait until a request is available on the pending list */
@@ -956,7 +984,11 @@ __acquires(fc->lock)
 {
 	DECLARE_WAITQUEUE(wait, current);
 
+<<<<<<< HEAD
 	add_wait_queue_exclusive(&fc->waitq[is_rt(fc)], &wait);
+=======
+	add_wait_queue_exclusive(&fc->waitq, &wait);
+>>>>>>> cm/cm-11.0
 	while (fc->connected && !request_pending(fc)) {
 		set_current_state(TASK_INTERRUPTIBLE);
 		if (signal_pending(current))
@@ -967,7 +999,11 @@ __acquires(fc->lock)
 		spin_lock(&fc->lock);
 	}
 	set_current_state(TASK_RUNNING);
+<<<<<<< HEAD
 	remove_wait_queue(&fc->waitq[is_rt(fc)], &wait);
+=======
+	remove_wait_queue(&fc->waitq, &wait);
+>>>>>>> cm/cm-11.0
 }
 
 /*
@@ -1154,22 +1190,36 @@ static ssize_t fuse_dev_do_read(struct fuse_conn *fc, struct file *file,
 	if (!request_pending(fc))
 		goto err_unlock;
 
+<<<<<<< HEAD
 	if (!list_empty(&fc->interrupts[is_rt(fc)])) {
 		req = list_entry(fc->interrupts[is_rt(fc)].next,
 				struct fuse_req, intr_entry);
+=======
+	if (!list_empty(&fc->interrupts)) {
+		req = list_entry(fc->interrupts.next, struct fuse_req,
+				 intr_entry);
+>>>>>>> cm/cm-11.0
 		return fuse_read_interrupt(fc, cs, nbytes, req);
 	}
 
 	if (forget_pending(fc)) {
+<<<<<<< HEAD
 		if (list_empty(&fc->pending[is_rt(fc)]) ||
 			fc->forget_batch-- > 0)
+=======
+		if (list_empty(&fc->pending) || fc->forget_batch-- > 0)
+>>>>>>> cm/cm-11.0
 			return fuse_read_forget(fc, cs, nbytes);
 
 		if (fc->forget_batch <= -8)
 			fc->forget_batch = 16;
 	}
 
+<<<<<<< HEAD
 	req = list_entry(fc->pending[is_rt(fc)].next, struct fuse_req, list);
+=======
+	req = list_entry(fc->pending.next, struct fuse_req, list);
+>>>>>>> cm/cm-11.0
 	req->state = FUSE_REQ_READING;
 	list_move(&req->list, &fc->io);
 
@@ -1926,7 +1976,11 @@ static unsigned fuse_dev_poll(struct file *file, poll_table *wait)
 	if (!fc)
 		return POLLERR;
 
+<<<<<<< HEAD
 	poll_wait(file, &fc->waitq[is_rt(fc)], wait);
+=======
+	poll_wait(file, &fc->waitq, wait);
+>>>>>>> cm/cm-11.0
 
 	spin_lock(&fc->lock);
 	if (!fc->connected)
@@ -1999,8 +2053,12 @@ __acquires(fc->lock)
 {
 	fc->max_background = UINT_MAX;
 	flush_bg_queue(fc);
+<<<<<<< HEAD
 	end_requests(fc, &fc->pending[0]);
 	end_requests(fc, &fc->pending[1]);
+=======
+	end_requests(fc, &fc->pending);
+>>>>>>> cm/cm-11.0
 	end_requests(fc, &fc->processing);
 	while (forget_pending(fc))
 		kfree(dequeue_forget(fc, 1, NULL));
@@ -2049,8 +2107,12 @@ void fuse_abort_conn(struct fuse_conn *fc)
 		end_io_requests(fc);
 		end_queued_requests(fc);
 		end_polls(fc);
+<<<<<<< HEAD
 		wake_up_all(&fc->waitq[0]);
 		wake_up_all(&fc->waitq[1]);
+=======
+		wake_up_all(&fc->waitq);
+>>>>>>> cm/cm-11.0
 		wake_up_all(&fc->blocked_waitq);
 		kill_fasync(&fc->fasync, SIGIO, POLL_IN);
 	}

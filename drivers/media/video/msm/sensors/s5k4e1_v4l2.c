@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -235,7 +239,11 @@ static inline uint8_t s5k4e1_byte(uint16_t word, uint8_t offset)
 }
 
 static int32_t s5k4e1_write_prev_exp_gain(struct msm_sensor_ctrl_t *s_ctrl,
+<<<<<<< HEAD
 						uint16_t gain, uint32_t line)
+=======
+	uint16_t gain, uint32_t line, int32_t luma_avg, uint16_t fgain)
+>>>>>>> cm/cm-11.0
 {
 	uint16_t max_legal_gain = 0x0200;
 	int32_t rc = 0;
@@ -321,7 +329,11 @@ static int32_t s5k4e1_write_prev_exp_gain(struct msm_sensor_ctrl_t *s_ctrl,
 }
 
 static int32_t s5k4e1_write_pict_exp_gain(struct msm_sensor_ctrl_t *s_ctrl,
+<<<<<<< HEAD
 		uint16_t gain, uint32_t line)
+=======
+		uint16_t gain, uint32_t line, int32_t luma_avg, uint16_t fgain)
+>>>>>>> cm/cm-11.0
 {
 	uint16_t max_legal_gain = 0x0200;
 	uint16_t min_ll_pck = 0x0AB2;

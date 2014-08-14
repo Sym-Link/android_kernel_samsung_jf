@@ -23,6 +23,10 @@
 #include <linux/rcupdate.h>
 #include <linux/ftrace.h>
 #include <linux/smp.h>
+<<<<<<< HEAD
+=======
+#include <linux/smpboot.h>
+>>>>>>> cm/cm-11.0
 #include <linux/tick.h>
 
 #define CREATE_TRACE_POINTS
@@ -197,21 +201,36 @@ void local_bh_enable_ip(unsigned long ip)
 EXPORT_SYMBOL(local_bh_enable_ip);
 
 /*
+<<<<<<< HEAD
  * We restart softirq processing MAX_SOFTIRQ_RESTART times,
  * and we fall back to softirqd after that.
  *
  * This number has been established via experimentation.
+=======
+ * We restart softirq processing for at most 2 ms,
+ * and if need_resched() is not set.
+ *
+ * These limits have been established via experimentation.
+>>>>>>> cm/cm-11.0
  * The two things to balance is latency against fairness -
  * we want to handle softirqs as soon as possible, but they
  * should not be able to lock up the box.
  */
+<<<<<<< HEAD
 #define MAX_SOFTIRQ_RESTART 10
+=======
+#define MAX_SOFTIRQ_TIME  msecs_to_jiffies(2)
+>>>>>>> cm/cm-11.0
 
 asmlinkage void __do_softirq(void)
 {
 	struct softirq_action *h;
 	__u32 pending;
+<<<<<<< HEAD
 	int max_restart = MAX_SOFTIRQ_RESTART;
+=======
+	unsigned long end = jiffies + MAX_SOFTIRQ_TIME;
+>>>>>>> cm/cm-11.0
 	int cpu;
 
 	pending = local_softirq_pending();
@@ -258,11 +277,20 @@ restart:
 	local_irq_disable();
 
 	pending = local_softirq_pending();
+<<<<<<< HEAD
 	if (pending && --max_restart)
 		goto restart;
 
 	if (pending)
 		wakeup_softirqd();
+=======
+	if (pending) {
+		if (time_before(jiffies, end) && !need_resched())
+			goto restart;
+
+		wakeup_softirqd();
+	}
+>>>>>>> cm/cm-11.0
 
 	lockdep_softirq_exit();
 
@@ -742,6 +770,7 @@ void __init softirq_init(void)
 	open_softirq(HI_SOFTIRQ, tasklet_hi_action);
 }
 
+<<<<<<< HEAD
 static int run_ksoftirqd(void * __bind_cpu)
 {
 	set_current_state(TASK_INTERRUPTIBLE);
@@ -785,6 +814,24 @@ wait_to_die:
 	}
 	__set_current_state(TASK_RUNNING);
 	return 0;
+=======
+static int ksoftirqd_should_run(unsigned int cpu)
+{
+	return local_softirq_pending();
+}
+
+static void run_ksoftirqd(unsigned int cpu)
+{
+	local_irq_disable();
+	if (local_softirq_pending()) {
+		__do_softirq();
+		rcu_note_context_switch(cpu);
+		local_irq_enable();
+		cond_resched();
+		return;
+	}
+	local_irq_enable();
+>>>>>>> cm/cm-11.0
 }
 
 #ifdef CONFIG_HOTPLUG_CPU
@@ -850,6 +897,7 @@ static int __cpuinit cpu_callback(struct notifier_block *nfb,
 				  unsigned long action,
 				  void *hcpu)
 {
+<<<<<<< HEAD
 	int hotcpu = (unsigned long)hcpu;
 	struct task_struct *p;
 
@@ -894,6 +942,16 @@ static int __cpuinit cpu_callback(struct notifier_block *nfb,
 	}
 #endif /* CONFIG_HOTPLUG_CPU */
  	}
+=======
+	switch (action) {
+#ifdef CONFIG_HOTPLUG_CPU
+	case CPU_DEAD:
+	case CPU_DEAD_FROZEN:
+		takeover_tasklets((unsigned long)hcpu);
+		break;
+#endif /* CONFIG_HOTPLUG_CPU */
+	}
+>>>>>>> cm/cm-11.0
 	return NOTIFY_OK;
 }
 
@@ -901,6 +959,7 @@ static struct notifier_block __cpuinitdata cpu_nfb = {
 	.notifier_call = cpu_callback
 };
 
+<<<<<<< HEAD
 static __init int spawn_ksoftirqd(void)
 {
 	void *cpu = (void *)(long)smp_processor_id();
@@ -909,6 +968,21 @@ static __init int spawn_ksoftirqd(void)
 	BUG_ON(err != NOTIFY_OK);
 	cpu_callback(&cpu_nfb, CPU_ONLINE, cpu);
 	register_cpu_notifier(&cpu_nfb);
+=======
+static struct smp_hotplug_thread softirq_threads = {
+	.store			= &ksoftirqd,
+	.thread_should_run	= ksoftirqd_should_run,
+	.thread_fn		= run_ksoftirqd,
+	.thread_comm		= "ksoftirqd/%u",
+};
+
+static __init int spawn_ksoftirqd(void)
+{
+	register_cpu_notifier(&cpu_nfb);
+
+	BUG_ON(smpboot_register_percpu_thread(&softirq_threads));
+
+>>>>>>> cm/cm-11.0
 	return 0;
 }
 early_initcall(spawn_ksoftirqd);

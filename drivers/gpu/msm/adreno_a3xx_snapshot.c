@@ -11,7 +11,10 @@
  *
  */
 
+<<<<<<< HEAD
 #include <linux/io.h>
+=======
+>>>>>>> cm/cm-11.0
 #include "kgsl.h"
 #include "adreno.h"
 #include "kgsl_snapshot.h"
@@ -20,7 +23,10 @@
 #define DEBUG_SECTION_SZ(_dwords) (((_dwords) * sizeof(unsigned int)) \
 		+ sizeof(struct kgsl_snapshot_debug))
 
+<<<<<<< HEAD
 /* Shader memory size in words */
+=======
+>>>>>>> cm/cm-11.0
 #define SHADER_MEMORY_SIZE 0x4000
 
 /**
@@ -39,6 +45,7 @@ static void _rbbm_debug_bus_read(struct kgsl_device *device,
 	adreno_regread(device, A3XX_RBBM_DEBUG_BUS_DATA_STATUS, val);
 }
 
+<<<<<<< HEAD
 /**
  * a3xx_snapshot_shader_memory - Helper function to dump the GPU shader
  * memory to the snapshot buffer.
@@ -47,16 +54,23 @@ static void _rbbm_debug_bus_read(struct kgsl_device *device,
  * @remain - Number of remaining bytes in the snapshot blob
  * @priv - Unused parameter
  */
+=======
+>>>>>>> cm/cm-11.0
 static int a3xx_snapshot_shader_memory(struct kgsl_device *device,
 	void *snapshot, int remain, void *priv)
 {
 	struct kgsl_snapshot_debug *header = snapshot;
+<<<<<<< HEAD
 	unsigned int i;
 	unsigned int *data = snapshot + sizeof(*header);
 	unsigned int shader_read_len = SHADER_MEMORY_SIZE;
 
 	if (SHADER_MEMORY_SIZE > (device->shader_mem_len >> 2))
 		shader_read_len = (device->shader_mem_len >> 2);
+=======
+	unsigned int *data = snapshot + sizeof(*header);
+	int i;
+>>>>>>> cm/cm-11.0
 
 	if (remain < DEBUG_SECTION_SZ(SHADER_MEMORY_SIZE)) {
 		SNAPSHOT_ERR_NOMEM(device, "SHADER MEMORY");
@@ -66,6 +80,7 @@ static int a3xx_snapshot_shader_memory(struct kgsl_device *device,
 	header->type = SNAPSHOT_DEBUG_SHADER_MEMORY;
 	header->size = SHADER_MEMORY_SIZE;
 
+<<<<<<< HEAD
 	/* Map shader memory to kernel, for dumping */
 	if (device->shader_mem_virt == NULL)
 		device->shader_mem_virt = devm_ioremap(device->dev,
@@ -82,6 +97,10 @@ static int a3xx_snapshot_shader_memory(struct kgsl_device *device,
 	for (i = 0; i < shader_read_len; i++)
 		adreno_shadermem_regread(device, i, &data[i]);
 
+=======
+	for (i = 0; i < SHADER_MEMORY_SIZE; i++)
+		adreno_regread(device, 0x4000 + i, &data[i]);
+>>>>>>> cm/cm-11.0
 
 	return DEBUG_SECTION_SZ(SHADER_MEMORY_SIZE);
 }

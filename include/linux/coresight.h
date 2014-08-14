@@ -39,9 +39,14 @@
 
 enum coresight_clk_rate {
 	CORESIGHT_CLK_RATE_OFF,
+<<<<<<< HEAD
 	CORESIGHT_CLK_RATE_TRACE = 1000,
 	CORESIGHT_CLK_RATE_HSTRACE = 2000,
 	CORESIGHT_CLK_RATE_FIXED = 3000,
+=======
+	CORESIGHT_CLK_RATE_TRACE,
+	CORESIGHT_CLK_RATE_HSTRACE,
+>>>>>>> cm/cm-11.0
 };
 
 enum coresight_dev_type {

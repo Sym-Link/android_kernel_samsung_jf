@@ -1,6 +1,11 @@
 /*
    BlueZ - Bluetooth protocol stack for Linux
+<<<<<<< HEAD
    Copyright (c) 2000-2001, 2010-2012 The Linux Foundation.  All rights reserved.
+=======
+   Copyright (c) 2000-2001, The Linux Foundation. All rights reserved.
+   Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
 
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
@@ -206,6 +211,16 @@ void hci_le_remove_dev_white_list(struct hci_dev *hdev, bdaddr_t *dst)
 }
 EXPORT_SYMBOL(hci_le_remove_dev_white_list);
 
+<<<<<<< HEAD
+=======
+static inline bool is_role_switch_possible(struct hci_dev *hdev)
+{
+	if (hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECTED))
+		return false;
+	return true;
+}
+
+>>>>>>> cm/cm-11.0
 void hci_acl_connect(struct hci_conn *conn)
 {
 	struct hci_dev *hdev = conn->hdev;
@@ -241,7 +256,12 @@ void hci_acl_connect(struct hci_conn *conn)
 	}
 
 	cp.pkt_type = cpu_to_le16(conn->pkt_type);
+<<<<<<< HEAD
 	if (lmp_rswitch_capable(hdev) && !(hdev->link_mode & HCI_LM_MASTER))
+=======
+	if (lmp_rswitch_capable(hdev) && !(hdev->link_mode & HCI_LM_MASTER)
+		&& is_role_switch_possible(hdev))
+>>>>>>> cm/cm-11.0
 		cp.role_switch = 0x01;
 	else
 		cp.role_switch = 0x00;
@@ -653,6 +673,12 @@ int hci_conn_del(struct hci_conn *conn)
 
 	hci_conn_put_device(conn);
 
+<<<<<<< HEAD
+=======
+	if (conn->hidp_session_valid)
+		hci_conn_put_device(conn);
+
+>>>>>>> cm/cm-11.0
 	hci_dev_put(hdev);
 
 	return 0;
@@ -1262,8 +1288,15 @@ EXPORT_SYMBOL(hci_conn_hold_device);
 
 void hci_conn_put_device(struct hci_conn *conn)
 {
+<<<<<<< HEAD
 	if (atomic_dec_and_test(&conn->devref))
 		hci_conn_del_sysfs(conn);
+=======
+	if (atomic_dec_and_test(&conn->devref)) {
+		conn->hidp_session_valid = false;
+		hci_conn_del_sysfs(conn);
+	}
+>>>>>>> cm/cm-11.0
 }
 EXPORT_SYMBOL(hci_conn_put_device);
 
@@ -1401,8 +1434,29 @@ int hci_set_auth_info(struct hci_dev *hdev, void __user *arg)
 
 	hci_dev_lock_bh(hdev);
 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &req.bdaddr);
+<<<<<<< HEAD
 	if (conn)
 		conn->auth_type = req.type;
+=======
+	if (conn) {
+		conn->auth_type = req.type;
+		switch (conn->auth_type) {
+		case HCI_AT_NO_BONDING:
+			conn->pending_sec_level = BT_SECURITY_LOW;
+			break;
+		case HCI_AT_DEDICATED_BONDING:
+		case HCI_AT_GENERAL_BONDING:
+			conn->pending_sec_level = BT_SECURITY_MEDIUM;
+			break;
+		case HCI_AT_DEDICATED_BONDING_MITM:
+		case HCI_AT_GENERAL_BONDING_MITM:
+			conn->pending_sec_level = BT_SECURITY_HIGH;
+			break;
+		default:
+			break;
+		}
+	}
+>>>>>>> cm/cm-11.0
 	hci_dev_unlock_bh(hdev);
 
 	if (!conn)

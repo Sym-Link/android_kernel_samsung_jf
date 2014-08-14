@@ -75,6 +75,13 @@
 #include <asm/sections.h>
 #include <asm/cacheflush.h>
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SEC_GPIO_DVS
+#include <linux/secgpio_dvs.h>
+#endif
+
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_X86_LOCAL_APIC
 #include <asm/smp.h>
 #endif
@@ -234,8 +241,13 @@ early_param("loglevel", loglevel);
  static int __init battStatus(char *str)
 {
 	int batt_val;
+<<<<<<< HEAD
   
 	
+=======
+
+
+>>>>>>> cm/cm-11.0
 	if (get_option(&str, &batt_val)) {
 		console_batt_stat = batt_val;
 		return 0;
@@ -494,6 +506,51 @@ static void __init mm_init(void)
 	vmalloc_init();
 }
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_CRYPTO_FIPS
+/* change@ksingh.sra-dallas - in kernel 3.4 and + 
+ * the mmu clears the unused/unreserved memory with default RAM initial sticky 
+ * bit data.
+ * Hence to preseve the copy of zImage in the unmarked area, the Copied zImage
+ * memory range has to be marked reserved.
+*/
+#define SHA256_DIGEST_SIZE 32
+
+// this is the size of memory area that is marked as reserved
+long integrity_mem_reservoir = 0;
+
+// internal API to mark zImage copy memory area as reserved
+static void __init integrity_mem_reserve(void) {
+	int result = 0;
+	long len = 0;
+	u8* zBuffer = 0;
+	
+	zBuffer = (u8*)phys_to_virt((unsigned long)CONFIG_CRYPTO_FIPS_INTEG_COPY_ADDRESS);
+	if (*((u32 *) &zBuffer[36]) != 0x016F2818) {
+		printk(KERN_ERR "FIPS main.c: invalid zImage magic number.");
+		return;
+	}
+
+	if (*(u32 *) &zBuffer[44] <= *(u32 *) &zBuffer[40]) {
+		printk(KERN_ERR "FIPS main.c: invalid zImage calculated len");
+		return;
+	}
+	
+	len = *(u32 *) &zBuffer[44] - *(u32 *) &zBuffer[40];
+	printk(KERN_NOTICE "FIPS Actual zImage len = %ld\n", len);
+	
+	integrity_mem_reservoir = len + SHA256_DIGEST_SIZE;
+	result = reserve_bootmem((unsigned long)CONFIG_CRYPTO_FIPS_INTEG_COPY_ADDRESS, integrity_mem_reservoir, 1);
+	if(result != 0) {
+		integrity_mem_reservoir = 0;
+	} 
+	printk(KERN_NOTICE "FIPS integrity_mem_reservoir = %ld\n", integrity_mem_reservoir);
+}
+// change@ksingh.sra-dallas - end
+#endif // CONFIG_CRYPTO_FIPS
+
+>>>>>>> cm/cm-11.0
 asmlinkage void __init start_kernel(void)
 {
 	char * command_line;
@@ -507,11 +564,14 @@ asmlinkage void __init start_kernel(void)
 	smp_setup_processor_id();
 	debug_objects_early_init();
 
+<<<<<<< HEAD
 	/*
 	 * Set up the the initial canary ASAP:
 	 */
 	boot_init_stack_canary();
 
+=======
+>>>>>>> cm/cm-11.0
 	cgroup_init_early();
 
 	local_irq_disable();
@@ -526,6 +586,13 @@ asmlinkage void __init start_kernel(void)
 	page_address_init();
 	printk(KERN_NOTICE "%s", linux_banner);
 	setup_arch(&command_line);
+<<<<<<< HEAD
+=======
+	/*
+	 * Set up the the initial canary ASAP:
+	 */
+	boot_init_stack_canary();
+>>>>>>> cm/cm-11.0
 	mm_init_owner(&init_mm, &init_task);
 	mm_init_cpumask(&init_mm);
 	setup_command_line(command_line);
@@ -544,6 +611,15 @@ asmlinkage void __init start_kernel(void)
 
 	jump_label_init();
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_CRYPTO_FIPS	
+	/* change@ksingh.sra-dallas
+	 * marks the zImage copy area as reserve before mmu can clear it
+	 */
+ 	integrity_mem_reserve();
+#endif // CONFIG_CRYPTO_FIPS
+>>>>>>> cm/cm-11.0
 	/*
 	 * These use large bootmem allocations and must precede
 	 * kmem_cache_init()
@@ -832,6 +908,18 @@ static void run_init_process(const char *init_filename)
  */
 static noinline int init_post(void)
 {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SEC_GPIO_DVS
+	/************************ Caution !!! ****************************/
+	/* This function must be located in appropriate INIT position
+	 * in accordance with the specification of each BB vendor.
+	 */
+	/************************ Caution !!! ****************************/
+	gpio_dvs_check_initgpio();
+#endif
+
+>>>>>>> cm/cm-11.0
 	/* need to finish all async __init code before freeing the memory */
 	async_synchronize_full();
 	free_initmem();

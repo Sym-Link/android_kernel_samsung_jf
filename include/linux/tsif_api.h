@@ -3,7 +3,11 @@
  *
  * Kernel API
  *
+<<<<<<< HEAD
  * Copyright (c) 2009-2010, 2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -256,6 +260,20 @@ int tsif_start(void *cookie);
 void tsif_stop(void *cookie);
 
 /**
+<<<<<<< HEAD
+=======
+ * tsif_get_ref_clk_counter - return the TSIF clock reference (TCR) counter.
+ * @cookie:      TSIF cookie previously obtained with tsif_attach()
+ * @tcr_counter: the value of TCR counter
+ *
+ * Return      error code
+ *
+ * TCR increments at a rate equal to 27 MHz/256 = 105.47 kHz.
+ */
+int tsif_get_ref_clk_counter(void *cookie, u32 *tcr_counter);
+
+/**
+>>>>>>> cm/cm-11.0
  * tsif_reclaim_packets - inform that buffer space may be reclaimed
  * @cookie:    TSIF cookie previously obtained with tsif_attach()
  * @ri:        new value for read index

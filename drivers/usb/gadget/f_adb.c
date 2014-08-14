@@ -316,7 +316,12 @@ requeue_req:
 	}
 
 	/* wait for a request to complete */
+<<<<<<< HEAD
 	ret = wait_event_interruptible(dev->read_wq, dev->rx_done);
+=======
+	ret = wait_event_interruptible(dev->read_wq, dev->rx_done ||
+				atomic_read(&dev->error));
+>>>>>>> cm/cm-11.0
 	if (ret < 0) {
 		if (ret != -ERESTARTSYS)
 		atomic_set(&dev->error, 1);
@@ -338,6 +343,12 @@ requeue_req:
 		r = -EIO;
 
 done:
+<<<<<<< HEAD
+=======
+	if (atomic_read(&dev->error))
+		wake_up(&dev->write_wq);
+
+>>>>>>> cm/cm-11.0
 	adb_unlock(&dev->read_excl);
 	pr_debug("adb_read returning %d\n", r);
 	return r;
@@ -406,6 +417,12 @@ static ssize_t adb_write(struct file *fp, const char __user *buf,
 	if (req)
 		adb_req_put(dev, &dev->tx_idle, req);
 
+<<<<<<< HEAD
+=======
+	if (atomic_read(&dev->error))
+		wake_up(&dev->read_wq);
+
+>>>>>>> cm/cm-11.0
 	adb_unlock(&dev->write_excl);
 	pr_debug("adb_write returning %d\n", r);
 	return r;
@@ -413,7 +430,14 @@ static ssize_t adb_write(struct file *fp, const char __user *buf,
 
 static int adb_open(struct inode *ip, struct file *fp)
 {
+<<<<<<< HEAD
 	pr_info("adb_open\n");
+=======
+	static DEFINE_RATELIMIT_STATE(rl, 10*HZ, 1);
+
+	if (__ratelimit(&rl))
+		pr_info("adb_open\n");
+>>>>>>> cm/cm-11.0
 	if (!_adb_dev)
 		return -ENODEV;
 
@@ -436,7 +460,14 @@ static int adb_open(struct inode *ip, struct file *fp)
 
 static int adb_release(struct inode *ip, struct file *fp)
 {
+<<<<<<< HEAD
 	pr_info("adb_release\n");
+=======
+	static DEFINE_RATELIMIT_STATE(rl, 10*HZ, 1);
+
+	if (__ratelimit(&rl))
+		pr_info("adb_release\n");
+>>>>>>> cm/cm-11.0
 
 	/*
 	 * ADB daemon closes the device file after I/O error.  The
@@ -599,7 +630,11 @@ static int adb_bind_config(struct usb_configuration *c)
 {
 	struct adb_dev *dev = _adb_dev;
 
+<<<<<<< HEAD
 	printk(KERN_INFO "adb_bind_config\n");
+=======
+	pr_debug("adb_bind_config\n");
+>>>>>>> cm/cm-11.0
 
 	dev->cdev = c->cdev;
 	dev->function.name = "adb";

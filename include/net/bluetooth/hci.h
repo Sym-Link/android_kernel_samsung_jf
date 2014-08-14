@@ -119,6 +119,10 @@ enum {
 #define HCIINQUIRY	_IOR('H', 240, int)
 
 /* HCI timeouts */
+<<<<<<< HEAD
+=======
+#define HCI_DISCONN_AUTH_FAILED_TIMEOUT	(10)	/* 10 ms */
+>>>>>>> cm/cm-11.0
 #define HCI_CONNECT_TIMEOUT	(40000)	/* 40 seconds */
 #define HCI_DISCONN_TIMEOUT	(2000)	/* 2 seconds */
 #define HCI_PAIRING_TIMEOUT	(60000)	/* 60 seconds */
@@ -412,6 +416,14 @@ struct hci_cp_read_remote_version {
 	__le16   handle;
 } __packed;
 
+<<<<<<< HEAD
+=======
+#define HCI_OP_READ_CLOCK_OFFSET	0x041f
+struct hci_cp_read_clock_offset {
+	__le16   handle;
+} __packed;
+
+>>>>>>> cm/cm-11.0
 #define HCI_OP_SETUP_SYNC_CONN		0x0428
 struct hci_cp_setup_sync_conn {
 	__le16   handle;

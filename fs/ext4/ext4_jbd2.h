@@ -164,20 +164,32 @@ static inline void ext4_journal_callback_add(handle_t *handle,
  * ext4_journal_callback_del: delete a registered callback
  * @handle: active journal transaction handle on which callback was registered
  * @jce: registered journal callback entry to unregister
+<<<<<<< HEAD
  * Return true if object was sucessfully removed
  */
 static inline bool ext4_journal_callback_try_del(handle_t *handle,
 					     struct ext4_journal_cb_entry *jce)
 {
 	bool deleted;
+=======
+ */
+static inline void ext4_journal_callback_del(handle_t *handle,
+					     struct ext4_journal_cb_entry *jce)
+{
+>>>>>>> cm/cm-11.0
 	struct ext4_sb_info *sbi =
 			EXT4_SB(handle->h_transaction->t_journal->j_private);
 
 	spin_lock(&sbi->s_md_lock);
+<<<<<<< HEAD
 	deleted = !list_empty(&jce->jce_list);
 	list_del_init(&jce->jce_list);
 	spin_unlock(&sbi->s_md_lock);
 	return deleted;
+=======
+	list_del_init(&jce->jce_list);
+	spin_unlock(&sbi->s_md_lock);
+>>>>>>> cm/cm-11.0
 }
 
 int

@@ -38,8 +38,12 @@
 #endif
 #include <mach/msm_subsystem_map.h>
 #include <mach/iommu_domains.h>
+<<<<<<< HEAD
 #include <linux/sync.h>   
 #include <linux/sw_sync.h>
+=======
+extern void xlog(const char *name, u32 data0, u32 data1, u32 data2, u32 data3, u32 data4);
+>>>>>>> cm/cm-11.0
 
 #define DRIVER_NAME "msm_rotator"
 
@@ -110,7 +114,10 @@
 #define	HW_BASE_ADDR(height, y_stride) (((dstp0_ystride >> 5) << 11) - \
 					((dst_height & 0x3f) * dstp0_ystride))
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 uint32_t rotator_hw_revision;
 static char rot_iommu_split_domain;
 
@@ -154,7 +161,10 @@ struct rot_sync_info {
 	atomic_t queue_buf_cnt;
 };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 struct msm_rotator_session {
 	struct msm_rotator_img_info img_info;
 	struct msm_rotator_fd_info fd_info;
@@ -163,7 +173,10 @@ struct msm_rotator_session {
 	u32 mem_hid;
 };
 
+<<<<<<< HEAD
 	
+=======
+>>>>>>> cm/cm-11.0
 struct msm_rotator_commit_info {
 	struct msm_rotator_data_info data_info;
 	struct msm_rotator_img_info img_info;
@@ -192,7 +205,10 @@ struct msm_rotator_commit_info {
 struct msm_rotator_dev {
 	void __iomem *io_base;
 	int irq;
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 	struct clk *core_clk;
 	struct msm_rotator_session *rot_session[MAX_SESSIONS];
 	struct list_head fd_list;
@@ -249,7 +265,10 @@ enum {
 	CLK_DIS,
 	CLK_SUSPEND,
 };
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 struct res_mmu_clk {
 	char *mmu_clk_name;
 	struct clk *mmu_clk;
@@ -430,6 +449,7 @@ int msm_rotator_iommu_map_buf(int mem_id, int domain,
 	return 0;
 }
 
+<<<<<<< HEAD
 static int rot_enable_iommu_clocks(struct msm_rotator_dev *rot_dev)                     
 {                                                                                       
 	int ret = 0, i;                                                                        
@@ -511,6 +531,8 @@ static int unmap_sec_resource(struct msm_rotator_dev *rot_dev)
 	return ret;                                                                            
 }                                                                                       
 
+=======
+>>>>>>> cm/cm-11.0
 int msm_rotator_imem_allocate(int requestor)
 {
 	int rc = 0;
@@ -537,7 +559,11 @@ int msm_rotator_imem_allocate(int requestor)
 		rc = 1;
 #endif
 	if (rc == 1) {
+<<<<<<< HEAD
 		cancel_delayed_work(&msm_rotator_dev->imem_clk_work);
+=======
+		cancel_delayed_work_sync(&msm_rotator_dev->imem_clk_work);
+>>>>>>> cm/cm-11.0
 		if (msm_rotator_dev->imem_clk_state != CLK_EN
 			&& msm_rotator_dev->imem_clk) {
 			clk_prepare_enable(msm_rotator_dev->imem_clk);
@@ -927,7 +953,10 @@ static int msm_rotator_get_plane_sizes(uint32_t format,	uint32_t w, uint32_t h,
 	return 0;
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 /* Checking invalid destination image size on FAST YUV for YUV420PP(NV12) with
  * HW issue  for rotation 90 + U/D filp + with/without flip operation
  * (rotation 90 + U/D + L/R flip is rotation 270 degree option) and pix_rot
@@ -1036,7 +1065,10 @@ uint32_t fast_yuv_invalid_size_checker(unsigned char rot_mode,
 	return 0;
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 static int msm_rotator_ycxcx_h2v1(struct msm_rotator_img_info *info,
 				  unsigned int in_paddr,
 				  unsigned int out_paddr,
@@ -1145,14 +1177,20 @@ static int msm_rotator_ycxcx_h2v2(struct msm_rotator_img_info *info,
 		is_tile = 1;
 		dst_format = MDP_Y_CRCB_H2V2;
 		break;
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 	case MDP_Y_CR_CB_H2V2:
 	case MDP_Y_CR_CB_GH2V2:
 		if (fast_yuv_en) {
 			dst_format = info->src.format;
 			break;
 		}
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 	case MDP_Y_CRCB_H2V2:
 		dst_format = MDP_Y_CRCB_H2V2;
 		break;
@@ -1163,7 +1201,10 @@ static int msm_rotator_ycxcx_h2v2(struct msm_rotator_img_info *info,
 		}
 		dst_format = MDP_Y_CBCR_H2V2;
 		break;
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 	case MDP_Y_CBCR_H2V2_TILE:
 		is_tile = 1;
 	case MDP_Y_CBCR_H2V2:
@@ -1189,7 +1230,11 @@ static int msm_rotator_ycxcx_h2v2(struct msm_rotator_img_info *info,
 			((info->dst_y * info->dst.width) + info->dst_x),
 		  MSM_ROTATOR_OUTP0_ADDR);
 	iowrite32(out_chroma_paddr +
+<<<<<<< HEAD
 		(((info->dst_y * info->dst.width)/2) + info->dst_x),
+=======
+			(((info->dst_y * info->dst.width)/2) + info->dst_x),
+>>>>>>> cm/cm-11.0
 		  MSM_ROTATOR_OUTP1_ADDR);
 	if (out_chroma2_paddr)
 		iowrite32(out_chroma2_paddr +
@@ -1216,7 +1261,10 @@ static int msm_rotator_ycxcx_h2v2(struct msm_rotator_img_info *info,
 					info->src.width << 16,
 					MSM_ROTATOR_SRC_YSTRIDE1);
 		}
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 		if (out_chroma2_paddr) {
 			if (info->dst.format == MDP_Y_CR_CB_GH2V2) {
 				iowrite32(ALIGN(info->dst.width, 16) |
@@ -1237,7 +1285,10 @@ static int msm_rotator_ycxcx_h2v2(struct msm_rotator_img_info *info,
 					MSM_ROTATOR_OUT_YSTRIDE1);
 		}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 		if (dst_format == MDP_Y_CBCR_H2V2 ||
 			dst_format == MDP_Y_CB_CR_H2V2) {
 			iowrite32(GET_PACK_PATTERN(0, 0, CLR_CB, CLR_CR, 8),
@@ -1250,7 +1301,11 @@ static int msm_rotator_ycxcx_h2v2(struct msm_rotator_img_info *info,
 			iowrite32(GET_PACK_PATTERN(0, 0, CLR_CR, CLR_CB, 8),
 				  MSM_ROTATOR_OUT_PACK_PATTERN1);
 		}
+<<<<<<< HEAD
 
+=======
+		xlog(__func__, fast_yuv_en, 0, 0, 0, 0);
+>>>>>>> cm/cm-11.0
 		iowrite32((3  << 18) |		/* chroma sampling 3=4:2:0 */
 			  (ROTATIONS_TO_BITMASK(info->rotations) << 9) |
 			  1 << 8 |			/* ROT_EN */
@@ -1442,12 +1497,18 @@ static int msm_rotator_ycxcx_h2v2_2pass(struct msm_rotator_img_info *info,
 
 	msm_rotator_dev->processing = 1;
 	iowrite32(0x1, MSM_ROTATOR_START);
+<<<<<<< HEAD
 	mutex_unlock(&msm_rotator_dev->rotator_lock);
+=======
+>>>>>>> cm/cm-11.0
 	/* End of Pass-1 */
 	wait_event(msm_rotator_dev->wq,
 		   (msm_rotator_dev->processing == 0));
 	/* Beginning of Pass-2 */
+<<<<<<< HEAD
 	mutex_lock(&msm_rotator_dev->rotator_lock);
+=======
+>>>>>>> cm/cm-11.0
 	status = (unsigned char)ioread32(MSM_ROTATOR_INTR_STATUS);
 	if ((status & 0x03) != 0x01) {
 		pr_err("%s(): AXI Bus Error, issuing SW_RESET\n",
@@ -1896,7 +1957,12 @@ static int msm_rotator_rotate_prepare(
 		pr_err("%s() : Attempt to use invalid session_id %d\n",
 			__func__, s);
 		rc = -EINVAL;
+<<<<<<< HEAD
 		goto rotate_prepare_error;
+=======
+		mutex_unlock(&msm_rotator_dev->rotator_lock);
+		return rc;
+>>>>>>> cm/cm-11.0
 	}
 
 	img_info = &(msm_rotator_dev->rot_session[s]->img_info);
@@ -1904,7 +1970,12 @@ static int msm_rotator_rotate_prepare(
 		dev_dbg(msm_rotator_dev->device,
 			"%s() : Session_id %d not enabled\n", __func__, s);
 		rc = -EINVAL;
+<<<<<<< HEAD
 		goto rotate_prepare_error;
+=======
+		mutex_unlock(&msm_rotator_dev->rotator_lock);
+		return rc;
+>>>>>>> cm/cm-11.0
 	}
 
 	if (msm_rotator_get_plane_sizes(img_info->src.format,
@@ -1913,7 +1984,12 @@ static int msm_rotator_rotate_prepare(
 					&src_planes)) {
 		pr_err("%s: invalid src format\n", __func__);
 		rc = -EINVAL;
+<<<<<<< HEAD
 		goto rotate_prepare_error;
+=======
+		mutex_unlock(&msm_rotator_dev->rotator_lock);
+		return rc;
+>>>>>>> cm/cm-11.0
 	}
 	if (msm_rotator_get_plane_sizes(img_info->dst.format,
 					img_info->dst.width,
@@ -1921,7 +1997,12 @@ static int msm_rotator_rotate_prepare(
 					&dst_planes)) {
 		pr_err("%s: invalid dst format\n", __func__);
 		rc = -EINVAL;
+<<<<<<< HEAD
 		goto rotate_prepare_error;
+=======
+		mutex_unlock(&msm_rotator_dev->rotator_lock);
+		return rc;
+>>>>>>> cm/cm-11.0
 	}
 
 	rc = get_img(&info.src, ROTATOR_SRC_DOMAIN, (unsigned long *)&in_paddr,
@@ -2114,11 +2195,20 @@ static int msm_rotator_do_rotate_sub(
 	dstp1_ihdl = commit_info->dstp1_ihdl;
 	ps0_need = commit_info->ps0_need;
 	s = commit_info->session_index;
+<<<<<<< HEAD
 
 	msm_rotator_wait_for_fence(commit_info->acq_fen);
 	commit_info->acq_fen = NULL;
 
 	cancel_delayed_work(&msm_rotator_dev->rot_clk_work);
+=======
+	xlog(__func__, 0, 0, 0, 0, 0);
+	msm_rotator_wait_for_fence(commit_info->acq_fen);
+	commit_info->acq_fen = NULL;
+	xlog(__func__, 1, 0, 0, 0, 0);
+
+	cancel_delayed_work_sync(&msm_rotator_dev->rot_clk_work);
+>>>>>>> cm/cm-11.0
 	if (msm_rotator_dev->rot_clk_state != CLK_EN) {
 		enable_rot_clks();
 		msm_rotator_dev->rot_clk_state = CLK_EN;
@@ -2151,6 +2241,14 @@ static int msm_rotator_do_rotate_sub(
 		  (img_info->src.width & 0x1fff),
 		  MSM_ROTATOR_SRC_IMAGE_SIZE);
 
+<<<<<<< HEAD
+=======
+	xlog(__func__, format, img_info->src_rect.w, img_info->src_rect.h,
+		img_info->rotations, img_info->downscale_ratio);
+	xlog(__func__, format, img_info->src_rect.w, img_info->src_rect.h,
+		img_info->src_rect.x, img_info->src_rect.y);
+	xlog(__func__, img_info->dst_x, img_info->dst_y, 0, 0, 0);
+>>>>>>> cm/cm-11.0
 	switch (format) {
 	case MDP_RGB_565:
 	case MDP_BGR_565:
@@ -2230,10 +2328,15 @@ static int msm_rotator_do_rotate_sub(
 
 	msm_rotator_dev->processing = 1;
 	iowrite32(0x1, MSM_ROTATOR_START);
+<<<<<<< HEAD
 	mutex_unlock(&msm_rotator_dev->rotator_lock);
 	wait_event(msm_rotator_dev->wq,
 		   (msm_rotator_dev->processing == 0));
 	mutex_lock(&msm_rotator_dev->rotator_lock);
+=======
+	wait_event(msm_rotator_dev->wq,
+		   (msm_rotator_dev->processing == 0));
+>>>>>>> cm/cm-11.0
 	status = (unsigned char)ioread32(MSM_ROTATOR_INTR_STATUS);
 	if ((status & 0x03) != 0x01) {
 		pr_err("%s(): AXI Bus Error, issuing SW_RESET\n", __func__);
@@ -2249,7 +2352,10 @@ do_rotate_exit:
 	msm_rotator_imem_free(ROTATOR_REQUEST);
 #endif
 	schedule_delayed_work(&msm_rotator_dev->rot_clk_work, HZ);
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 	put_img(dstp1_file, dstp1_ihdl, ROTATOR_DST_DOMAIN,
 		img_info->secure);
 	put_img(srcp1_file, srcp1_ihdl, ROTATOR_SRC_DOMAIN, 0);
@@ -2261,7 +2367,13 @@ do_rotate_exit:
 		fput_light(srcp0_file, ps0_need);
 	else
 		put_img(srcp0_file, srcp0_ihdl, ROTATOR_SRC_DOMAIN, 0);
+<<<<<<< HEAD
 	msm_rotator_signal_timeline_done(s);
+=======
+	xlog(__func__, 0, 0, 0, 0, 0);
+	msm_rotator_signal_timeline_done(s);
+	xlog(__func__, 1, 0, 0, 0, 0);
+>>>>>>> cm/cm-11.0
 	mutex_unlock(&msm_rotator_dev->rotator_lock);
 	dev_dbg(msm_rotator_dev->device, "%s() returning rc = %d\n",
 		__func__, rc);
@@ -2396,6 +2508,90 @@ static void msm_rotator_set_perf_level(u32 wh, u32 is_rgb)
 
 }
 
+<<<<<<< HEAD
+=======
+static int rot_enable_iommu_clocks(struct msm_rotator_dev *rot_dev)
+{
+	int ret = 0, i;
+	if (rot_dev->mmu_clk_on)
+		return 0;
+	for (i = 0; i < ARRAY_SIZE(rot_mmu_clks); i++) {
+		rot_mmu_clks[i].mmu_clk = clk_get(&msm_rotator_dev->pdev->dev,
+			rot_mmu_clks[i].mmu_clk_name);
+		if (IS_ERR(rot_mmu_clks[i].mmu_clk)) {
+			pr_err(" %s: Get failed for clk %s", __func__,
+				   rot_mmu_clks[i].mmu_clk_name);
+			ret = PTR_ERR(rot_mmu_clks[i].mmu_clk);
+			break;
+		}
+		ret = clk_prepare_enable(rot_mmu_clks[i].mmu_clk);
+		if (ret) {
+			clk_put(rot_mmu_clks[i].mmu_clk);
+			rot_mmu_clks[i].mmu_clk = NULL;
+		}
+	}
+	if (ret) {
+		for (i--; i >= 0; i--) {
+			clk_disable_unprepare(rot_mmu_clks[i].mmu_clk);
+			clk_put(rot_mmu_clks[i].mmu_clk);
+			rot_mmu_clks[i].mmu_clk = NULL;
+		}
+	} else {
+		rot_dev->mmu_clk_on = 1;
+	}
+	return ret;
+}
+
+static int rot_disable_iommu_clocks(struct msm_rotator_dev *rot_dev)
+{
+	int i;
+	if (!rot_dev->mmu_clk_on)
+		return 0;
+	for (i = 0; i < ARRAY_SIZE(rot_mmu_clks); i++) {
+		clk_disable_unprepare(rot_mmu_clks[i].mmu_clk);
+		clk_put(rot_mmu_clks[i].mmu_clk);
+		rot_mmu_clks[i].mmu_clk = NULL;
+	}
+	rot_dev->mmu_clk_on = 0;
+	return 0;
+}
+
+static int map_sec_resource(struct msm_rotator_dev *rot_dev)
+{
+	int ret = 0;
+	if (rot_dev->sec_mapped)
+		return 0;
+
+	ret = rot_enable_iommu_clocks(rot_dev);
+	if (ret) {
+		pr_err("IOMMU clock enabled failed while open");
+		return ret;
+	}
+	ret = msm_ion_secure_heap(ION_HEAP(ION_CP_MM_HEAP_ID));
+	if (ret)
+		pr_err("ION heap secure failed heap id %d ret %d\n",
+			   ION_CP_MM_HEAP_ID, ret);
+	else
+		rot_dev->sec_mapped = 1;
+	rot_disable_iommu_clocks(rot_dev);
+	return ret;
+}
+
+static int unmap_sec_resource(struct msm_rotator_dev *rot_dev)
+{
+	int ret = 0;
+	ret = rot_enable_iommu_clocks(rot_dev);
+	if (ret) {
+		pr_err("IOMMU clock enabled failed while close\n");
+		return ret;
+	}
+	msm_ion_unsecure_heap(ION_HEAP(ION_CP_MM_HEAP_ID));
+	rot_dev->sec_mapped = 0;
+	rot_disable_iommu_clocks(rot_dev);
+	return ret;
+}
+
+>>>>>>> cm/cm-11.0
 static int msm_rotator_start(unsigned long arg,
 			     struct msm_rotator_fd_info *fd_info)
 {
@@ -2441,6 +2637,10 @@ static int msm_rotator_start(unsigned long arg,
 	switch (info.src.format) {
 	case MDP_Y_CB_CR_H2V2:
 	case MDP_Y_CR_CB_H2V2:
+<<<<<<< HEAD
+=======
+	case MDP_Y_CR_CB_GH2V2:
+>>>>>>> cm/cm-11.0
 		is_planar420 = 1;
 	case MDP_Y_CBCR_H2V2:
 	case MDP_Y_CRCB_H2V2:
@@ -2488,6 +2688,7 @@ static int msm_rotator_start(unsigned long arg,
 					enable_2pass = 1;
 		}
 	break;
+<<<<<<< HEAD
 	case MDP_Y_CR_CB_GH2V2:
 		fast_yuv_en = 0;
 		is_planar420 = 1;
@@ -2495,6 +2696,12 @@ static int msm_rotator_start(unsigned long arg,
 	default:
 		fast_yuv_en = 0;
 	}
+=======
+	default:
+		fast_yuv_en = 0;
+	}
+
+>>>>>>> cm/cm-11.0
 	switch (info.src.format) {
 	case MDP_RGB_565:
 	case MDP_BGR_565:
@@ -2548,7 +2755,11 @@ static int msm_rotator_start(unsigned long arg,
 		if (fast_yuv_en) {
 			info.dst.format = info.src.format;
 			break;
+<<<<<<< HEAD
 		}		
+=======
+		}
+>>>>>>> cm/cm-11.0
 	case MDP_Y_CRCB_H2V2_TILE:
 		info.dst.format = MDP_Y_CRCB_H2V2;
 		break;
@@ -2566,7 +2777,11 @@ static int msm_rotator_start(unsigned long arg,
 			(unsigned int)msm_rotator_dev->rot_session[s]
 			)) {
 			rot_session = msm_rotator_dev->rot_session[s];
+<<<<<<< HEAD
 			rot_session->img_info = info;
+=======
+			rot_session->img_info =	info;
+>>>>>>> cm/cm-11.0
 			rot_session->fd_info =	*fd_info;
 			rot_session->fast_yuv_enable = fast_yuv_en;
 			rot_session->enable_2pass = enable_2pass;
@@ -2580,7 +2795,10 @@ static int msm_rotator_start(unsigned long arg,
 		if ((msm_rotator_dev->rot_session[s] == NULL) &&
 			(first_free_idx == INVALID_SESSION))
 				first_free_idx = s;
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 	}
 
 	if ((s == MAX_SESSIONS) && (first_free_idx != INVALID_SESSION)) {
@@ -2595,11 +2813,18 @@ static int msm_rotator_start(unsigned long arg,
 			goto rotator_start_exit;
 		}
 		info.session_id = (unsigned int)
+<<<<<<< HEAD
 			
 			msm_rotator_dev->rot_session[first_free_idx];
 		rot_session = msm_rotator_dev->rot_session[first_free_idx];
 
 		rot_session->img_info = info;
+=======
+			msm_rotator_dev->rot_session[first_free_idx];
+		rot_session = msm_rotator_dev->rot_session[first_free_idx];
+
+		rot_session->img_info =	info;
+>>>>>>> cm/cm-11.0
 		rot_session->fd_info =	*fd_info;
 		rot_session->fast_yuv_enable = fast_yuv_en;
 		rot_session->enable_2pass = enable_2pass;
@@ -2646,7 +2871,10 @@ static int msm_rotator_start(unsigned long arg,
 	}
 	sync_info->acq_fen = NULL;
 	atomic_set(&sync_info->queue_buf_cnt, 0);
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 rotator_start_exit:
 	mutex_unlock(&msm_rotator_dev->rotator_lock);
 
@@ -2671,14 +2899,22 @@ static int msm_rotator_finish(unsigned long arg)
 			if (msm_rotator_dev->last_session_idx == s)
 				msm_rotator_dev->last_session_idx =
 					INVALID_SESSION;
+<<<<<<< HEAD
             msm_rotator_signal_timeline(s);
             msm_rotator_release_acq_fence(s);
+=======
+			msm_rotator_signal_timeline(s);
+			msm_rotator_release_acq_fence(s);
+>>>>>>> cm/cm-11.0
 			if (msm_rotator_dev->rot_session[s]->enable_2pass) {
 				rotator_free_2pass_buf(mrd->y_rot_buf, s);
 				rotator_free_2pass_buf(mrd->chroma_rot_buf, s);
 				rotator_free_2pass_buf(mrd->chroma2_rot_buf, s);
 			}
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 			kfree(msm_rotator_dev->rot_session[s]);
 			msm_rotator_dev->rot_session[s] = NULL;
 			break;
@@ -2783,7 +3019,11 @@ static long msm_rotator_ioctl(struct file *file, unsigned cmd,
 						 unsigned long arg)
 {
 	struct msm_rotator_fd_info *fd_info;
+<<<<<<< HEAD
 
+=======
+	int ret = 0;
+>>>>>>> cm/cm-11.0
 	if (_IOC_TYPE(cmd) != MSM_ROTATOR_IOCTL_MAGIC)
 		return -ENOTTY;
 
@@ -2793,12 +3033,26 @@ static long msm_rotator_ioctl(struct file *file, unsigned cmd,
 	case MSM_ROTATOR_IOCTL_START:
 		return msm_rotator_start(arg, fd_info);
 	case MSM_ROTATOR_IOCTL_ROTATE:
+<<<<<<< HEAD
 		return msm_rotator_do_rotate(arg);
 	case MSM_ROTATOR_IOCTL_FINISH:
 		return msm_rotator_finish(arg);
 	case MSM_ROTATOR_IOCTL_BUFFER_SYNC:
 		return msm_rotator_buf_sync(arg);
 
+=======
+		xlog(__func__, 0, 0, 0, 0, 0);
+		ret = msm_rotator_do_rotate(arg);
+		xlog(__func__, 1, 0, 0, 0, 0);
+		return ret;
+	case MSM_ROTATOR_IOCTL_FINISH:
+		return msm_rotator_finish(arg);
+	case MSM_ROTATOR_IOCTL_BUFFER_SYNC:
+		xlog(__func__, 0, 0, 1, 0, 0);
+		ret =  msm_rotator_buf_sync(arg);
+		xlog(__func__, 0, 0, 0, 0, 0);
+		return ret;
+>>>>>>> cm/cm-11.0
 	default:
 		dev_dbg(msm_rotator_dev->device,
 			"unexpected IOCTL %d\n", cmd);
@@ -3060,11 +3314,19 @@ static int __devexit msm_rotator_remove(struct platform_device *plat_dev)
 
 	rot_wait_for_commit_queue(true);
 #ifdef CONFIG_MSM_BUS_SCALING
+<<<<<<< HEAD
 	//msm_bus_scale_unregister_client(msm_rotator_dev->bus_client_handle);
 	if (msm_rotator_dev->bus_client_handle) {                           
 		msm_bus_scale_unregister_client(msm_rotator_dev->bus_client_handle);
 		msm_rotator_dev->bus_client_handle = 0;                             
 	}                                                                   
+=======
+	if (msm_rotator_dev->bus_client_handle) {
+		msm_bus_scale_unregister_client
+			(msm_rotator_dev->bus_client_handle);
+		msm_rotator_dev->bus_client_handle = 0;
+	}
+>>>>>>> cm/cm-11.0
 #endif
 	free_irq(msm_rotator_dev->irq, NULL);
 	mutex_destroy(&msm_rotator_dev->rotator_lock);

@@ -83,11 +83,18 @@ static void print_one_rcu_data(struct seq_file *m, struct rcu_data *rdp)
 			rdp->nxttail[RCU_WAIT_TAIL]],
 		   ".D"[&rdp->nxtlist != rdp->nxttail[RCU_DONE_TAIL]]);
 #ifdef CONFIG_RCU_BOOST
+<<<<<<< HEAD
 	seq_printf(m, " kt=%d/%c/%d ktl=%x",
 		   per_cpu(rcu_cpu_has_work, rdp->cpu),
 		   convert_kthread_status(per_cpu(rcu_cpu_kthread_status,
 					  rdp->cpu)),
 		   per_cpu(rcu_cpu_kthread_cpu, rdp->cpu),
+=======
+	seq_printf(m, " kt=%d/%c ktl=%x",
+		   per_cpu(rcu_cpu_has_work, rdp->cpu),
+		   convert_kthread_status(per_cpu(rcu_cpu_kthread_status,
+					  rdp->cpu)),
+>>>>>>> cm/cm-11.0
 		   per_cpu(rcu_cpu_kthread_loops, rdp->cpu) & 0xffff);
 #endif /* #ifdef CONFIG_RCU_BOOST */
 	seq_printf(m, " b=%ld", rdp->blimit);
@@ -271,13 +278,21 @@ static void print_one_rcu_state(struct seq_file *m, struct rcu_state *rsp)
 
 	gpnum = rsp->gpnum;
 	seq_printf(m, "c=%lu g=%lu s=%d jfq=%ld j=%x "
+<<<<<<< HEAD
 		      "nfqs=%lu/nfqsng=%lu(%lu) fqlh=%lu\n",
+=======
+		      "nfqs=%lu/nfqsng=%lu(%lu) fqlh=%lu oqlen=%ld/%ld\n",
+>>>>>>> cm/cm-11.0
 		   rsp->completed, gpnum, rsp->fqs_state,
 		   (long)(rsp->jiffies_force_qs - jiffies),
 		   (int)(jiffies & 0xffff),
 		   rsp->n_force_qs, rsp->n_force_qs_ngp,
 		   rsp->n_force_qs - rsp->n_force_qs_ngp,
+<<<<<<< HEAD
 		   rsp->n_force_qs_lh);
+=======
+		   rsp->n_force_qs_lh, rsp->qlen_lazy, rsp->qlen);
+>>>>>>> cm/cm-11.0
 	for (rnp = &rsp->node[0]; rnp - &rsp->node[0] < NUM_RCU_NODES; rnp++) {
 		if (rnp->level != level) {
 			seq_puts(m, "\n");

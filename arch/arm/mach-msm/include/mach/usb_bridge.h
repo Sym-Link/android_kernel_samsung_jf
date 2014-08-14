@@ -17,10 +17,15 @@
 #include <linux/netdevice.h>
 #include <linux/usb.h>
 
+<<<<<<< HEAD
 /* bridge device 0: DUN
  * bridge device 1 : Tethered RMNET
  */
 #define MAX_BRIDGE_DEVICES 2
+=======
+#define MAX_BRIDGE_DEVICES 4
+#define BRIDGE_NAME_MAX_LEN 20
+>>>>>>> cm/cm-11.0
 
 struct bridge_ops {
 	int (*send_pkt)(void *, void *, size_t actual);
@@ -37,11 +42,20 @@ struct bridge {
 	/* context of the gadget port using bridge driver */
 	void *ctx;
 
+<<<<<<< HEAD
 	/* bridge device array index mapped to the gadget port array index.
 	 * data bridge[ch_id] <-- bridge --> gadget port[ch_id]
 	 */
 	unsigned int ch_id;
 
+=======
+	/*to maps bridge driver instance*/
+	unsigned int ch_id;
+
+	/*to match against bridge xport name to get bridge driver instance*/
+	char *name;
+
+>>>>>>> cm/cm-11.0
 	/* flow control bits */
 	unsigned long flags;
 
@@ -101,7 +115,14 @@ int data_bridge_write(unsigned int , struct sk_buff *);
 int data_bridge_unthrottle_rx(unsigned int);
 
 /* defined in control bridge */
+<<<<<<< HEAD
 int ctrl_bridge_probe(struct usb_interface *, struct usb_host_endpoint *, int);
+=======
+int ctrl_bridge_init(void);
+void ctrl_bridge_exit(void);
+int ctrl_bridge_probe(struct usb_interface *, struct usb_host_endpoint *,
+		char *, int);
+>>>>>>> cm/cm-11.0
 void ctrl_bridge_disconnect(unsigned int);
 int ctrl_bridge_resume(unsigned int);
 int ctrl_bridge_suspend(unsigned int);

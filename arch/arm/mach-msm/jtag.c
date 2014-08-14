@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1105,9 +1109,12 @@ static int __init msm_jtag_dbg_init(void)
 	int ret;
 	uint32_t dbgdidr;
 
+<<<<<<< HEAD
 	if (msm_jtag_fuse_apps_access_disabled())
 		return -EPERM;
 
+=======
+>>>>>>> cm/cm-11.0
 	/* This will run on core0 so use it to populate parameters */
 
 	/* Populate dbg_ctx data */
@@ -1149,9 +1156,12 @@ static int __init msm_jtag_etm_init(void)
 	uint32_t etmidr;
 	uint32_t etmccr;
 
+<<<<<<< HEAD
 	if (msm_jtag_fuse_apps_access_disabled())
 		return -EPERM;
 
+=======
+>>>>>>> cm/cm-11.0
 	/* Vote for ETM power/clock enable */
 	etm_clk_enable();
 

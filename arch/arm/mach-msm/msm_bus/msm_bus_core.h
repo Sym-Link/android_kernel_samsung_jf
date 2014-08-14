@@ -35,8 +35,18 @@
 #define IS_SLAVE_VALID(slv) \
 	(((slv >= MSM_BUS_SLAVE_FIRST) && (slv <= MSM_BUS_SLAVE_LAST)) ? 1 : 0)
 
+<<<<<<< HEAD
 #define INTERLEAVED_BW(fab_pdata, bw, ports) \
 	((fab_pdata->il_flag) ? msm_bus_div64((ports), (bw)) : (bw))
+=======
+#if defined(CONFIG_MACH_JACTIVE_ATT) || defined(CONFIG_MACH_JACTIVE_EUR)
+#define INTERLEAVED_BW(fab_pdata, bw, ports) \
+	((fab_pdata->il_flag) ? msm_bus_div64((ports), (bw)) : (bw))//((bw), (ports)) : (bw))
+#else
+#define INTERLEAVED_BW(fab_pdata, bw, ports) \
+	((fab_pdata->il_flag) ? msm_bus_div64((ports), (bw)) : (bw))
+#endif
+>>>>>>> cm/cm-11.0
 #define INTERLEAVED_VAL(fab_pdata, n) \
 	((fab_pdata->il_flag) ? (n) : 1)
 

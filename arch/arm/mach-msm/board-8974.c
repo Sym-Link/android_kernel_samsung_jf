@@ -21,6 +21,12 @@
 #include <linux/of_platform.h>
 #include <linux/of_irq.h>
 #include <linux/memory.h>
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_ANDROID_PMEM
+#include <linux/android_pmem.h>
+#endif
+>>>>>>> cm/cm-11.0
 #include <linux/regulator/machine.h>
 #include <linux/regulator/krait-regulator.h>
 #include <linux/msm_thermal.h>

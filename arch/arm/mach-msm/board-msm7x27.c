@@ -54,6 +54,10 @@
 #include <linux/mtd/nand.h>
 #include <linux/mtd/partitions.h>
 #include <linux/i2c.h>
+<<<<<<< HEAD
+=======
+#include <linux/android_pmem.h>
+>>>>>>> cm/cm-11.0
 #include <mach/camera.h>
 
 #ifdef CONFIG_USB_G_ANDROID

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -90,7 +94,10 @@ extern int msm_use_iommu(void);
 
 extern int msm_iommu_map_extra(struct iommu_domain *domain,
 						unsigned long start_iova,
+<<<<<<< HEAD
 						unsigned long phys_addr,
+=======
+>>>>>>> cm/cm-11.0
 						unsigned long size,
 						unsigned long page_size,
 						int cached);
@@ -141,7 +148,10 @@ static inline int msm_use_iommu(void)
 
 static inline int msm_iommu_map_extra(struct iommu_domain *domain,
 						unsigned long start_iova,
+<<<<<<< HEAD
 						unsigned long phys_addr,
+=======
+>>>>>>> cm/cm-11.0
 						unsigned long size,
 						unsigned long page_size,
 						int cached)

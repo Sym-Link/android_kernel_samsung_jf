@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -32,6 +36,12 @@
 
 #define PM_PWM_LUT_NO_TABLE	0x100
 
+<<<<<<< HEAD
+=======
+#define PM_PWM_BANK_LO		0x1000
+#define PM_PWM_BANK_HI		0x2000
+
+>>>>>>> cm/cm-11.0
 /**
  * PWM frequency/period control
  *

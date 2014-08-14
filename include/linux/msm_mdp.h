@@ -75,6 +75,10 @@
 						struct mdp_display_commit)
 #define MSMFB_WRITEBACK_SET_MIRRORING_HINT _IOW(MSMFB_IOCTL_MAGIC, 165, \
 						unsigned int)
+<<<<<<< HEAD
+=======
+#define MSMFB_METADATA_SET  _IOW(MSMFB_IOCTL_MAGIC, 165, struct msmfb_metadata)
+>>>>>>> cm/cm-11.0
 #define MSMFB_METADATA_GET  _IOW(MSMFB_IOCTL_MAGIC, 166, struct msmfb_metadata)
 
 #define FB_TYPE_3D_PANEL 0x10101010
@@ -487,12 +491,25 @@ struct mdp_bl_scale_data {
 	uint32_t scale;
 };
 
+<<<<<<< HEAD
+=======
+struct mdp_calib_config_data {
+	uint32_t ops;
+	uint32_t addr;
+	uint32_t data;
+};
+
+>>>>>>> cm/cm-11.0
 enum {
 	mdp_op_pcc_cfg,
 	mdp_op_csc_cfg,
 	mdp_op_lut_cfg,
 	mdp_op_qseed_cfg,
 	mdp_bl_scale_cfg,
+<<<<<<< HEAD
+=======
+	mdp_op_calib_cfg,
+>>>>>>> cm/cm-11.0
 	mdp_op_max,
 };
 
@@ -504,9 +521,15 @@ struct msmfb_mdp_pp {
 		struct mdp_lut_cfg_data lut_cfg_data;
 		struct mdp_qseed_cfg_data qseed_cfg_data;
 		struct mdp_bl_scale_data bl_scale_data;
+<<<<<<< HEAD
 	} data;
 };
 
+=======
+		struct mdp_calib_config_data calib_cfg;
+	} data;
+};
+>>>>>>> cm/cm-11.0
 enum {
 	metadata_op_none,
 	metadata_op_base_blend,
@@ -527,6 +550,10 @@ struct msmfb_metadata {
 	} data;
 };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cm/cm-11.0
 #define MDP_MAX_FENCE_FD	10
 #define MDP_BUF_SYNC_FLAG_WAIT	1
 
@@ -559,7 +586,11 @@ struct mdp_mixer_info {
 	int z_order;
 };
 
+<<<<<<< HEAD
 #define MAX_PIPE_PER_MIXER  5
+=======
+#define MAX_PIPE_PER_MIXER 5 //ss fix 4-> 5.  this value should be (MDP4_MIXER_STAGE_MAX-MDP4_MIXER_STAGE_BASE)
+>>>>>>> cm/cm-11.0
 
 struct msmfb_mixer_info_req {
 	int mixer_num;

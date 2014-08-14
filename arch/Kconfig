@@ -148,6 +148,12 @@ config HAVE_DMA_CONTIGUOUS
 config USE_GENERIC_SMP_HELPERS
 	bool
 
+<<<<<<< HEAD
+=======
+config GENERIC_SMP_IDLE_THREAD
+       bool
+
+>>>>>>> cm/cm-11.0
 config HAVE_REGS_AND_STACK_ACCESS_API
 	bool
 	help

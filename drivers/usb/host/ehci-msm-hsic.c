@@ -1,6 +1,10 @@
 /* ehci-msm-hsic.c - HSUSB Host Controller Driver Implementation
  *
+<<<<<<< HEAD
  * Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2011-2013, Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * Partly derived from ehci-fsl.c and ehci-hcd.c
  * Copyright (c) 2000-2004 by David Brownell
@@ -39,6 +43,10 @@
 #include <linux/wait.h>
 #include <linux/pm_qos.h>
 #include <linux/irq.h>
+<<<<<<< HEAD
+=======
+#include <linux/ktime.h>
+>>>>>>> cm/cm-11.0
 
 #include <mach/msm_bus.h>
 #include <mach/clk.h>
@@ -52,6 +60,13 @@
 #define USB_REG_START_OFFSET 0x90
 #define USB_REG_END_OFFSET 0x250
 
+<<<<<<< HEAD
+=======
+#define RESUME_RETRY_LIMIT		3
+#define RESUME_SIGNAL_TIME_USEC		(21 * 1000)
+#define RESUME_SIGNAL_TIME_SOF_USEC	(23 * 1000)
+
+>>>>>>> cm/cm-11.0
 static struct workqueue_struct  *ehci_wq;
 struct ehci_timer {
 #define GPT_LD(p)	((p) & 0x00FFFFFF)
@@ -97,6 +112,12 @@ struct msm_hsic_hcd {
 	struct completion	rt_completion;
 	int			resume_status;
 	int			resume_again;
+<<<<<<< HEAD
+=======
+	int			bus_reset;
+	int			reset_again;
+	ktime_t			resume_start_t;
+>>>>>>> cm/cm-11.0
 
 	struct pm_qos_request pm_qos_req_dma;
 };
@@ -186,11 +207,19 @@ static char *get_timestamp(char *tbuf)
 	return tbuf;
 }
 
+<<<<<<< HEAD
 static int allow_dbg_log(int ep_addr)
 {
 	int dir, num;
 
 	dir = ep_addr & USB_DIR_IN ? USB_DIR_IN : USB_DIR_OUT;
+=======
+static int allow_dbg_log(struct urb *urb, int ep_addr)
+{
+	int dir, num;
+
+	dir = usb_urb_dir_in(urb) ? USB_DIR_IN : USB_DIR_OUT;
+>>>>>>> cm/cm-11.0
 	num = ep_addr & ~USB_DIR_IN;
 	num = 1 << num;
 
@@ -202,9 +231,15 @@ static int allow_dbg_log(int ep_addr)
 	return 0;
 }
 
+<<<<<<< HEAD
 static char *get_hex_data(char *dbuf, struct urb *urb, int event, int status)
 {
 	int ep_addr = urb->ep->desc.bEndpointAddress;
+=======
+static char *
+get_hex_data(char *dbuf, struct urb *urb, int event, int status, size_t max_len)
+{
+>>>>>>> cm/cm-11.0
 	char *ubuf = urb->transfer_buffer;
 	size_t len = event ? \
 		urb->actual_length : urb->transfer_buffer_length;
@@ -212,12 +247,20 @@ static char *get_hex_data(char *dbuf, struct urb *urb, int event, int status)
 	if (status == -EINPROGRESS)
 		status = 0;
 
+<<<<<<< HEAD
 	/*Only dump ep in completions and epout submissions*/
 	if (len && !status &&
 		(((ep_addr & USB_DIR_IN) && event) ||
 		(!(ep_addr & USB_DIR_IN) && !event))) {
 		if (len >= 32)
 			len = 32;
+=======
+	/*Only dump ep in successful completions and epout submissions*/
+	if (len && !status && ((usb_urb_dir_in(urb) && event) ||
+			(usb_urb_dir_out(urb) && !event))) {
+		if (len >= max_len)
+			len = max_len;
+>>>>>>> cm/cm-11.0
 		hex_dump_to_buffer(ubuf, len, 32, 4, dbuf, HEX_DUMP_LEN, 0);
 	} else {
 		dbuf = "";
@@ -246,7 +289,11 @@ static void dbg_log_event(struct urb *urb, char * event, unsigned extra)
 	}
 
 	ep_addr = urb->ep->desc.bEndpointAddress;
+<<<<<<< HEAD
 	if (!allow_dbg_log(ep_addr))
+=======
+	if (!allow_dbg_log(urb, ep_addr))
+>>>>>>> cm/cm-11.0
 		return;
 
 	if ((ep_addr & 0x0f) == 0x0) {
@@ -255,9 +302,15 @@ static void dbg_log_event(struct urb *urb, char * event, unsigned extra)
 			write_lock_irqsave(&dbg_hsic_ctrl.lck, flags);
 			scnprintf(dbg_hsic_ctrl.buf[dbg_hsic_ctrl.idx],
 				DBG_MSG_LEN, "%s: [%s : %p]:[%s] "
+<<<<<<< HEAD
 				  "%02x %02x %04x %04x %04x  %u %d",
 				  get_timestamp(tbuf), event, urb,
 				  (ep_addr & USB_DIR_IN) ? "in" : "out",
+=======
+				  "%02x %02x %04x %04x %04x  %u %d %s",
+				  get_timestamp(tbuf), event, urb,
+				  usb_urb_dir_in(urb) ? "in" : "out",
+>>>>>>> cm/cm-11.0
 				  urb->setup_packet[0], urb->setup_packet[1],
 				  (urb->setup_packet[3] << 8) |
 				  urb->setup_packet[2],
@@ -265,17 +318,32 @@ static void dbg_log_event(struct urb *urb, char * event, unsigned extra)
 				  urb->setup_packet[4],
 				  (urb->setup_packet[7] << 8) |
 				  urb->setup_packet[6],
+<<<<<<< HEAD
 				  urb->transfer_buffer_length, extra);
+=======
+				  urb->transfer_buffer_length, extra,
+				  enable_payload_log ? get_hex_data(dbuf, urb,
+				  str_to_event(event), extra, 16) : "");
+>>>>>>> cm/cm-11.0
 
 			dbg_inc(&dbg_hsic_ctrl.idx);
 			write_unlock_irqrestore(&dbg_hsic_ctrl.lck, flags);
 		} else {
 			write_lock_irqsave(&dbg_hsic_ctrl.lck, flags);
 			scnprintf(dbg_hsic_ctrl.buf[dbg_hsic_ctrl.idx],
+<<<<<<< HEAD
 				DBG_MSG_LEN, "%s: [%s : %p]:[%s] %u %d",
 				  get_timestamp(tbuf), event, urb,
 				  (ep_addr & USB_DIR_IN) ? "in" : "out",
 				  urb->actual_length, extra);
+=======
+				DBG_MSG_LEN, "%s: [%s : %p]:[%s] %u %d %s",
+				  get_timestamp(tbuf), event, urb,
+				  usb_urb_dir_in(urb) ? "in" : "out",
+				  urb->actual_length, extra,
+				  enable_payload_log ? get_hex_data(dbuf, urb,
+				  str_to_event(event), extra, 16) : "");
+>>>>>>> cm/cm-11.0
 
 			dbg_inc(&dbg_hsic_ctrl.idx);
 			write_unlock_irqrestore(&dbg_hsic_ctrl.lck, flags);
@@ -285,11 +353,19 @@ static void dbg_log_event(struct urb *urb, char * event, unsigned extra)
 		scnprintf(dbg_hsic_data.buf[dbg_hsic_data.idx], DBG_MSG_LEN,
 			  "%s: [%s : %p]:ep%d[%s]  %u %d %s",
 			  get_timestamp(tbuf), event, urb, ep_addr & 0x0f,
+<<<<<<< HEAD
 			  (ep_addr & USB_DIR_IN) ? "in" : "out",
 			  str_to_event(event) ? urb->actual_length :
 			  urb->transfer_buffer_length, extra,
 			  enable_payload_log ? get_hex_data(dbuf, urb,
 				  str_to_event(event), extra) : "");
+=======
+			  usb_urb_dir_in(urb) ? "in" : "out",
+			  str_to_event(event) ? urb->actual_length :
+			  urb->transfer_buffer_length, extra,
+			  enable_payload_log ? get_hex_data(dbuf, urb,
+				  str_to_event(event), extra, 32) : "");
+>>>>>>> cm/cm-11.0
 
 		dbg_inc(&dbg_hsic_data.idx);
 		write_unlock_irqrestore(&dbg_hsic_data.lck, flags);
@@ -394,7 +470,11 @@ reg_enable_err:
 
 }
 
+<<<<<<< HEAD
 static int ulpi_read(struct msm_hsic_hcd *mehci, u32 reg)
+=======
+static int __maybe_unused ulpi_read(struct msm_hsic_hcd *mehci, u32 reg)
+>>>>>>> cm/cm-11.0
 {
 	struct usb_hcd *hcd = hsic_to_hcd(mehci);
 	int cnt = 0;
@@ -465,6 +545,7 @@ static int ulpi_write(struct msm_hsic_hcd *mehci, u32 val, u32 reg)
 	return 0;
 }
 
+<<<<<<< HEAD
 #define HSIC_DBG1		0X38
 #define ULPI_MANUAL_ENABLE	BIT(4)
 #define ULPI_LINESTATE_DATA	BIT(5)
@@ -496,6 +577,8 @@ static void ehci_msm_disable_ulpi_control(struct usb_hcd *hcd)
 	ulpi_write(mehci, val, HSIC_DBG1);
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static int msm_hsic_config_gpios(struct msm_hsic_hcd *mehci, int gpio_en)
 {
 	int rc = 0;
@@ -575,10 +658,19 @@ static void msm_hsic_clk_reset(struct msm_hsic_hcd *mehci)
 #define HSIC_PAD_CALIBRATION	0xA8
 #define HSIC_GPIO_PAD_VAL	0x0A0AAA10
 #define LINK_RESET_TIMEOUT_USEC		(250 * 1000)
+<<<<<<< HEAD
 
 static void msm_hsic_phy_reset(struct msm_hsic_hcd *mehci)
 {
 	struct usb_hcd *hcd = hsic_to_hcd(mehci);
+=======
+static int msm_hsic_reset(struct msm_hsic_hcd *mehci)
+{
+	struct usb_hcd *hcd = hsic_to_hcd(mehci);
+	int ret;
+	struct msm_hsic_host_platform_data *pdata = mehci->dev->platform_data;
+	u32 temp;
+>>>>>>> cm/cm-11.0
 
 	msm_hsic_clk_reset(mehci);
 
@@ -586,12 +678,16 @@ static void msm_hsic_phy_reset(struct msm_hsic_hcd *mehci)
 	writel_relaxed(0x80000000, USB_PORTSC);
 
 	mb();
+<<<<<<< HEAD
 }
 
 static int msm_hsic_start(struct msm_hsic_hcd *mehci)
 {
 	struct msm_hsic_host_platform_data *pdata = mehci->dev->platform_data;
 	int ret;
+=======
+
+>>>>>>> cm/cm-11.0
 	/* HSIC init sequence when HSIC signals (Strobe/Data) are
 	routed via GPIOs */
 	if (pdata && pdata->strobe && pdata->data) {
@@ -614,9 +710,14 @@ static int msm_hsic_start(struct msm_hsic_hcd *mehci)
 			dev_err(mehci->dev, " gpio configuarion failed\n");
 			return ret;
 		}
+<<<<<<< HEAD
 			/* Set LV_MODE=0x1 and DCC=0x2 in STROBE GPIO PAD_CTL */
 		writel_relaxed(HSIC_GPIO_PAD_VAL, HSIC_STROBE_GPIO_PAD_CTL);
 			/* Set LV_MODE=0x1 and DCC=0x2 in STROBE GPIO PAD_CTL */
+=======
+		/* Set LV_MODE=0x1 and DCC=0x2 in HSIC_GPIO PAD_CTL register */
+		writel_relaxed(HSIC_GPIO_PAD_VAL, HSIC_STROBE_GPIO_PAD_CTL);
+>>>>>>> cm/cm-11.0
 		writel_relaxed(HSIC_GPIO_PAD_VAL, HSIC_DATA_GPIO_PAD_CTL);
 
 		mb();
@@ -642,6 +743,13 @@ static int msm_hsic_start(struct msm_hsic_hcd *mehci)
 		ulpi_write(mehci, 0xA9, 0x30);
 	}
 
+<<<<<<< HEAD
+=======
+	temp = readl_relaxed(USB_GENCONFIG2);
+	temp &= ~GENCFG2_SYS_CLK_HOST_DEV_GATE_EN;
+	writel_relaxed(temp, USB_GENCONFIG2);
+
+>>>>>>> cm/cm-11.0
 	/*disable auto resume*/
 	ulpi_write(mehci, ULPI_IFC_CTRL_AUTORESUME, ULPI_CLR(ULPI_IFC_CTRL));
 
@@ -652,6 +760,7 @@ static int msm_hsic_start(struct msm_hsic_hcd *mehci)
 #define PHY_RESUME_TIMEOUT_USEC		(100 * 1000)
 
 #ifdef CONFIG_PM_SLEEP
+<<<<<<< HEAD
 static int msm_hsic_reset(struct msm_hsic_hcd *mehci)
 {
 	/* reset HSIC phy */
@@ -661,6 +770,8 @@ static int msm_hsic_reset(struct msm_hsic_hcd *mehci)
 	return msm_hsic_start(mehci);
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static int msm_hsic_suspend(struct msm_hsic_hcd *mehci)
 {
 	struct usb_hcd *hcd = hsic_to_hcd(mehci);
@@ -718,7 +829,11 @@ static int msm_hsic_suspend(struct msm_hsic_hcd *mehci)
 		writel_relaxed(readl_relaxed(USB_USBCMD) |
 				ULPI_STP_CTRL, USB_USBCMD);
 	else
+<<<<<<< HEAD
 	writel_relaxed(readl_relaxed(USB_USBCMD) | ASYNC_INTR_CTRL |
+=======
+		writel_relaxed(readl_relaxed(USB_USBCMD) | ASYNC_INTR_CTRL |
+>>>>>>> cm/cm-11.0
 				ULPI_STP_CTRL, USB_USBCMD);
 
 	/*
@@ -751,13 +866,21 @@ static int msm_hsic_suspend(struct msm_hsic_hcd *mehci)
 	enable_irq_wake(mehci->wakeup_irq);
 	enable_irq(mehci->wakeup_irq);
 
+<<<<<<< HEAD
 	if (pdata && pdata->swfi_latency)
+=======
+	if (pdata && pdata->standalone_latency)
+>>>>>>> cm/cm-11.0
 		pm_qos_update_request(&mehci->pm_qos_req_dma,
 			PM_QOS_DEFAULT_VALUE);
 
 	wake_unlock(&mehci->wlock);
 
+<<<<<<< HEAD
 	dev_info(mehci->dev, "HSIC-USB in low power mode\n");
+=======
+	dev_dbg(mehci->dev, "HSIC-USB in low power mode\n");
+>>>>>>> cm/cm-11.0
 
 	return 0;
 }
@@ -779,9 +902,15 @@ static int msm_hsic_resume(struct msm_hsic_hcd *mehci)
 	/* Handles race with Async interrupt */
 	disable_irq(hcd->irq);
 
+<<<<<<< HEAD
 	if (pdata && pdata->swfi_latency)
 		pm_qos_update_request(&mehci->pm_qos_req_dma,
 			PM_QOS_DEFAULT_VALUE);
+=======
+	if (pdata && pdata->standalone_latency)
+		pm_qos_update_request(&mehci->pm_qos_req_dma,
+			pdata->standalone_latency + 1);
+>>>>>>> cm/cm-11.0
 
 	spin_lock_irqsave(&mehci->wakeup_lock, flags);
 	if (mehci->wakeup_irq_enabled) {
@@ -857,7 +986,11 @@ skip_phy_resume:
 	}
 
 	enable_irq(hcd->irq);
+<<<<<<< HEAD
 	dev_info(mehci->dev, "HSIC-USB exited from low power mode\n");
+=======
+	dev_dbg(mehci->dev, "HSIC-USB exited from low power mode\n");
+>>>>>>> cm/cm-11.0
 
 	return 0;
 }
@@ -876,13 +1009,40 @@ static void ehci_hsic_bus_vote_w(struct work_struct *w)
 				__func__, ret);
 }
 
+<<<<<<< HEAD
+=======
+static int msm_hsic_reset_done(struct usb_hcd *hcd)
+{
+	struct ehci_hcd *ehci = hcd_to_ehci(hcd);
+	u32 __iomem *status_reg = &ehci->regs->port_status[0];
+	int ret;
+
+	ehci_writel(ehci, ehci_readl(ehci, status_reg) & ~(PORT_RWC_BITS |
+					PORT_RESET), status_reg);
+
+	ret = handshake(ehci, status_reg, PORT_RESET, 0, 1 * 1000);
+
+	if (ret)
+		pr_err("reset handshake failed in %s\n", __func__);
+	else
+		ehci_writel(ehci, ehci_readl(ehci, &ehci->regs->command) |
+				CMD_RUN, &ehci->regs->command);
+
+	return ret;
+}
+
+>>>>>>> cm/cm-11.0
 #define STS_GPTIMER0_INTERRUPT	BIT(24)
 static irqreturn_t msm_hsic_irq(struct usb_hcd *hcd)
 {
 	struct ehci_hcd *ehci = hcd_to_ehci(hcd);
 	struct msm_hsic_hcd *mehci = hcd_to_hsic(hcd);
 	u32			status;
+<<<<<<< HEAD
         int			ret;
+=======
+	int			ret;
+>>>>>>> cm/cm-11.0
 
 	if (atomic_read(&mehci->in_lpm)) {
 		dev_dbg(mehci->dev, "phy async intr\n");
@@ -891,7 +1051,11 @@ static irqreturn_t msm_hsic_irq(struct usb_hcd *hcd)
 		if ((ret == 1) || (ret == -EINPROGRESS)) {
 			pm_runtime_put_noidle(mehci->dev);
 		} else {
+<<<<<<< HEAD
 		disable_irq_nosync(hcd->irq);
+=======
+			disable_irq_nosync(hcd->irq);
+>>>>>>> cm/cm-11.0
 			atomic_set(&mehci->async_int, 1);
 		}
 
@@ -903,6 +1067,7 @@ static irqreturn_t msm_hsic_irq(struct usb_hcd *hcd)
 	if (status & STS_GPTIMER0_INTERRUPT) {
 		int timeleft;
 
+<<<<<<< HEAD
 		dbg_log_event(NULL, "FPR: gpt0_isr", 0);
 
 		timeleft = GPT_CNT(ehci_readl(ehci,
@@ -913,6 +1078,48 @@ static irqreturn_t msm_hsic_irq(struct usb_hcd *hcd)
 				&ehci->regs->command);
 		} else
 			mehci->resume_again = 1;
+=======
+		dbg_log_event(NULL, "FPR: gpt0_isr", mehci->bus_reset);
+
+		timeleft = GPT_CNT(ehci_readl(ehci,
+						 &mehci->timer->gptimer1_ctrl));
+		if (!mehci->bus_reset) {
+			if (ktime_us_delta(ktime_get(), mehci->resume_start_t) >
+					RESUME_SIGNAL_TIME_SOF_USEC) {
+				dbg_log_event(NULL, "FPR: GPT prog invalid",
+						timeleft);
+				pr_err("HSIC GPT timer prog invalid\n");
+				timeleft = 0;
+			}
+		}
+		if (timeleft) {
+			if (mehci->bus_reset) {
+				ret = msm_hsic_reset_done(hcd);
+				if (ret) {
+					mehci->reset_again = 1;
+					dbg_log_event(NULL, "RESET: fail", 0);
+				}
+			} else {
+				writel_relaxed(readl_relaxed(
+					&ehci->regs->command) | CMD_RUN,
+					&ehci->regs->command);
+				if (ktime_us_delta(ktime_get(),
+					mehci->resume_start_t) >
+					RESUME_SIGNAL_TIME_SOF_USEC) {
+					dbg_log_event(NULL,
+						"FPR: resume prog invalid",
+						timeleft);
+					pr_err("HSIC resume fail. retrying\n");
+					mehci->resume_again = 1;
+				}
+			}
+		} else {
+			if (mehci->bus_reset)
+				mehci->reset_again = 1;
+			else
+				mehci->resume_again = 1;
+		}
+>>>>>>> cm/cm-11.0
 
 		dbg_log_event(NULL, "FPR: timeleft", timeleft);
 
@@ -966,6 +1173,105 @@ static int ehci_hsic_reset(struct usb_hcd *hcd)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+#define RESET_RETRY_LIMIT 3
+#define RESET_SIGNAL_TIME_SOF_USEC (50 * 1000)
+#define RESET_SIGNAL_TIME_USEC (20 * 1000)
+static void ehci_hsic_reset_sof_bug_handler(struct usb_hcd *hcd, u32 val)
+{
+	struct ehci_hcd	*ehci = hcd_to_ehci(hcd);
+	struct msm_hsic_hcd *mehci = hcd_to_hsic(hcd);
+	struct msm_hsic_host_platform_data *pdata = mehci->dev->platform_data;
+	u32 __iomem *status_reg = &ehci->regs->port_status[0];
+	u32 cmd;
+	unsigned long flags;
+	int retries = 0, ret, cnt = RESET_SIGNAL_TIME_USEC;
+	s32 next_latency = 0;
+
+	if (pdata && pdata->swfi_latency) {
+		next_latency = pdata->swfi_latency + 1;
+		pm_qos_update_request(&mehci->pm_qos_req_dma, next_latency);
+		if (pdata->standalone_latency)
+			next_latency = pdata->standalone_latency + 1;
+		else
+			next_latency = PM_QOS_DEFAULT_VALUE;
+	}
+
+	mehci->bus_reset = 1;
+
+	/* Halt the controller */
+	cmd = ehci_readl(ehci, &ehci->regs->command);
+	cmd &= ~CMD_RUN;
+	ehci_writel(ehci, cmd, &ehci->regs->command);
+	ret = handshake(ehci, &ehci->regs->status, STS_HALT,
+			STS_HALT, 16 * 125);
+	if (ret) {
+		pr_err("halt handshake fatal error\n");
+		dbg_log_event(NULL, "HALT: fatal", 0);
+		goto fail;
+	}
+
+retry:
+	retries++;
+	dbg_log_event(NULL, "RESET: start", retries);
+	pr_debug("reset begin %d\n", retries);
+	mehci->reset_again = 0;
+	spin_lock_irqsave(&ehci->lock, flags);
+	ehci_writel(ehci, val, status_reg);
+	ehci_writel(ehci, GPT_LD(RESET_SIGNAL_TIME_USEC - 1),
+					&mehci->timer->gptimer0_ld);
+	ehci_writel(ehci, GPT_RESET | GPT_RUN,
+			&mehci->timer->gptimer0_ctrl);
+	ehci_writel(ehci, INTR_MASK | STS_GPTIMER0_INTERRUPT,
+			&ehci->regs->intr_enable);
+
+	ehci_writel(ehci, GPT_LD(RESET_SIGNAL_TIME_SOF_USEC - 1),
+			&mehci->timer->gptimer1_ld);
+	ehci_writel(ehci, GPT_RESET | GPT_RUN,
+		&mehci->timer->gptimer1_ctrl);
+
+	spin_unlock_irqrestore(&ehci->lock, flags);
+	wait_for_completion(&mehci->gpt0_completion);
+
+	if (!mehci->reset_again)
+		goto done;
+
+	if (handshake(ehci, status_reg, PORT_RESET, 0, 10 * 1000)) {
+		pr_err("reset handshake fatal error\n");
+		dbg_log_event(NULL, "RESET: fatal", retries);
+		goto fail;
+	}
+
+	if (retries < RESET_RETRY_LIMIT)
+		goto retry;
+
+	/* complete reset in tight loop */
+	pr_info("RESET in tight loop\n");
+	dbg_log_event(NULL, "RESET: tight", 0);
+
+	spin_lock_irqsave(&ehci->lock, flags);
+	ehci_writel(ehci, val, status_reg);
+	while (cnt--)
+		udelay(1);
+	ret = msm_hsic_reset_done(hcd);
+	spin_unlock_irqrestore(&ehci->lock, flags);
+	if (ret) {
+		pr_err("RESET in tight loop failed\n");
+		dbg_log_event(NULL, "RESET: tight failed", 0);
+		goto fail;
+	}
+
+done:
+	dbg_log_event(NULL, "RESET: done", retries);
+	pr_debug("reset completed\n");
+fail:
+	mehci->bus_reset = 0;
+	if (next_latency)
+		pm_qos_update_request(&mehci->pm_qos_req_dma, next_latency);
+}
+
+>>>>>>> cm/cm-11.0
 static int ehci_hsic_bus_suspend(struct usb_hcd *hcd)
 {
 	struct msm_hsic_hcd *mehci = hcd_to_hsic(hcd);
@@ -981,9 +1287,12 @@ static int ehci_hsic_bus_suspend(struct usb_hcd *hcd)
 	return ehci_bus_suspend(hcd);
 }
 
+<<<<<<< HEAD
 #define RESUME_RETRY_LIMIT		3
 #define RESUME_SIGNAL_TIME_USEC		(21 * 1000)
 #define RESUME_SIGNAL_TIME_SOF_USEC	(23 * 1000)
+=======
+>>>>>>> cm/cm-11.0
 static int msm_hsic_resume_thread(void *data)
 {
 	struct msm_hsic_hcd *mehci = data;
@@ -993,6 +1302,7 @@ static int msm_hsic_resume_thread(void *data)
 	unsigned long		resume_needed = 0;
 	int			retry_cnt = 0;
 	int			tight_resume = 0;
+<<<<<<< HEAD
 	struct msm_hsic_host_platform_data *pdata = mehci->dev->platform_data;
 	ktime_t	now;
 	s64 mdiff;
@@ -1011,6 +1321,31 @@ static int msm_hsic_resume_thread(void *data)
 		mehci->resume_status = -ESHUTDOWN;
 		complete(&mehci->rt_completion);
 		return 0;
+=======
+	int			tight_count = 0;
+	struct msm_hsic_host_platform_data *pdata = mehci->dev->platform_data;
+	s32 next_latency = 0;
+
+	dbg_log_event(NULL, "Resume RH", 0);
+
+	if (pdata && pdata->swfi_latency) {
+		next_latency = pdata->swfi_latency + 1;
+		pm_qos_update_request(&mehci->pm_qos_req_dma, next_latency);
+		if (pdata->standalone_latency)
+			next_latency = pdata->standalone_latency + 1;
+		else
+			next_latency = PM_QOS_DEFAULT_VALUE;
+	}
+
+	/* keep delay between bus states */
+	if (time_before_eq(jiffies, ehci->next_statechange))
+		usleep_range(10000, 10000);
+
+	spin_lock_irq(&ehci->lock);
+	if (!HCD_HW_ACCESSIBLE(hcd)) {
+		mehci->resume_status = -ESHUTDOWN;
+		goto exit;
+>>>>>>> cm/cm-11.0
 	}
 
 	if (unlikely(ehci->debug)) {
@@ -1023,19 +1358,32 @@ static int msm_hsic_resume_thread(void *data)
 	/* at least some APM implementations will try to deliver
 	 * IRQs right away, so delay them until we're ready.
 	 */
+<<<<<<< HEAD
 	ehci_writel(ehci, 0, &ehci->regs->intr_enable);
 
 	/* re-init operational registers */
 	ehci_writel(ehci, 0, &ehci->regs->segment);
 	ehci_writel(ehci, ehci->periodic_dma, &ehci->regs->frame_list);
 	ehci_writel(ehci, (u32) ehci->async->qh_dma, &ehci->regs->async_next);
+=======
+	writel_relaxed(0, &ehci->regs->intr_enable);
+
+	/* re-init operational registers */
+	writel_relaxed(0, &ehci->regs->segment);
+	writel_relaxed(ehci->periodic_dma, &ehci->regs->frame_list);
+	writel_relaxed((u32) ehci->async->qh_dma, &ehci->regs->async_next);
+>>>>>>> cm/cm-11.0
 
 	/*CMD_RUN will be set after, PORT_RESUME gets cleared*/
 	if (ehci->resume_sof_bug)
 		ehci->command &= ~CMD_RUN;
 
 	/* restore CMD_RUN, framelist size, and irq threshold */
+<<<<<<< HEAD
 	ehci_writel(ehci, ehci->command, &ehci->regs->command);
+=======
+	writel_relaxed(ehci->command, &ehci->regs->command);
+>>>>>>> cm/cm-11.0
 
 	/* manually resume the ports we suspended during bus_suspend() */
 resume_again:
@@ -1045,15 +1393,25 @@ resume_again:
 		tight_resume = 1;
 	}
 
+<<<<<<< HEAD
 
 	temp = ehci_readl(ehci, &ehci->regs->port_status[0]);
+=======
+	temp = readl_relaxed(&ehci->regs->port_status[0]);
+>>>>>>> cm/cm-11.0
 	temp &= ~(PORT_RWC_BITS | PORT_WAKE_BITS);
 	if (test_bit(0, &ehci->bus_suspended) && (temp & PORT_SUSPEND)) {
 		temp |= PORT_RESUME;
 		set_bit(0, &resume_needed);
 	}
+<<<<<<< HEAD
 	dbg_log_event(NULL, "FPR: Set", temp);
 	ehci_writel(ehci, temp, &ehci->regs->port_status[0]);
+=======
+	mehci->resume_start_t = ktime_get();
+	dbg_log_event(NULL, "FPR: Set", temp);
+	writel_relaxed(temp, &ehci->regs->port_status[0]);
+>>>>>>> cm/cm-11.0
 
 	/* HSIC controller has a h/w bug due to which it can try to send SOFs
 	 * (start of frames) during port resume resulting in phy lockup. HSIC hw
@@ -1068,6 +1426,7 @@ resume_again:
 	if (ehci->resume_sof_bug && resume_needed) {
 		if (!tight_resume) {
 			mehci->resume_again = 0;
+<<<<<<< HEAD
 			ehci_writel(ehci, GPT_LD(RESUME_SIGNAL_TIME_USEC - 1),
 					&mehci->timer->gptimer0_ld);
 			ehci_writel(ehci, GPT_RESET | GPT_RUN,
@@ -1098,6 +1457,43 @@ resume_again:
 			ehci_writel(ehci, ehci_readl(ehci,
 				&ehci->regs->command) | CMD_RUN,
 				&ehci->regs->command);
+=======
+			writel_relaxed(GPT_LD(RESUME_SIGNAL_TIME_USEC - 1),
+					&mehci->timer->gptimer0_ld);
+			writel_relaxed(GPT_RESET | GPT_RUN,
+					&mehci->timer->gptimer0_ctrl);
+			writel_relaxed(INTR_MASK | STS_GPTIMER0_INTERRUPT,
+					&ehci->regs->intr_enable);
+
+			writel_relaxed(GPT_LD(RESUME_SIGNAL_TIME_SOF_USEC - 1),
+					&mehci->timer->gptimer1_ld);
+			writel_relaxed(GPT_RESET | GPT_RUN,
+				&mehci->timer->gptimer1_ctrl);
+			dbg_log_event(NULL, "GPT timer prog done", 0);
+
+			spin_unlock_irq(&ehci->lock);
+			wait_for_completion(&mehci->gpt0_completion);
+			spin_lock_irq(&ehci->lock);
+		} else {
+			dbg_log_event(NULL, "FPR: Tightloop", tight_count);
+			/* do the resume in a tight loop */
+			mdelay(22);
+			writel_relaxed(readl_relaxed(&ehci->regs->command) |
+					CMD_RUN, &ehci->regs->command);
+			if (ktime_us_delta(ktime_get(), mehci->resume_start_t) >
+					RESUME_SIGNAL_TIME_SOF_USEC) {
+				dbg_log_event(NULL, "FPR: Tightloop fail", 0);
+				if (++tight_count > 3) {
+					pr_err("HSIC resume failed\n");
+					mehci->resume_status = -ENODEV;
+					goto exit;
+				}
+				pr_err("FPR tight loop fail %d\n", tight_count);
+				mehci->resume_again = 1;
+			} else {
+				dbg_log_event(NULL, "FPR: Tightloop done", 0);
+			}
+>>>>>>> cm/cm-11.0
 		}
 
 		if (mehci->resume_again) {
@@ -1106,10 +1502,23 @@ resume_again:
 			dbg_log_event(NULL, "FPR: Re-Resume", retry_cnt);
 			pr_info("FPR: retry count: %d\n", retry_cnt);
 			spin_unlock_irq(&ehci->lock);
+<<<<<<< HEAD
 			temp = ehci_readl(ehci, &ehci->regs->port_status[0]);
 			temp &= ~PORT_RWC_BITS;
 			temp |= PORT_SUSPEND;
 			ehci_writel(ehci, temp, &ehci->regs->port_status[0]);
+=======
+			temp = readl_relaxed(&ehci->regs->command);
+			if (temp & CMD_RUN) {
+				temp &= ~CMD_RUN;
+				writel_relaxed(temp, &ehci->regs->command);
+				dbg_log_event(NULL, "FPR: R/S cleared", 0);
+			}
+			temp = readl_relaxed(&ehci->regs->port_status[0]);
+			temp &= ~PORT_RWC_BITS;
+			temp |= PORT_SUSPEND;
+			writel_relaxed(temp, &ehci->regs->port_status[0]);
+>>>>>>> cm/cm-11.0
 			/* Keep the bus idle for 5ms so that peripheral
 			 * can detect and initiate suspend
 			 */
@@ -1124,11 +1533,22 @@ resume_again:
 		}
 	}
 
+<<<<<<< HEAD
 	dbg_log_event(NULL, "FPR: RT-Done", 0);
 	mehci->resume_status = 1;
 	spin_unlock_irq(&ehci->lock);
 
 	complete(&mehci->rt_completion);
+=======
+	ehci->command |= CMD_RUN;
+	dbg_log_event(NULL, "FPR: RT-Done", 0);
+	mehci->resume_status = 1;
+exit:
+	spin_unlock_irq(&ehci->lock);
+	complete(&mehci->rt_completion);
+	if (next_latency)
+		pm_qos_update_request(&mehci->pm_qos_req_dma, next_latency);
+>>>>>>> cm/cm-11.0
 
 	return 0;
 }
@@ -1228,8 +1648,12 @@ static struct hc_driver msm_hsic_driver = {
 	.log_urb		= dbg_log_event,
 	.dump_regs		= dump_hsic_regs,
 
+<<<<<<< HEAD
 	.enable_ulpi_control	= ehci_msm_enable_ulpi_control,
 	.disable_ulpi_control	= ehci_msm_disable_ulpi_control,
+=======
+	.reset_sof_bug_handler	= ehci_hsic_reset_sof_bug_handler,
+>>>>>>> cm/cm-11.0
 };
 
 static int msm_hsic_init_clocks(struct msm_hsic_hcd *mehci, u32 init)
@@ -1645,8 +2069,16 @@ static int __devinit ehci_hsic_msm_probe(struct platform_device *pdev)
 
 	init_completion(&mehci->rt_completion);
 	init_completion(&mehci->gpt0_completion);
+<<<<<<< HEAD
 
 	msm_hsic_phy_reset(mehci);
+=======
+	ret = msm_hsic_reset(mehci);
+	if (ret) {
+		dev_err(&pdev->dev, "unable to initialize PHY\n");
+		goto deinit_vddcx;
+	}
+>>>>>>> cm/cm-11.0
 
 	ehci_wq = create_singlethread_workqueue("ehci_wq");
 	if (!ehci_wq) {
@@ -1663,12 +2095,15 @@ static int __devinit ehci_hsic_msm_probe(struct platform_device *pdev)
 		goto unconfig_gpio;
 	}
 
+<<<<<<< HEAD
 	ret = msm_hsic_start(mehci);
 	if (ret) {
 		dev_err(&pdev->dev, "unable to initialize PHY\n");
 		goto unconfig_gpio;
 	}
 
+=======
+>>>>>>> cm/cm-11.0
 	device_init_wakeup(&pdev->dev, 1);
 	wake_lock_init(&mehci->wlock, WAKE_LOCK_SUSPEND, dev_name(&pdev->dev));
 	wake_lock(&mehci->wlock);
@@ -1722,9 +2157,15 @@ static int __devinit ehci_hsic_msm_probe(struct platform_device *pdev)
 
 	__mehci = mehci;
 
+<<<<<<< HEAD
 	if (pdata && pdata->swfi_latency)
 		pm_qos_add_request(&mehci->pm_qos_req_dma,
 			PM_QOS_CPU_DMA_LATENCY, PM_QOS_DEFAULT_VALUE);
+=======
+	if (pdata && pdata->standalone_latency)
+		pm_qos_add_request(&mehci->pm_qos_req_dma,
+			PM_QOS_CPU_DMA_LATENCY, pdata->standalone_latency + 1);
+>>>>>>> cm/cm-11.0
 
 	/*
 	 * This pdev->dev is assigned parent of root-hub by USB core,
@@ -1763,6 +2204,7 @@ static int __devexit ehci_hsic_msm_remove(struct platform_device *pdev)
 	struct msm_hsic_hcd *mehci = hcd_to_hsic(hcd);
 	struct msm_hsic_host_platform_data *pdata = mehci->dev->platform_data;
 
+<<<<<<< HEAD
 	/* If the device was removed no need to call pm_runtime_disable */
 	if (pdev->dev.power.power_state.event != PM_EVENT_INVALID)
 		pm_runtime_disable(&pdev->dev);
@@ -1770,6 +2212,12 @@ static int __devexit ehci_hsic_msm_remove(struct platform_device *pdev)
 	pm_runtime_set_suspended(&pdev->dev);
 
 	if (pdata && pdata->swfi_latency)
+=======
+	/* Remove the HCD prior to releasing our resources. */
+	usb_remove_hcd(hcd);
+
+	if (pdata && pdata->standalone_latency)
+>>>>>>> cm/cm-11.0
 		pm_qos_remove_request(&mehci->pm_qos_req_dma);
 
 	if (mehci->peripheral_status_irq)
@@ -1794,10 +2242,17 @@ static int __devexit ehci_hsic_msm_remove(struct platform_device *pdev)
 
 	ehci_hsic_msm_debugfs_cleanup();
 	device_init_wakeup(&pdev->dev, 0);
+<<<<<<< HEAD
 
 	destroy_workqueue(ehci_wq);
 
 	usb_remove_hcd(hcd);
+=======
+	pm_runtime_set_suspended(&pdev->dev);
+
+	destroy_workqueue(ehci_wq);
+
+>>>>>>> cm/cm-11.0
 	msm_hsic_config_gpios(mehci, 0);
 	msm_hsic_init_vddcx(mehci, 0);
 
@@ -1812,7 +2267,10 @@ static int __devexit ehci_hsic_msm_remove(struct platform_device *pdev)
 #ifdef CONFIG_PM_SLEEP
 static int msm_hsic_pm_suspend(struct device *dev)
 {
+<<<<<<< HEAD
 	int ret;
+=======
+>>>>>>> cm/cm-11.0
 	struct usb_hcd *hcd = dev_get_drvdata(dev);
 	struct msm_hsic_hcd *mehci = hcd_to_hsic(hcd);
 
@@ -1820,6 +2278,7 @@ static int msm_hsic_pm_suspend(struct device *dev)
 
 	dbg_log_event(NULL, "PM Suspend", 0);
 
+<<<<<<< HEAD
 	if (device_may_wakeup(dev))
 		enable_irq_wake(hcd->irq);
 
@@ -1829,6 +2288,18 @@ static int msm_hsic_pm_suspend(struct device *dev)
 		disable_irq_wake(hcd->irq);
 
 	return ret;
+=======
+	if (!atomic_read(&mehci->in_lpm)) {
+		dev_info(dev, "abort suspend\n");
+		dbg_log_event(NULL, "PM Suspend abort", 0);
+		return -EBUSY;
+	}
+
+	if (device_may_wakeup(dev))
+		enable_irq_wake(hcd->irq);
+
+	return 0;
+>>>>>>> cm/cm-11.0
 }
 
 static int msm_hsic_pm_suspend_noirq(struct device *dev)

@@ -18,6 +18,12 @@ void show_mem(unsigned int filter)
 	printk("Mem-Info:\n");
 	show_free_areas(filter);
 
+<<<<<<< HEAD
+=======
+	if (filter & SHOW_MEM_FILTER_PAGE_COUNT)
+		return;
+
+>>>>>>> cm/cm-11.0
 	for_each_online_pgdat(pgdat) {
 		unsigned long i, flags;
 

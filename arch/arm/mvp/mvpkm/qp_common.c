@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -27,7 +31,11 @@
  *  implementations.
  */
 
+<<<<<<< HEAD
 #include <asm/uaccess.h>
+=======
+#include <linux/uaccess.h>
+>>>>>>> cm/cm-11.0
 #include <linux/module.h>
 
 #include "mvp_types.h"
@@ -38,16 +46,34 @@
 /**
  *  @brief Calculate free space in the queue, convenience function
  *  @param head queue head offset
+<<<<<<< HEAD
  *  @param tail  queue tail offset
+=======
+ *  @param tail queue tail offset
+>>>>>>> cm/cm-11.0
  *  @param queueSize size of queue
  *  @return free space in the queue
  */
 static inline int32
+<<<<<<< HEAD
 FreeSpace(uint32 head, uint32 tail, uint32 queueSize) {
    /* Leave 1 byte free to resolve ambiguity between empty
     * and full conditions */
    return (tail >= head) ? (queueSize - (tail - head) - 1) :
                            (head - tail - 1);
+=======
+FreeSpace(uint32 head,
+	  uint32 tail,
+	  uint32 queueSize)
+{
+	/*
+	 * Leave 1 byte free to resolve ambiguity between empty
+	 * and full conditions
+	 */
+
+	return (tail >= head) ? (queueSize - (tail - head) - 1) :
+				(head - tail - 1);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -60,6 +86,7 @@ FreeSpace(uint32 head, uint32 tail, uint32 queueSize) {
 int32
 QP_EnqueueSpace(QPHandle *qp)
 {
+<<<<<<< HEAD
    uint32 head;
    uint32 phantom;
    if (!QP_CheckHandle(qp)) {
@@ -76,6 +103,24 @@ QP_EnqueueSpace(QPHandle *qp)
 
    return FreeSpace(head, phantom, qp->queueSize);
 }
+=======
+	uint32 head;
+	uint32 phantom;
+
+	if (!QP_CheckHandle(qp))
+		return QP_ERROR_INVALID_HANDLE;
+
+	head    = qp->produceQ->head;
+	phantom = qp->produceQ->phantom_tail;
+
+	if (head    >= qp->queueSize ||
+	    phantom >= qp->queueSize)
+		return QP_ERROR_INVALID_HANDLE;
+
+	return FreeSpace(head, phantom, qp->queueSize);
+}
+EXPORT_SYMBOL(QP_EnqueueSpace);
+>>>>>>> cm/cm-11.0
 
 
 /**
@@ -90,6 +135,7 @@ QP_EnqueueSpace(QPHandle *qp)
  */
 int32
 QP_EnqueueSegment(QPHandle *qp,
+<<<<<<< HEAD
                   const void *buf,
                   size_t bufSize,
                   int kern)
@@ -156,6 +202,74 @@ QP_EnqueueSegment(QPHandle *qp,
 
    return bufSize;
 }
+=======
+		  const void *buf,
+		  size_t bufSize,
+		  int kern)
+{
+	int32 freeSpace;
+	uint32 head;
+	uint32 phantom;
+
+	if (!QP_CheckHandle(qp))
+		return QP_ERROR_INVALID_HANDLE;
+
+	head = qp->produceQ->head;
+	phantom = qp->produceQ->phantom_tail;
+
+	/*
+	 * This check must go after the assignment above,
+	 * otherwise a malicious guest could write bogus
+	 * offsets to the queue and cause copying to write
+	 * into unpleasant places.
+	 */
+	if (head    >= qp->queueSize ||
+	    phantom >= qp->queueSize)
+		return QP_ERROR_INVALID_HANDLE;
+
+	freeSpace = FreeSpace(head, phantom, qp->queueSize);
+
+	if (bufSize <= freeSpace) {
+		if (bufSize + phantom < qp->queueSize) {
+			if (kern) {
+				memcpy(qp->produceQ->data + phantom,
+				       buf, bufSize);
+			} else {
+				if (copy_from_user(qp->produceQ->data + phantom,
+						   buf, bufSize))
+					return QP_ERROR_INVALID_ARGS;
+			}
+			phantom += bufSize;
+		} else {
+			uint32 written = qp->queueSize - phantom;
+
+			if (kern) {
+				memcpy(qp->produceQ->data + phantom,
+				       buf, written);
+				memcpy(qp->produceQ->data,
+				       (uint8 *)buf + written,
+				       bufSize - written);
+			} else {
+				if (copy_from_user(qp->produceQ->data + phantom,
+						   buf, written))
+					return QP_ERROR_INVALID_ARGS;
+				if (copy_from_user(qp->produceQ->data,
+						   (uint8 *)buf + written,
+						   bufSize - written))
+					return QP_ERROR_INVALID_ARGS;
+			}
+			phantom = bufSize - written;
+		}
+	} else {
+		return QP_ERROR_NO_MEM;
+	}
+
+	qp->produceQ->phantom_tail = phantom;
+
+	return bufSize;
+}
+EXPORT_SYMBOL(QP_EnqueueSegment);
+>>>>>>> cm/cm-11.0
 
 
 /**
@@ -168,6 +282,7 @@ QP_EnqueueSegment(QPHandle *qp,
 int32
 QP_EnqueueCommit(QPHandle *qp)
 {
+<<<<<<< HEAD
    uint32 phantom;
    if (!QP_CheckHandle(qp)) {
       return QP_ERROR_INVALID_HANDLE;
@@ -181,6 +296,21 @@ QP_EnqueueCommit(QPHandle *qp)
    qp->produceQ->tail = phantom;
    return QP_SUCCESS;
 }
+=======
+	uint32 phantom;
+
+	if (!QP_CheckHandle(qp))
+		return QP_ERROR_INVALID_HANDLE;
+
+	phantom = qp->produceQ->phantom_tail;
+	if (phantom >= qp->queueSize)
+		return QP_ERROR_INVALID_HANDLE;
+
+	qp->produceQ->tail = phantom;
+	return QP_SUCCESS;
+}
+EXPORT_SYMBOL(QP_EnqueueCommit);
+>>>>>>> cm/cm-11.0
 
 
 /**
@@ -192,6 +322,7 @@ QP_EnqueueCommit(QPHandle *qp)
 int32
 QP_DequeueSpace(QPHandle *qp)
 {
+<<<<<<< HEAD
    uint32 tail;
    uint32 phantom;
    int32 bytesAvailable;
@@ -214,6 +345,29 @@ QP_DequeueSpace(QPHandle *qp)
    }
    return bytesAvailable;
 }
+=======
+	uint32 tail;
+	uint32 phantom;
+	int32 bytesAvailable;
+
+	if (!QP_CheckHandle(qp))
+		return QP_ERROR_INVALID_HANDLE;
+
+	tail    = qp->consumeQ->tail;
+	phantom = qp->consumeQ->phantom_head;
+
+	if (tail    >= qp->queueSize ||
+	    phantom >= qp->queueSize)
+		return QP_ERROR_INVALID_HANDLE;
+
+	bytesAvailable = (tail - phantom);
+	if ((int32)bytesAvailable < 0)
+		bytesAvailable += qp->queueSize;
+
+	return bytesAvailable;
+}
+EXPORT_SYMBOL(QP_DequeueSpace);
+>>>>>>> cm/cm-11.0
 
 
 /**
@@ -229,6 +383,7 @@ QP_DequeueSpace(QPHandle *qp)
  */
 int32
 QP_DequeueSegment(QPHandle *qp,
+<<<<<<< HEAD
                   void *buf,
                   size_t bytesDesired,
                   int kern)
@@ -296,6 +451,78 @@ QP_DequeueSegment(QPHandle *qp,
 
    return bytesDesired;
 }
+=======
+		  void *buf,
+		  size_t bytesDesired,
+		  int kern)
+{
+	uint32 tail;
+	uint32 phantom;
+	int32 bytesAvailable = 0;
+
+	if (!QP_CheckHandle(qp))
+		return QP_ERROR_INVALID_HANDLE;
+
+	tail = qp->consumeQ->tail;
+	phantom = qp->consumeQ->phantom_head;
+
+	/*
+	 * This check must go after the assignment above,
+	 * otherwise a malicious guest could write bogus
+	 * offsets to the queue and cause copying to write
+	 * into unpleasant places.
+	 */
+	if (tail    >= qp->queueSize  ||
+	    phantom >= qp->queueSize)
+		return QP_ERROR_INVALID_HANDLE;
+
+	bytesAvailable = (tail - phantom);
+	if ((int32)bytesAvailable < 0)
+		bytesAvailable += qp->queueSize;
+
+	if (bytesDesired <= bytesAvailable) {
+		if (bytesDesired + phantom < qp->queueSize) {
+			if (kern) {
+				memcpy(buf, qp->consumeQ->data + phantom,
+				       bytesDesired);
+			} else {
+				if (copy_to_user(buf,
+				    qp->consumeQ->data + phantom,
+				    bytesDesired))
+					return QP_ERROR_INVALID_ARGS;
+			}
+			phantom += bytesDesired;
+		} else {
+			uint32 written = qp->queueSize - phantom;
+
+			if (kern) {
+				memcpy(buf, qp->consumeQ->data + phantom,
+				       written);
+				memcpy((uint8 *)buf + written,
+				       qp->consumeQ->data,
+				       bytesDesired - written);
+			} else {
+				if (copy_to_user(buf,
+						 qp->consumeQ->data + phantom,
+						 written))
+					return QP_ERROR_INVALID_ARGS;
+				if (copy_to_user((uint8 *)buf + written,
+						 qp->consumeQ->data,
+						 bytesDesired - written))
+					return QP_ERROR_INVALID_ARGS;
+			}
+			phantom = bytesDesired - written;
+		}
+	} else {
+		return QP_ERROR_NO_MEM;
+	}
+
+	qp->consumeQ->phantom_head = phantom;
+
+	return bytesDesired;
+}
+EXPORT_SYMBOL(QP_DequeueSegment);
+>>>>>>> cm/cm-11.0
 
 
 /**
@@ -309,6 +536,7 @@ QP_DequeueSegment(QPHandle *qp,
 int32
 QP_DequeueCommit(QPHandle *qp)
 {
+<<<<<<< HEAD
    uint32 phantom;
    if (!QP_CheckHandle(qp)) {
       return QP_ERROR_INVALID_HANDLE;
@@ -322,6 +550,21 @@ QP_DequeueCommit(QPHandle *qp)
    qp->consumeQ->head = phantom;
    return QP_SUCCESS;
 }
+=======
+	uint32 phantom;
+
+	if (!QP_CheckHandle(qp))
+		return QP_ERROR_INVALID_HANDLE;
+
+	phantom = qp->consumeQ->phantom_head;
+	if (phantom >= qp->queueSize)
+		return QP_ERROR_INVALID_HANDLE;
+
+	qp->consumeQ->head = phantom;
+	return QP_SUCCESS;
+}
+EXPORT_SYMBOL(QP_DequeueCommit);
+>>>>>>> cm/cm-11.0
 
 
 /**
@@ -335,6 +578,7 @@ QP_DequeueCommit(QPHandle *qp)
 int32
 QP_EnqueueReset(QPHandle *qp)
 {
+<<<<<<< HEAD
    uint32 tail;
    if (!QP_CheckHandle(qp)) {
       return QP_ERROR_INVALID_HANDLE;
@@ -348,6 +592,21 @@ QP_EnqueueReset(QPHandle *qp)
    qp->produceQ->phantom_tail = tail;
    return QP_SUCCESS;
 }
+=======
+	uint32 tail;
+
+	if (!QP_CheckHandle(qp))
+		return QP_ERROR_INVALID_HANDLE;
+
+	tail = qp->produceQ->tail;
+	if (tail >= qp->queueSize)
+		return QP_ERROR_INVALID_HANDLE;
+
+	qp->produceQ->phantom_tail = tail;
+	return QP_SUCCESS;
+}
+EXPORT_SYMBOL(QP_EnqueueReset);
+>>>>>>> cm/cm-11.0
 
 /**
  *  @brief Resets the phantom head pointer and discards any pending
@@ -360,6 +619,7 @@ QP_EnqueueReset(QPHandle *qp)
 int32
 QP_DequeueReset(QPHandle *qp)
 {
+<<<<<<< HEAD
    uint32 head;
    if (!QP_CheckHandle(qp)) {
       return QP_ERROR_INVALID_HANDLE;
@@ -381,5 +641,19 @@ EXPORT_SYMBOL(QP_DequeueSpace);
 EXPORT_SYMBOL(QP_DequeueSegment);
 EXPORT_SYMBOL(QP_DequeueCommit);
 EXPORT_SYMBOL(QP_EnqueueReset);
+=======
+	uint32 head;
+
+	if (!QP_CheckHandle(qp))
+		return QP_ERROR_INVALID_HANDLE;
+
+	head = qp->consumeQ->head;
+	if (head >= qp->queueSize)
+		return QP_ERROR_INVALID_HANDLE;
+
+	qp->consumeQ->phantom_head = head;
+	return QP_SUCCESS;
+}
+>>>>>>> cm/cm-11.0
 EXPORT_SYMBOL(QP_DequeueReset);
 

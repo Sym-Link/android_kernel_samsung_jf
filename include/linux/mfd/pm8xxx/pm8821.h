@@ -21,6 +21,10 @@
 #include <linux/device.h>
 #include <linux/mfd/pm8xxx/pm8821-irq.h>
 #include <linux/mfd/pm8xxx/mpp.h>
+<<<<<<< HEAD
+=======
+#include <linux/mfd/pm8xxx/tm.h>
+>>>>>>> cm/cm-11.0
 
 #define PM8821_NR_IRQS		(112)
 #define PM8821_NR_MPPS		(4)
@@ -38,6 +42,11 @@
 		PM8821_IRQ_BLOCK_BIT(PM8821_MPP_BLOCK_START, (mpp)-1))
 
 /* PMIC Interrupts */
+<<<<<<< HEAD
+=======
+#define PM8821_OVERTEMP_IRQ		PM8821_IRQ_BLOCK_BIT(5, 2)
+#define PM8821_TEMPSTAT_IRQ		PM8821_IRQ_BLOCK_BIT(5, 7)
+>>>>>>> cm/cm-11.0
 
 struct pm8821_platform_data {
 	int					irq_base;

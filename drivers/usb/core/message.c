@@ -1535,7 +1535,11 @@ static int usb_if_uevent(struct device *dev, struct kobj_uevent_env *env)
 
 	if (add_uevent_var(env,
 		   "MODALIAS=usb:"
+<<<<<<< HEAD
 		   "v%04Xp%04Xd%04Xdc%02Xdsc%02Xdp%02Xic%02Xisc%02Xip%02X",
+=======
+		   "v%04Xp%04Xd%04Xdc%02Xdsc%02Xdp%02Xic%02Xisc%02Xip%02Xin%02X",
+>>>>>>> cm/cm-11.0
 		   le16_to_cpu(usb_dev->descriptor.idVendor),
 		   le16_to_cpu(usb_dev->descriptor.idProduct),
 		   le16_to_cpu(usb_dev->descriptor.bcdDevice),
@@ -1544,7 +1548,12 @@ static int usb_if_uevent(struct device *dev, struct kobj_uevent_env *env)
 		   usb_dev->descriptor.bDeviceProtocol,
 		   alt->desc.bInterfaceClass,
 		   alt->desc.bInterfaceSubClass,
+<<<<<<< HEAD
 		   alt->desc.bInterfaceProtocol))
+=======
+		   alt->desc.bInterfaceProtocol,
+		   alt->desc.bInterfaceNumber))
+>>>>>>> cm/cm-11.0
 		return -ENOMEM;
 
 	return 0;

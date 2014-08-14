@@ -3446,8 +3446,13 @@ static void mtp_sorting(struct SMART_DIM *psmart)
 		pdest[loop] = pfrom[sorting[loop]];
 
 	if (get_ldi_chip() == LDI_MAGNA) {
+<<<<<<< HEAD
 		pdest[10] = 3;
 		pdest[21] = 2;
+=======
+		pdest[10] = 2;
+		pdest[21] = 3;
+>>>>>>> cm/cm-11.0
 		pdest[32] = 2;
 	}
 }

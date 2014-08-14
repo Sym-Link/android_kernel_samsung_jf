@@ -193,7 +193,11 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= arm
+<<<<<<< HEAD
 CROSS_COMPILE	?= /opt/toolchains/arm-eabi-4.6/bin/arm-eabi-
+=======
+CROSS_COMPILE	?= arm-eabi-
+>>>>>>> cm/cm-11.0
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -647,6 +651,7 @@ endif
 
 #Disable the whole of the following block to disable L1 TIMA
 #ifeq ($(TIMA_ENABLED),1)
+<<<<<<< HEAD
 #      KBUILD_CFLAGS += -DTIMA_ENABLED \
 #						-DTIMA_PGD_FREE_MANAGE -DTIMA_COPY_PMD_MANAGE -DTIMA_PMD_CLEAR_MANAGE \
 #						-DTIMA_KERNEL_L1_MANAGE \
@@ -655,12 +660,29 @@ endif
 #						-DTIMA_PGD_FREE_MANAGE -DTIMA_COPY_PMD_MANAGE -DTIMA_PMD_CLEAR_MANAGE \
 #						-DTIMA_KERNEL_L1_MANAGE \
 #						-DTIMA_DEBUG_INFRA -DTIMA_INIT_SEC_MON
+=======
+#      KBUILD_CFLAGS += 	-DTIMA_ENABLED \
+			-DTIMA_PGD_FREE_MANAGE -DTIMA_COPY_PMD_MANAGE \
+			-DTIMA_PMD_CLEAR_MANAGE -DTIMA_KERNEL_L1_MANAGE \
+			-DTIMA_L2_MANAGE -DTIMA_L2_GROUP \
+			-DTIMA_DEBUG_INFRA -DTIMA_INIT_SEC_MON
+#       KBUILD_AFLAGS += -DTIMA_ENABLED \
+			-DTIMA_PGD_FREE_MANAGE -DTIMA_COPY_PMD_MANAGE \
+			-DTIMA_PMD_CLEAR_MANAGE -DTIMA_KERNEL_L1_MANAGE \
+			-DTIMA_L2_MANAGE -DTIMA_L2_GROUP \
+			-DTIMA_DEBUG_INFRA -DTIMA_INIT_SEC_MON
+>>>>>>> cm/cm-11.0
 #endif
 
 #Disable the whole of the following block to disable LKM AUTH
 ifeq ($(TIMA_ENABLED),1)
+<<<<<<< HEAD
        KBUILD_CFLAGS += -DTIMA_LKM_AUTH_ENABLED
        KBUILD_AFLAGS += -DTIMA_LKM_AUTH_ENABLED
+=======
+       KBUILD_CFLAGS += -DTIMA_LKM_AUTH_ENABLED -DTIMA_TEST_INFRA #-DTIMA_LKM_SET_PAGE_ATTRIB
+       KBUILD_AFLAGS += -DTIMA_LKM_AUTH_ENABLED #-DTIMA_LKM_SET_PAGE_ATTRIB
+>>>>>>> cm/cm-11.0
 endif
 
 # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments

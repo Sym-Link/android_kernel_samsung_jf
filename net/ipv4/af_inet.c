@@ -1559,7 +1559,11 @@ static const struct net_protocol udp_protocol = {
 
 static const struct net_protocol icmp_protocol = {
 	.handler =	icmp_rcv,
+<<<<<<< HEAD
 	.err_handler =	ping_err,
+=======
+	.err_handler =	ping_v4_err,
+>>>>>>> cm/cm-11.0
 	.no_policy =	1,
 	.netns_ok =	1,
 };

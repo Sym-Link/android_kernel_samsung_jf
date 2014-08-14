@@ -41,7 +41,10 @@
 #include <linux/cpu.h>
 #include <linux/notifier.h>
 #include <linux/rculist.h>
+<<<<<<< HEAD
 #include <linux/coresight-stm.h>
+=======
+>>>>>>> cm/cm-11.0
 
 #include <asm/uaccess.h>
 #ifdef CONFIG_SEC_DEBUG
@@ -1166,8 +1169,11 @@ asmlinkage int vprintk(const char *fmt, va_list args)
 		}
 	}
 
+<<<<<<< HEAD
 	stm_log(OST_ENTITY_PRINTK, printk_buf, printed_len);
 
+=======
+>>>>>>> cm/cm-11.0
 	/*
 	 * Copy the output into log_buf. If the caller didn't provide
 	 * the appropriate log prefix, we insert them here

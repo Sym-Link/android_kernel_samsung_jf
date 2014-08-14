@@ -16,6 +16,10 @@
 #include <linux/slab.h>
 #include <linux/string.h>
 #include <linux/clk.h>
+<<<<<<< HEAD
+=======
+#include <linux/dma-mapping.h>
+>>>>>>> cm/cm-11.0
 
 #include <mach/scm.h>
 #include <mach/socinfo.h>
@@ -36,6 +40,7 @@ int pas_init_image(enum pas_id id, const u8 *metadata, size_t size)
 		u32	image_addr;
 	} request;
 	u32 scm_ret = 0;
+<<<<<<< HEAD
 	/* Make memory physically contiguous */
 	void *mdata_buf = kmemdup(metadata, size, GFP_KERNEL);
 
@@ -48,6 +53,30 @@ int pas_init_image(enum pas_id id, const u8 *metadata, size_t size)
 	ret = scm_call(SCM_SVC_PIL, PAS_INIT_IMAGE_CMD, &request,
 			sizeof(request), &scm_ret, sizeof(scm_ret));
 	kfree(mdata_buf);
+=======
+	void *mdata_buf;
+	dma_addr_t mdata_phys;
+	DEFINE_DMA_ATTRS(attrs);
+
+	dma_set_attr(DMA_ATTR_STRONGLY_ORDERED, &attrs);
+	mdata_buf = dma_alloc_attrs(NULL, size, &mdata_phys, GFP_KERNEL,
+	                                      &attrs);
+
+	if (!mdata_buf) {
+	        pr_err("Allocation for metadata failed.\n");
+		return -ENOMEM;
+        }
+
+        memcpy(mdata_buf, metadata, size);
+
+	request.proc = id;
+	request.image_addr = mdata_phys;
+
+	ret = scm_call(SCM_SVC_PIL, PAS_INIT_IMAGE_CMD, &request,
+			sizeof(request), &scm_ret, sizeof(scm_ret));
+
+        dma_free_attrs(NULL, size, mdata_buf, mdata_phys, &attrs);
+>>>>>>> cm/cm-11.0
 
 	if (ret)
 		return ret;

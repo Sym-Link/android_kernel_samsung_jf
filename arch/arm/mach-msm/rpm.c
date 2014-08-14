@@ -1002,7 +1002,12 @@ int __init msm_rpm_init(struct msm_rpm_platform_data *data)
 	}
 
 	rc = request_irq(data->irq_wakeup,
+<<<<<<< HEAD
 			msm_pm_rpm_wakeup_interrupt, IRQF_TRIGGER_RISING,
+=======
+			msm_pm_rpm_wakeup_interrupt,
+			IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND,
+>>>>>>> cm/cm-11.0
 			"pm_drv", msm_pm_rpm_wakeup_interrupt);
 	if (rc) {
 		pr_err("%s: failed to request irq %u: %d\n",

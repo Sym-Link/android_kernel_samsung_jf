@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -44,6 +48,7 @@
  *
  * @return floor(log2(n)).
  */
+<<<<<<< HEAD
 #define LOG2(n)                         \
 (                                       \
           __builtin_constant_p(n) ? (   \
@@ -81,6 +86,45 @@
             (n) & (1UL <<  0) ?  0 :    \
 	    0xffffffff			\
 	  ) : (uint32)(CLZ(1) - CLZ(n)) \
+=======
+#define LOG2(n)				\
+(					\
+	__builtin_constant_p(n) ? (	\
+	(n) & (1UL << 31) ? 31 :	\
+	(n) & (1UL << 30) ? 30 :	\
+	(n) & (1UL << 29) ? 29 :	\
+	(n) & (1UL << 28) ? 28 :	\
+	(n) & (1UL << 27) ? 27 :	\
+	(n) & (1UL << 26) ? 26 :	\
+	(n) & (1UL << 25) ? 25 :	\
+	(n) & (1UL << 24) ? 24 :	\
+	(n) & (1UL << 23) ? 23 :	\
+	(n) & (1UL << 22) ? 22 :	\
+	(n) & (1UL << 21) ? 21 :	\
+	(n) & (1UL << 20) ? 20 :	\
+	(n) & (1UL << 19) ? 19 :	\
+	(n) & (1UL << 18) ? 18 :	\
+	(n) & (1UL << 17) ? 17 :	\
+	(n) & (1UL << 16) ? 16 :	\
+	(n) & (1UL << 15) ? 15 :	\
+	(n) & (1UL << 14) ? 14 :	\
+	(n) & (1UL << 13) ? 13 :	\
+	(n) & (1UL << 12) ? 12 :	\
+	(n) & (1UL << 11) ? 11 :	\
+	(n) & (1UL << 10) ? 10 :	\
+	(n) & (1UL <<  9) ?  9 :	\
+	(n) & (1UL <<  8) ?  8 :	\
+	(n) & (1UL <<  7) ?  7 :	\
+	(n) & (1UL <<  6) ?  6 :	\
+	(n) & (1UL <<  5) ?  5 :	\
+	(n) & (1UL <<  4) ?  4 :	\
+	(n) & (1UL <<  3) ?  3 :	\
+	(n) & (1UL <<  2) ?  2 :	\
+	(n) & (1UL <<  1) ?  1 :	\
+	(n) & (1UL <<  0) ?  0 :	\
+	0xffffffff			\
+	) : (uint32)(CLZ(1) - CLZ(n))	\
+>>>>>>> cm/cm-11.0
 )
 
 /**
@@ -93,9 +137,16 @@
  * @return hash value in range [0..2^p)
  */
 static inline uint32
+<<<<<<< HEAD
 Math_MultiplicativeHash(uint32 key, uint32 p)
 {
    return (key * 2654435769UL) >> (32 - p);
+=======
+Math_MultiplicativeHash(uint32 key,
+			uint32 p)
+{
+	return (key * 2654435769UL) >> (32 - p);
+>>>>>>> cm/cm-11.0
 }
 
 /**
@@ -107,7 +158,11 @@ Math_MultiplicativeHash(uint32 key, uint32 p)
  */
 static inline uint32 CLOG2(uint32 n)
 {
+<<<<<<< HEAD
    return LOG2(n) + ((n & -n) != n);
+=======
+	return LOG2(n) + ((n & -n) != n);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -120,6 +175,7 @@ static inline uint32 CLOG2(uint32 n)
 static inline
 uint32 Math_Djb2Hash(uint8 *str)
 {
+<<<<<<< HEAD
      uint32 hash = 5381;
      int32 c;
 
@@ -131,4 +187,16 @@ uint32 Math_Djb2Hash(uint8 *str)
 }
 
 #endif // ifndef _MVP_MATH_H_
+=======
+	uint32 hash = 5381;
+	int32 c;
+
+	while ((c = *str++))
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+	return hash;
+}
+
+#endif /* ifndef _MVP_MATH_H_ */
+>>>>>>> cm/cm-11.0
 

@@ -2,7 +2,11 @@
  * Diag Function Device - Route ARM9 and ARM11 DIAG messages
  * between HOST and DEVICE.
  * Copyright (C) 2007 Google, Inc.
+<<<<<<< HEAD
  * Copyright (c) 2008-2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2008-2013, Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  * Author: Brian Swetland <swetland@google.com>
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -101,9 +105,12 @@ static struct usb_descriptor_header *hs_diag_desc[] = {
  * @out_desc: USB OUT endpoint descriptor struct
  * @read_pool: List of requests used for Rx (OUT ep)
  * @write_pool: List of requests used for Tx (IN ep)
+<<<<<<< HEAD
  * @config_work: Work item schedule after interface is configured to notify
  *               CONNECT event to diag char driver and updating product id
  *               and serial number to MODEM/IMEM.
+=======
+>>>>>>> cm/cm-11.0
  * @lock: Spinlock to proctect read_pool, write_pool lists
  * @cdev: USB composite device struct
  * @ch: USB diag channel
@@ -115,7 +122,10 @@ struct diag_context {
 	struct usb_ep *in;
 	struct list_head read_pool;
 	struct list_head write_pool;
+<<<<<<< HEAD
 	struct work_struct config_work;
+=======
+>>>>>>> cm/cm-11.0
 	spinlock_t lock;
 	unsigned configured;
 	struct usb_composite_dev *cdev;
@@ -133,17 +143,25 @@ static inline struct diag_context *func_to_diag(struct usb_function *f)
 	return container_of(f, struct diag_context, function);
 }
 
+<<<<<<< HEAD
 static void usb_config_work_func(struct work_struct *work)
 {
 	struct diag_context *ctxt = container_of(work,
 			struct diag_context, config_work);
+=======
+static void diag_update_pid_and_serial_num(struct diag_context *ctxt)
+{
+>>>>>>> cm/cm-11.0
 	struct usb_composite_dev *cdev = ctxt->cdev;
 	struct usb_gadget_strings *table;
 	struct usb_string *s;
 
+<<<<<<< HEAD
 	if (ctxt->ch.notify)
 		ctxt->ch.notify(ctxt->ch.priv, USB_DIAG_CONNECT, NULL);
 
+=======
+>>>>>>> cm/cm-11.0
 	if (!ctxt->update_pid_and_serial_num)
 		return;
 
@@ -296,6 +314,7 @@ void usb_diag_close(struct usb_diag_ch *ch)
 }
 EXPORT_SYMBOL(usb_diag_close);
 
+<<<<<<< HEAD
 /**
  * usb_diag_free_req() - Free USB requests
  * @ch: Channel handler
@@ -312,6 +331,12 @@ void usb_diag_free_req(struct usb_diag_ch *ch)
 
 	if (!ctxt)
 		return;
+=======
+static void free_reqs(struct diag_context *ctxt)
+{
+	struct list_head *act, *tmp;
+	struct usb_request *req;
+>>>>>>> cm/cm-11.0
 
 	list_for_each_safe(act, tmp, &ctxt->write_pool) {
 		req = list_entry(act, struct usb_request, list);
@@ -325,6 +350,30 @@ void usb_diag_free_req(struct usb_diag_ch *ch)
 		usb_ep_free_request(ctxt->out, req);
 	}
 }
+<<<<<<< HEAD
+=======
+
+/**
+ * usb_diag_free_req() - Free USB requests
+ * @ch: Channel handler
+ *
+ * This function free read and write USB requests for the interface
+ * associated with this channel.
+ *
+ */
+void usb_diag_free_req(struct usb_diag_ch *ch)
+{
+	struct diag_context *ctxt = ch->priv_usb;
+	unsigned long flags;
+
+	if (ctxt) {
+		spin_lock_irqsave(&ctxt->lock, flags);
+		free_reqs(ctxt);
+		spin_unlock_irqrestore(&ctxt->lock, flags);
+	}
+
+}
+>>>>>>> cm/cm-11.0
 EXPORT_SYMBOL(usb_diag_free_req);
 
 /**
@@ -343,10 +392,20 @@ int usb_diag_alloc_req(struct usb_diag_ch *ch, int n_write, int n_read)
 	struct diag_context *ctxt = ch->priv_usb;
 	struct usb_request *req;
 	int i;
+<<<<<<< HEAD
+=======
+	unsigned long flags;
+>>>>>>> cm/cm-11.0
 
 	if (!ctxt)
 		return -ENODEV;
 
+<<<<<<< HEAD
+=======
+	spin_lock_irqsave(&ctxt->lock, flags);
+	/* Free previous session's stale requests */
+	free_reqs(ctxt);
+>>>>>>> cm/cm-11.0
 	for (i = 0; i < n_write; i++) {
 		req = usb_ep_alloc_request(ctxt->in, GFP_ATOMIC);
 		if (!req)
@@ -362,11 +421,19 @@ int usb_diag_alloc_req(struct usb_diag_ch *ch, int n_write, int n_read)
 		req->complete = diag_read_complete;
 		list_add_tail(&req->list, &ctxt->read_pool);
 	}
+<<<<<<< HEAD
 
 	return 0;
 
 fail:
 	usb_diag_free_req(ch);
+=======
+	spin_unlock_irqrestore(&ctxt->lock, flags);
+	return 0;
+fail:
+	free_reqs(ctxt);
+	spin_unlock_irqrestore(&ctxt->lock, flags);
+>>>>>>> cm/cm-11.0
 	return -ENOMEM;
 
 }
@@ -545,7 +612,10 @@ static int diag_function_set_alt(struct usb_function *f,
 		usb_ep_disable(dev->in);
 		return rc;
 	}
+<<<<<<< HEAD
 	schedule_work(&dev->config_work);
+=======
+>>>>>>> cm/cm-11.0
 
 	dev->dpkts_tolaptop = 0;
 	dev->dpkts_tomodem = 0;
@@ -555,6 +625,12 @@ static int diag_function_set_alt(struct usb_function *f,
 	dev->configured = 1;
 	spin_unlock_irqrestore(&dev->lock, flags);
 
+<<<<<<< HEAD
+=======
+	if (dev->ch.notify)
+		dev->ch.notify(dev->ch.priv, USB_DIAG_CONNECT, NULL);
+
+>>>>>>> cm/cm-11.0
 	return rc;
 }
 
@@ -606,6 +682,10 @@ static int diag_function_bind(struct usb_configuration *c,
 		/* copy descriptors, and track endpoint copies */
 		f->hs_descriptors = usb_copy_descriptors(hs_diag_desc);
 	}
+<<<<<<< HEAD
+=======
+	diag_update_pid_and_serial_num(ctxt);
+>>>>>>> cm/cm-11.0
 	return 0;
 fail:
 	if (ctxt->out)
@@ -652,7 +732,10 @@ int diag_function_add(struct usb_configuration *c, const char *name,
 	spin_lock_init(&dev->lock);
 	INIT_LIST_HEAD(&dev->read_pool);
 	INIT_LIST_HEAD(&dev->write_pool);
+<<<<<<< HEAD
 	INIT_WORK(&dev->config_work, usb_config_work_func);
+=======
+>>>>>>> cm/cm-11.0
 
 	ret = usb_add_function(c, &dev->function);
 	if (ret) {

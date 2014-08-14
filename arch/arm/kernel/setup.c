@@ -149,6 +149,10 @@ struct machine_desc *machine_desc __initdata;
 #ifdef CONFIG_SEC_DEBUG_SUBSYS
 const char *unit_name;
 EXPORT_SYMBOL(unit_name);
+<<<<<<< HEAD
+=======
+
+>>>>>>> cm/cm-11.0
 #endif
 
 static char default_command_line[COMMAND_LINE_SIZE] __initdata = CONFIG_CMDLINE;
@@ -514,7 +518,11 @@ void __init dump_machine_table(void)
 		/* can't use cpu_relax() here as it may require MMU setup */;
 }
 
+<<<<<<< HEAD
 int __init arm_add_memory(phys_addr_t start, phys_addr_t size)
+=======
+int __init arm_add_memory(phys_addr_t start, unsigned long size)
+>>>>>>> cm/cm-11.0
 {
 	struct membank *bank = &meminfo.bank[meminfo.nr_banks];
 
@@ -544,7 +552,11 @@ int __init arm_add_memory(phys_addr_t start, phys_addr_t size)
 	}
 #endif
 
+<<<<<<< HEAD
 	bank->size = size & ~(phys_addr_t)(PAGE_SIZE - 1);
+=======
+	bank->size = size & PAGE_MASK;
+>>>>>>> cm/cm-11.0
 
 	/*
 	 * Check whether this memory region has non-zero size or
@@ -564,7 +576,11 @@ int __init arm_add_memory(phys_addr_t start, phys_addr_t size)
 static int __init early_mem(char *p)
 {
 	static int usermem __initdata = 0;
+<<<<<<< HEAD
 	phys_addr_t size;
+=======
+	unsigned long size;
+>>>>>>> cm/cm-11.0
 	phys_addr_t start;
 	char *endp;
 

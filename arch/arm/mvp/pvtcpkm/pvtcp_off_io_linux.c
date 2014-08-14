@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP PVTCP Server
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -80,7 +84,11 @@ LargeDgramBufGet(int size)
 
    CommOS_MutexLockUninterruptible(&largeDgramBuf.lock);
 
+<<<<<<< HEAD
    if (size <= sizeof largeDgramBuf.buf) {
+=======
+   if (size <= sizeof(largeDgramBuf.buf)) {
+>>>>>>> cm/cm-11.0
       return largeDgramBuf.buf;
    }
 
@@ -108,7 +116,11 @@ LargeDgramBufGet(int size)
 static inline void
 LargeDgramBufPut(void *buf)
 {
+<<<<<<< HEAD
    static unsigned int spareBufPuts = 0;
+=======
+   static unsigned int spareBufPuts;
+>>>>>>> cm/cm-11.0
 
    BUG_ON((buf != largeDgramBuf.buf) && (buf != largeDgramBuf.spareBuf));
 
@@ -175,7 +187,11 @@ SendZeroSizedDgram(struct socket *sock,
    if (rc != dummy.iov_len) {
 #if defined(PVTCP_FULL_DEBUG)
       CommOS_Debug(("%s: Dgram [0x%p] sent [%d], expected [%d]\n",
+<<<<<<< HEAD
                     __FUNCTION__, sock, rc, dummy.iov_len));
+=======
+                    __func__, sock, rc, dummy.iov_len));
+>>>>>>> cm/cm-11.0
 #endif
       if (rc == -EAGAIN) { /* As if lost on the wire. */
          rc = 0;
@@ -210,7 +226,11 @@ PvtcpIoOp(CommChannel channel,
    PvtcpSock *pvsk = PvtcpGetPvskOrReturn(packet->data64, upperLayerState);
    struct sock *sk = SkFromPvsk(pvsk);
    struct socket *sock = sk->sk_socket;
+<<<<<<< HEAD
    unsigned int dataLen = packet->len - sizeof *packet;
+=======
+   unsigned int dataLen = packet->len - sizeof(*packet);
+>>>>>>> cm/cm-11.0
    struct msghdr msg = {
       .msg_controllen = 0,
       .msg_control = NULL
@@ -243,10 +263,27 @@ PvtcpIoOp(CommChannel channel,
              (CommOS_ReadAtomic(&pvsk->queueSize) == 0)) {
             /* Attempt to write directly as many bytes as we can. */
 
+<<<<<<< HEAD
             msg.msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL;
             rc = kernel_sendmsg(sock, &msg, vec, vecLen, dataLen);
 
             if (rc == -EAGAIN) {
+=======
+            /*
+             * kernel_sendmsg() may use memcpy_fromiovec() that
+             * "modifies the original iovec".
+             */
+            struct kvec *vecTmp = kmemdup(vec, vecLen * sizeof(*vec), GFP_ATOMIC);
+            if (vecTmp) {
+               msg.msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL;
+               rc = kernel_sendmsg(sock, &msg, vecTmp, vecLen, dataLen);
+               kfree(vecTmp);
+
+               if (rc == -EAGAIN) {
+                  rc = 0;
+               }
+            } else {
+>>>>>>> cm/cm-11.0
                rc = 0;
             }
             if (rc >= 0) {
@@ -285,7 +322,11 @@ PvtcpIoOp(CommChannel channel,
                 */
 
                dataLen = 0;
+<<<<<<< HEAD
                for ( vecOff = 0; vecOff < vecLen; vecOff++) {
+=======
+               for (vecOff = 0; vecOff < vecLen; vecOff++) {
+>>>>>>> cm/cm-11.0
                   PvtcpBufFree(vec[vecOff].iov_base);
                }
             }
@@ -326,7 +367,11 @@ enqueueBytes:
                needSched = 1;
             }
          } else {
+<<<<<<< HEAD
             for ( vecOff = 0; vecOff < vecLen; vecOff++) {
+=======
+            for (vecOff = 0; vecOff < vecLen; vecOff++) {
+>>>>>>> cm/cm-11.0
                PvtcpBufFree(vec[vecOff].iov_base);
             }
          }
@@ -346,14 +391,22 @@ enqueueBytes:
          sin.sin_family = AF_INET;
          sin.sin_port = packet->data16;
          addr = (struct sockaddr *)&sin;
+<<<<<<< HEAD
          addrLen = sizeof sin;
+=======
+         addrLen = sizeof(sin);
+>>>>>>> cm/cm-11.0
          sin.sin_addr.s_addr = (unsigned int)packet->data64ex;
          PvtcpTestAndBindLoopbackInet4(pvsk, &sin.sin_addr.s_addr, 0);
       } else { /* AF_INET6 */
          sin6.sin6_family = AF_INET6;
          sin6.sin6_port = packet->data16;
          addr = (struct sockaddr *)&sin6;
+<<<<<<< HEAD
          addrLen = sizeof sin6;
+=======
+         addrLen = sizeof(sin6);
+>>>>>>> cm/cm-11.0
          PvtcpTestAndBindLoopbackInet6(pvsk, &packet->data64ex,
                                        &packet->data64ex2, 0);
          PvtcpI6AddrUnpack(&sin6.sin6_addr.s6_addr32[0],
@@ -382,13 +435,26 @@ enqueueBytes:
                BUG_ON(vec[vecOff].iov_base != NULL);
                rc = SendZeroSizedDgram(sock, &msg);
             } else {
+<<<<<<< HEAD
                internalBuf = PvtcpOffInternalFromBuf(vec[vecOff].iov_base);
+=======
+               /*
+                * Backup iov_base as it may be modified by kernel_sendmsg().
+                * New net/ipv4/ping.c is using memcpy_fromiovec() that
+                * "modifies the original iovec".
+                */
+               void *buf = vec[vecOff].iov_base;
+               size_t len = vec[vecOff].iov_len;
+
+               internalBuf = PvtcpOffInternalFromBuf(buf);
+>>>>>>> cm/cm-11.0
                BUG_ON(internalBuf == NULL);
 
                if (internalBuf->off == USHRT_MAX) {
                   /* Fragmented payload containing an embedded iovec. */
 
                   rc = kernel_sendmsg(sock, &msg,
+<<<<<<< HEAD
                                       (struct kvec *)vec[vecOff].iov_base,
                                       internalBuf->len, vec[vecOff].iov_len);
                } else {
@@ -400,6 +466,18 @@ enqueueBytes:
 #if defined(PVTCP_FULL_DEBUG)
                   CommOS_Debug(("%s: Dgram [0x%p] sent [%d], expected [%d]\n",
                                 __FUNCTION__, sk, rc, vec[vecOff].iov_len));
+=======
+                                      (struct kvec *)buf,
+                                      internalBuf->len, len);
+               } else {
+                  rc = kernel_sendmsg(sock, &msg, &vec[vecOff], 1, len);
+               }
+               PvtcpBufFree(buf);
+               if (rc != len) {
+#if defined(PVTCP_FULL_DEBUG)
+                  CommOS_Debug(("%s: Dgram [0x%p] sent [%d], expected [%d]\n",
+                                __func__, sk, rc, len));
+>>>>>>> cm/cm-11.0
 #endif
                   if (rc == -EAGAIN) { /* As if lost on the wire. */
                      rc = 0;
@@ -415,7 +493,11 @@ enqueueBytes:
             PvtcpSchedSock(pvsk);
          }
       } else {
+<<<<<<< HEAD
          for ( vecOff = 0; vecOff < vecLen; vecOff++) {
+=======
+         for (vecOff = 0; vecOff < vecLen; vecOff++) {
+>>>>>>> cm/cm-11.0
             PvtcpBufFree(vec[vecOff].iov_base);
          }
       }
@@ -471,7 +553,11 @@ PvtcpFlowAIO(PvtcpSock *pvsk,
       }
 #if defined(PVTCP_FULL_DEBUG)
       CommOS_Debug(("%s: Sending socket error [%u] on [0x%p -> 0x%0x].\n",
+<<<<<<< HEAD
                     __FUNCTION__, packet.data32ex, pvsk,
+=======
+                    __func__, packet.data32ex, pvsk,
+>>>>>>> cm/cm-11.0
                     (unsigned)(pvsk->peerSock)));
 #endif
    } else {
@@ -499,7 +585,11 @@ PvtcpFlowAIO(PvtcpSock *pvsk,
    if (((packet.data32 != PVTCP_FLOW_OP_INVALID_SIZE) ||
         COMM_OPF_TEST_ERR(packet.flags)) &&
        pvsk->peerSockSet) {
+<<<<<<< HEAD
       packet.len = sizeof packet;
+=======
+      packet.len = sizeof(packet);
+>>>>>>> cm/cm-11.0
       packet.opCode = PVTCP_OP_FLOW;
       packet.data64 = pvsk->peerSock;
       timeout = COMM_MAX_TO;
@@ -692,13 +782,21 @@ PvtcpInputAIO(PvtcpSock *pvsk,
    if (sk->sk_state == TCP_LISTEN) {
       /* Process stream listen 'input'. */
 
+<<<<<<< HEAD
       packet.len = sizeof packet;
+=======
+      packet.len = sizeof(packet);
+>>>>>>> cm/cm-11.0
       packet.data16 = sk->sk_ack_backlog;
       timeout = COMM_MAX_TO;
       if (pvsk->peerSockSet) {
          CommSvc_Write(pvsk->channel, &packet, &timeout);
          CommOS_Debug(("%s: Listen sock [0x%p] 'ack_backlog' [%hu].\n",
+<<<<<<< HEAD
                        __FUNCTION__, sk, packet.data16));
+=======
+                       __func__, sk, packet.data16));
+>>>>>>> cm/cm-11.0
       }
    } else {
       /* Common path for both stream and datagram sockets. */
@@ -741,10 +839,17 @@ PvtcpInputAIO(PvtcpSock *pvsk,
          } else { /* SOCK_DGRAM || SOCK_RAW */
             if (sk->sk_family == AF_INET) {
                msg.msg_name = &sin;
+<<<<<<< HEAD
                msg.msg_namelen = sizeof sin;
             } else {
                msg.msg_name = &sin6;
                msg.msg_namelen = sizeof sin6;
+=======
+               msg.msg_namelen = sizeof(sin);
+            } else {
+               msg.msg_name = &sin6;
+               msg.msg_namelen = sizeof(sin6);
+>>>>>>> cm/cm-11.0
             }
 
             /*
@@ -777,7 +882,11 @@ PvtcpInputAIO(PvtcpSock *pvsk,
                    */
 
                   CommOS_Debug(("%s: Dropping datagram (alloc failure)!\n",
+<<<<<<< HEAD
                                 __FUNCTION__));
+=======
+                                __func__));
+>>>>>>> cm/cm-11.0
                   ioBuf = perCpuBuf;
                   vec[0].iov_len = PVTCP_SOCK_DGRAM_BUF_SIZE;
                } else {
@@ -816,7 +925,11 @@ PvtcpInputAIO(PvtcpSock *pvsk,
             vec[0].iov_base = ioBuf;
             vec[0].iov_len = rc;
             inVecLen = 1;
+<<<<<<< HEAD
             packet.len = sizeof packet + rc;
+=======
+            packet.len = sizeof(packet) + rc;
+>>>>>>> cm/cm-11.0
          } else { /* SOCK_DGRAM || SOCK_RAW */
             if (sk->sk_family == AF_INET) {
                dgramHeader.d0 = (unsigned long long)sin.sin_port;
@@ -829,11 +942,19 @@ PvtcpInputAIO(PvtcpSock *pvsk,
                                &dgramHeader.d1, &dgramHeader.d2);
             }
             vec[0].iov_base = &dgramHeader;
+<<<<<<< HEAD
             vec[0].iov_len = sizeof dgramHeader;
             vec[1].iov_base = ioBuf;
             vec[1].iov_len = rc;
             inVecLen = 2;
             packet.len = sizeof packet + sizeof dgramHeader + rc;
+=======
+            vec[0].iov_len = sizeof(dgramHeader);
+            vec[1].iov_base = ioBuf;
+            vec[1].iov_len = rc;
+            inVecLen = 2;
+            packet.len = sizeof(packet) + sizeof(dgramHeader) + rc;
+>>>>>>> cm/cm-11.0
          }
 
          inVec = vec;
@@ -842,7 +963,11 @@ PvtcpInputAIO(PvtcpSock *pvsk,
                                &inVec, &inVecLen, &timeout, &iovOffset, 1);
          if (rc != packet.len) {
             CommOS_Log(("%s: BOOG -- WROTE INCOMPLETE PACKET [%u->%d]!\n",
+<<<<<<< HEAD
                         __FUNCTION__, packet.len, rc));
+=======
+                        __func__, packet.len, rc));
+>>>>>>> cm/cm-11.0
             break;
          }
 

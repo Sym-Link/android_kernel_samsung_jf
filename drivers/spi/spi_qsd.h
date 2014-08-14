@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2008-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2008-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -283,7 +287,12 @@ struct msm_spi {
 	struct msm_dmov_cmd      rx_hdr;
 	int                      input_block_size;
 	int                      output_block_size;
+<<<<<<< HEAD
 	int                      burst_size;
+=======
+	int                      input_burst_size;
+	int                      output_burst_size;
+>>>>>>> cm/cm-11.0
 	atomic_t                 rx_irq_called;
 	atomic_t                 tx_irq_called;
 	/* Used to pad messages unaligned to block size */
@@ -291,7 +300,12 @@ struct msm_spi {
 	dma_addr_t               tx_padding_dma;
 	u8                       *rx_padding;
 	dma_addr_t               rx_padding_dma;
+<<<<<<< HEAD
 	u32                      unaligned_len;
+=======
+	u32                      tx_unaligned_len;
+	u32                      rx_unaligned_len;
+>>>>>>> cm/cm-11.0
 	/* DMA statistics */
 	int                      stat_dmov_tx_err;
 	int                      stat_dmov_rx_err;

@@ -163,6 +163,10 @@ void __init rpc_init_irq(void)
 		}
 	}
 
+<<<<<<< HEAD
 	init_FIQ();
+=======
+	init_FIQ(FIQ_START);
+>>>>>>> cm/cm-11.0
 }
 

@@ -108,7 +108,11 @@ static struct gpiomux_setting gsbi9_active_cfg = {
 };
 
 static struct gpiomux_setting gsbi9_suspended_cfg = {
+<<<<<<< HEAD
 	.func = GPIOMUX_FUNC_2,
+=======
+	.func = GPIOMUX_FUNC_GPIO,
+>>>>>>> cm/cm-11.0
 	.drv = GPIOMUX_DRV_2MA,
 	.pull = GPIOMUX_PULL_DOWN,
 };
@@ -243,25 +247,41 @@ static struct gpiomux_setting hap_lvl_shft_active_config = {
 
 static struct gpiomux_setting ap2mdm_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
+<<<<<<< HEAD
 	.drv = GPIOMUX_DRV_8MA,
+=======
+	.drv = GPIOMUX_DRV_4MA,
+>>>>>>> cm/cm-11.0
 	.pull = GPIOMUX_PULL_DOWN,
 };
 
 static struct gpiomux_setting mdm2ap_status_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
+<<<<<<< HEAD
 	.drv = GPIOMUX_DRV_8MA,
+=======
+	.drv = GPIOMUX_DRV_2MA,
+>>>>>>> cm/cm-11.0
 	.pull = GPIOMUX_PULL_NONE,
 };
 
 static struct gpiomux_setting mdm2ap_errfatal_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
+<<<<<<< HEAD
 	.drv = GPIOMUX_DRV_16MA,
+=======
+	.drv = GPIOMUX_DRV_2MA,
+>>>>>>> cm/cm-11.0
 	.pull = GPIOMUX_PULL_DOWN,
 };
 
 static struct gpiomux_setting ap2mdm_kpdpwr_n_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
+<<<<<<< HEAD
 	.drv = GPIOMUX_DRV_8MA,
+=======
+	.drv = GPIOMUX_DRV_4MA,
+>>>>>>> cm/cm-11.0
 	.pull = GPIOMUX_PULL_DOWN,
 };
 

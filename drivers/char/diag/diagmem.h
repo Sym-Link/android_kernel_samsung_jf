@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2008-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2008-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -18,7 +22,12 @@ void *diagmem_alloc(struct diagchar_dev *driver, int size, int pool_type);
 void diagmem_free(struct diagchar_dev *driver, void *buf, int pool_type);
 void diagmem_init(struct diagchar_dev *driver);
 void diagmem_exit(struct diagchar_dev *driver, int pool_type);
+<<<<<<< HEAD
 #ifdef CONFIG_DIAG_BRIDGE_CODE
 void diagmem_hsic_init(struct diagchar_dev *driver);
+=======
+#ifdef CONFIG_DIAGFWD_BRIDGE_CODE
+void diagmem_hsic_init(int index);
+>>>>>>> cm/cm-11.0
 #endif
 #endif

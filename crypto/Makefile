@@ -2,6 +2,11 @@
 # Cryptographic API
 #
 
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_CRYPTO_FIPS) += fips_integrity.o
+
+>>>>>>> cm/cm-11.0
 obj-$(CONFIG_CRYPTO) += crypto.o
 crypto-y := api.o cipher.o compress.o
 

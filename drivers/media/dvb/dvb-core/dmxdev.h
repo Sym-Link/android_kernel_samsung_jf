@@ -4,7 +4,11 @@
  * Copyright (C) 2000 Ralph Metzler & Marcus Metzler
  *                    for convergence integrated media GmbH
  *
+<<<<<<< HEAD
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -58,10 +62,22 @@ enum dmxdev_state {
 
 struct dmxdev_feed {
 	u16 pid;
+<<<<<<< HEAD
+=======
+	struct dmx_secure_mode sec_mode;
+>>>>>>> cm/cm-11.0
 	struct dmx_ts_feed *ts;
 	struct list_head next;
 };
 
+<<<<<<< HEAD
+=======
+struct dmxdev_sec_feed {
+	struct dmx_secure_mode sec_mode;
+	struct dmx_section_feed *feed;
+};
+
+>>>>>>> cm/cm-11.0
 struct dmxdev_events_queue {
 #define DMX_EVENT_QUEUE_SIZE	500 /* number of events */
 	/*
@@ -99,7 +115,11 @@ struct dmxdev_filter {
 	union {
 		/* list of TS and PES feeds (struct dmxdev_feed) */
 		struct list_head ts;
+<<<<<<< HEAD
 		struct dmx_section_feed *sec;
+=======
+		struct dmxdev_sec_feed sec;
+>>>>>>> cm/cm-11.0
 	} feed;
 
 	union {
@@ -115,7 +135,10 @@ struct dmxdev_filter {
 	struct dvb_ringbuffer buffer;
 	void *priv_buff_handle;
 	enum dmx_buffer_mode buffer_mode;
+<<<<<<< HEAD
 	u32 flush_data_len;
+=======
+>>>>>>> cm/cm-11.0
 
 	struct mutex mutex;
 
@@ -160,7 +183,10 @@ struct dmxdev {
 	enum dmx_buffer_mode dvr_buffer_mode;
 	struct dmxdev_events_queue dvr_output_events;
 	struct dmxdev_filter *dvr_feed;
+<<<<<<< HEAD
 	u32 dvr_flush_data_len;
+=======
+>>>>>>> cm/cm-11.0
 	int dvr_feeds_count;
 
 	struct dvb_ringbuffer dvr_input_buffer;

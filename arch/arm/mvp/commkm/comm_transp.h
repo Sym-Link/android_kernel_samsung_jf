@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Guest Communications
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -44,17 +48,26 @@
 
 
 typedef struct CommTranspID {
+<<<<<<< HEAD
    union {
       unsigned char d8[8];
       unsigned int d32[2];
       unsigned long long d64;
    };
+=======
+	union {
+		unsigned char d8[8];
+		unsigned int d32[2];
+		unsigned long long d64;
+	};
+>>>>>>> cm/cm-11.0
 } CommTranspID;
 
 
 /* Basic initialization arguments. */
 
 typedef enum CommTranspInitMode {
+<<<<<<< HEAD
    COMM_TRANSP_INIT_CREATE = 0x0,
    COMM_TRANSP_INIT_ATTACH = 0x1
 } CommTranspInitMode;
@@ -64,6 +77,17 @@ typedef struct CommTranspInitArgs {
    unsigned int type;          // Type / implementation using this area.
    CommTranspID id;            // ID (name) of shared memory area.
    CommTranspInitMode mode;    // Init mode (above).
+=======
+	COMM_TRANSP_INIT_CREATE = 0x0,
+	COMM_TRANSP_INIT_ATTACH = 0x1
+} CommTranspInitMode;
+
+typedef struct CommTranspInitArgs {
+	unsigned int capacity;      /* Shared memory capacity. */
+	unsigned int type;          /* Type / implementation using this area. */
+	CommTranspID id;            /* ID (name) of shared memory area. */
+	CommTranspInitMode mode;    /* Init mode (above). */
+>>>>>>> cm/cm-11.0
 } CommTranspInitArgs;
 
 
@@ -78,6 +102,7 @@ typedef struct CommTranspInitArgs {
 static inline unsigned int
 CommTransp_GetType(const char *str)
 {
+<<<<<<< HEAD
    unsigned int hash = 5381;
    int c;
 
@@ -88,4 +113,16 @@ CommTransp_GetType(const char *str)
 }
 
 #endif // _COMM_TRANSP_H_
+=======
+	unsigned int hash = 5381;
+	int c;
+
+	while ((c = *str++))
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+	return hash;
+}
+
+#endif /* _COMM_TRANSP_H_ */
+>>>>>>> cm/cm-11.0
 

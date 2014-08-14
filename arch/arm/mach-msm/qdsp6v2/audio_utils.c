@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2010-2012, 2014 The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -23,6 +27,10 @@
 #include <asm/ioctls.h>
 #include "audio_utils.h"
 
+<<<<<<< HEAD
+=======
+#define FRAME_SIZE            (1 + ((1536+sizeof(struct meta_out_dsp)) * 5))
+>>>>>>> cm/cm-11.0
 static int audio_in_pause(struct q6audio_in  *audio)
 {
 	int rc;
@@ -197,6 +205,10 @@ long audio_in_ioctl(struct file *file,
 
 	if (cmd == AUDIO_GET_STATS) {
 		struct msm_audio_stats stats;
+<<<<<<< HEAD
+=======
+		memset(&stats, 0, sizeof(stats));
+>>>>>>> cm/cm-11.0
 		stats.byte_count = atomic_read(&audio->in_bytes);
 		stats.sample_count = atomic_read(&audio->in_samples);
 		if (copy_to_user((void *) arg, &stats, sizeof(stats)))
@@ -257,6 +269,14 @@ long audio_in_ioctl(struct file *file,
 			rc = -EINVAL;
 			break;
 		}
+<<<<<<< HEAD
+=======
+		if ((cfg.buffer_size > FRAME_SIZE) ||
+			(cfg.buffer_count != FRAME_NUM)) {
+			rc = -EINVAL;
+			break;
+		}
+>>>>>>> cm/cm-11.0
 		audio->str_cfg.buffer_size = cfg.buffer_size;
 		audio->str_cfg.buffer_count = cfg.buffer_count;
 		rc = q6asm_audio_client_buf_alloc(OUT, audio->ac,
@@ -388,7 +408,11 @@ ssize_t audio_in_read(struct file *file,
 	uint32_t mfield_size = (audio->buf_cfg.meta_info_enable == 0) ? 0 :
 		(sizeof(unsigned char) +
 		(sizeof(struct meta_out_dsp)*(audio->buf_cfg.frames_per_buf)));
+<<<<<<< HEAD
 
+=======
+	memset(&meta, 0, sizeof(meta));
+>>>>>>> cm/cm-11.0
 	pr_debug("%s:session id %d: read - %d\n", __func__, audio->ac->session,
 			count);
 	if (!audio->enabled)

@@ -185,6 +185,10 @@ static struct acpuclk_krait_params acpuclk_8974_params __initdata = {
 	.l2_freq_tbl_size = sizeof(l2_freq_tbl),
 	.bus_scale = &bus_scale_data,
 	.pte_efuse_phys = 0xFC4B80B0,
+<<<<<<< HEAD
+=======
+	.get_bin_info = get_krait_bin_format_b,
+>>>>>>> cm/cm-11.0
 	.stby_khz = 300000,
 };
 

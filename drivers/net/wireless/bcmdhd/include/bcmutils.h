@@ -2,7 +2,11 @@
  * Misc useful os-independent macros and functions.
  *
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -119,12 +123,21 @@ typedef struct {
 	uint32 ps_retry;     
 	uint32 retry_drop;   
 	uint32 max_avail;    
+<<<<<<< HEAD
 	uint32 max_used;     
 	uint32 queue_capacity; 
 	uint32 rtsfail;        
 	uint32 acked;          
 } pktq_counters_t;
 #endif 
+=======
+	uint32 max_used;
+	uint32 queue_capacity;
+	uint32 rtsfail;
+	uint32 acked;
+} pktq_counters_t;
+#endif
+>>>>>>> cm/cm-11.0
 
 
 #define PKTQ_COMMON	\
@@ -139,9 +152,15 @@ struct pktq {
 	
 	struct pktq_prec q[PKTQ_MAX_PREC];
 #ifdef PKTQ_LOG
+<<<<<<< HEAD
 	pktq_counters_t	_prec_cnt[PKTQ_MAX_PREC];     
 	pktq_counters_t _prec_bytes[PKTQ_MAX_PREC];   
 	uint32 _logtime;                   
+=======
+	pktq_counters_t	_prec_cnt[PKTQ_MAX_PREC];
+	pktq_counters_t _prec_bytes[PKTQ_MAX_PREC];
+	uint32 _logtime;
+>>>>>>> cm/cm-11.0
 #endif
 };
 
@@ -344,10 +363,17 @@ extern uint8 *pktdataoffset(osl_t *osh, void *p,  uint offset);
 extern void *pktoffset(osl_t *osh, void *p,  uint offset);
 
 
+<<<<<<< HEAD
 #define	PKTPRIO_VDSCP	0x100		
 #define	PKTPRIO_VLAN	0x200		
 #define	PKTPRIO_UPD	0x400		
 #define	PKTPRIO_DSCP	0x800		
+=======
+#define	PKTPRIO_VDSCP	0x100
+#define	PKTPRIO_VLAN	0x200
+#define	PKTPRIO_UPD	0x400		
+#define	PKTPRIO_DSCP	0x800
+>>>>>>> cm/cm-11.0
 
 
 
@@ -527,12 +553,21 @@ extern int bcm_format_ssid(char* buf, const uchar ssid[], uint ssid_len);
 #define BCME_TXFAIL			-38 	
 #define BCME_RXFAIL			-39	
 #define BCME_NODEVICE			-40 	
+<<<<<<< HEAD
 #define BCME_NMODE_DISABLED		-41 	
 #define BCME_NONRESIDENT		-42 
 #define BCME_SCANREJECT			-43 	
 #define BCME_USAGE_ERROR                -44     
 #define BCME_IOCTL_ERROR                -45     
 #define BCME_SERIAL_PORT_ERR            -46     
+=======
+#define BCME_NMODE_DISABLED		-41
+#define BCME_NONRESIDENT		-42
+#define BCME_SCANREJECT			-43
+#define BCME_USAGE_ERROR                -44
+#define BCME_IOCTL_ERROR                -45
+#define BCME_SERIAL_PORT_ERR            -46
+>>>>>>> cm/cm-11.0
 #define BCME_LAST			BCME_SERIAL_PORT_ERR
 
 
@@ -596,25 +631,41 @@ extern int bcm_format_ssid(char* buf, const uchar ssid[], uint ssid_len);
 
 #ifndef MAX
 #define	MAX(a, b)		(((a) > (b)) ? (a) : (b))
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 
 #ifndef LIMIT_TO_RANGE
 #define LIMIT_TO_RANGE(x, min, max) \
 	((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 
 #ifndef LIMIT_TO_MAX
 #define LIMIT_TO_MAX(x, max) \
 	(((x) > (max) ? (max) : (x)))
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 
 #ifndef LIMIT_TO_MIN
 #define LIMIT_TO_MIN(x, min) \
 	(((x) < (min) ? (min) : (x)))
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 #define CEIL(x, y)		(((x) + ((y) - 1)) / (y))
 #define	ROUNDUP(x, y)		((((x) + ((y) - 1)) / (y)) * (y))
@@ -640,7 +691,11 @@ extern int bcm_format_ssid(char* buf, const uchar ssid[], uint ssid_len);
 #define ARRAYSIZE(a)		(sizeof(a) / sizeof(a[0]))
 #endif
 
+<<<<<<< HEAD
 #ifndef ARRAYLAST   
+=======
+#ifndef ARRAYLAST
+>>>>>>> cm/cm-11.0
 #define ARRAYLAST(a)		(&a[ARRAYSIZE(a)-1])
 #endif
 
@@ -650,9 +705,15 @@ extern void *_bcmutils_dummy_fn;
 
 
 #ifndef setbit
+<<<<<<< HEAD
 #ifndef NBBY		  
 #define	NBBY	8	
 #endif 
+=======
+#ifndef NBBY
+#define	NBBY	8
+#endif
+>>>>>>> cm/cm-11.0
 #ifdef BCMUTILS_BIT_MACROS_USE_FUNCS
 extern void setbit(void *array, uint bit);
 extern void clrbit(void *array, uint bit);
@@ -664,7 +725,11 @@ extern bool isclr(const void *array, uint bit);
 #define	isset(a, i)	(((const uint8 *)a)[(i) / NBBY] & (1 << ((i) % NBBY)))
 #define	isclr(a, i)	((((const uint8 *)a)[(i) / NBBY] & (1 << ((i) % NBBY))) == 0)
 #endif
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 #define	isbitset(a, i)	(((a) & (1 << (i))) != 0)
 
@@ -724,7 +789,11 @@ extern bool isclr(const void *array, uint bit);
 #else
 #define MACDBG				"%02x:%02x:%02x"
 #define MAC2STRDBG(ea) (ea)[0], (ea)[4], (ea)[5]
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 
 typedef struct bcm_bit_desc {
@@ -813,7 +882,11 @@ extern const char *bcmerrorstr(int bcmerror);
 
 
 typedef uint32 mbool;
+<<<<<<< HEAD
 #define mboolset(mb, bit)		((mb) |= (bit))		
+=======
+#define mboolset(mb, bit)		((mb) |= (bit))
+>>>>>>> cm/cm-11.0
 #define mboolclr(mb, bit)		((mb) &= ~(bit))	
 #define mboolisset(mb, bit)		(((mb) & (bit)) != 0)	
 #define	mboolmaskset(mb, mask, val)	((mb) = (((mb) & ~(mask)) | (val)))

@@ -21,9 +21,26 @@
 
 #define FPGA_GPIO_BASE	300
 #define NR_FPGA_GPIO	16
+<<<<<<< HEAD
 #define ICE_FPGA_GPIO_TO_SYS(fpga_gpio)  (fpga_gpio + FPGA_GPIO_BASE)
 
 enum { ICE_12M = 0, ICE_19M, ICE_GPIOX, ICE_I2C, ICE_24M };
+=======
+#if !defined(CONFIG_MACH_JF)
+#define FPGA_GPIO_VPS_SOUND_EN 15
+#endif
+#define ICE_FPGA_GPIO_TO_SYS(fpga_gpio)  (fpga_gpio + FPGA_GPIO_BASE)
+
+enum {
+	ICE_12M = 0,
+	ICE_19M,
+	ICE_GPIOX,
+	ICE_I2C,
+	ICE_IRDA,
+	ICE_24M,
+	ICE_IRDA_SERRANO,
+};
+>>>>>>> cm/cm-11.0
 
 extern int ice_gpiox_set(int num, int val);
 extern int ice_gpiox_get(int num);
@@ -36,6 +53,10 @@ struct barcode_emul_platform_data {
 	int rst_n;
 	int cdone;
 	int fw_type;
+<<<<<<< HEAD
+=======
+	int fw_status;
+>>>>>>> cm/cm-11.0
 #if defined CONFIG_IR_REMOCON_FPGA
 	int irda_wake;
 	int irda_irq;

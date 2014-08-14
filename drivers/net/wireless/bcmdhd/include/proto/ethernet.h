@@ -2,7 +2,11 @@
  * From FreeBSD 2.2.7: Fundamental constants relating to ethernet.
  *
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -24,7 +28,11 @@
  * $Id: ethernet.h 384540 2013-02-12 04:28:58Z $
  */
 
+<<<<<<< HEAD
 #ifndef _NET_ETHERNET_H_	  
+=======
+#ifndef _NET_ETHERNET_H_
+>>>>>>> cm/cm-11.0
 #define _NET_ETHERNET_H_
 
 #ifndef _TYPEDEFS_H_
@@ -65,6 +73,7 @@
 #define ETHER_TYPE_ARP		0x0806		
 #define ETHER_TYPE_8021Q	0x8100		
 #define	ETHER_TYPE_IPV6		0x86dd		
+<<<<<<< HEAD
 #define	ETHER_TYPE_BRCM		0x886c		
 #define	ETHER_TYPE_802_1X	0x888e		
 #ifdef PLC
@@ -80,6 +89,23 @@
 
 
 #define	ETHER_BRCM_SUBTYPE_LEN	4	
+=======
+#define	ETHER_TYPE_BRCM		0x886c
+#define	ETHER_TYPE_802_1X	0x888e
+#ifdef PLC
+#define	ETHER_TYPE_88E1		0x88e1
+#define	ETHER_TYPE_8912		0x8912
+#define ETHER_TYPE_GIGLED	0xffff
+#endif
+#define	ETHER_TYPE_802_1X_PREAUTH 0x88c7
+#define ETHER_TYPE_WAI		0x88b4
+#define ETHER_TYPE_89_0D	0x890d
+
+#define ETHER_TYPE_PPP_SES	0x8864
+
+
+#define	ETHER_BRCM_SUBTYPE_LEN	4
+>>>>>>> cm/cm-11.0
 
 
 #define ETHER_DEST_OFFSET	(0 * ETHER_ADDR_LEN)	
@@ -99,7 +125,11 @@
 		((uint8 *)ea)[5] = ((mgrp_ip) >>  0) & 0xff;	\
 }
 
+<<<<<<< HEAD
 #ifndef __INCif_etherh   
+=======
+#ifndef __INCif_etherh
+>>>>>>> cm/cm-11.0
 
 BWL_PRE_PACKED_STRUCT struct ether_header {
 	uint8	ether_dhost[ETHER_ADDR_LEN];
@@ -187,4 +217,8 @@ do { \
 
 #include <packed_section_end.h>
 
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0

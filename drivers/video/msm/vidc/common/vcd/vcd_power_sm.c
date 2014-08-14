@@ -188,17 +188,21 @@ u32 vcd_client_power_event(
 			if (cctxt) {
 				rc = VCD_S_SUCCESS;
 				if (cctxt->status.req_perf_lvl) {
+<<<<<<< HEAD
 					VCD_MSG_HIGH("%s: reduce client(0x%x) "\
 					"perf level(%u) from device "\
 					"perf level(%u)", __func__,
 					(u32)cctxt, cctxt->reqd_perf_lvl,
 					dev_ctxt->reqd_perf_lvl);
 
+=======
+>>>>>>> cm/cm-11.0
 					dev_ctxt->reqd_perf_lvl -=
 						cctxt->reqd_perf_lvl;
 					cctxt->status.req_perf_lvl = false;
 					rc = vcd_set_perf_level(dev_ctxt,
 						dev_ctxt->reqd_perf_lvl);
+<<<<<<< HEAD
 
 					if ((cctxt->perf_set_by_client) &&
 						(event ==
@@ -208,6 +212,8 @@ u32 vcd_client_power_event(
 							__func__, (u32)cctxt);
 						cctxt->perf_set_by_client = 0;
 					}
+=======
+>>>>>>> cm/cm-11.0
 				}
 			}
 			break;
@@ -219,12 +225,15 @@ u32 vcd_client_power_event(
 			if (cctxt) {
 				rc = VCD_S_SUCCESS;
 				if (!cctxt->status.req_perf_lvl) {
+<<<<<<< HEAD
 					VCD_MSG_HIGH("%s: add client(0x%x) "\
 					"perf level(%u) to device "\
 					"perf level(%u)", __func__,
 					(u32)cctxt, cctxt->reqd_perf_lvl,
 					dev_ctxt->reqd_perf_lvl);
 
+=======
+>>>>>>> cm/cm-11.0
 					dev_ctxt->reqd_perf_lvl +=
 						cctxt->reqd_perf_lvl;
 					cctxt->status.req_perf_lvl = true;
@@ -366,12 +375,16 @@ u32 vcd_update_clnt_perf_lvl(
 	u32 new_perf_lvl;
 	new_perf_lvl = frm_p_units *\
 		(fps->fps_numerator / fps->fps_denominator);
+<<<<<<< HEAD
 	if (cctxt->perf_set_by_client) {
 		new_perf_lvl = cctxt->reqd_perf_lvl;
 		VCD_MSG_HIGH("%s: perf_set_by_client (0x%x), "\
 			"perf level = %u\n", __func__,
 			(u32)cctxt, new_perf_lvl);
 	}
+=======
+
+>>>>>>> cm/cm-11.0
 	if ((fps->fps_numerator * 1000) / fps->fps_denominator
 		 > VCD_MAXPERF_FPS_THRESHOLD_X_1000) {
 		u32 max_perf_level = 0;
@@ -383,7 +396,10 @@ u32 vcd_update_clnt_perf_lvl(
 			VCD_MSG_ERROR("Failed to get max perf level\n");
 		}
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 	if (cctxt->status.req_perf_lvl) {
 		dev_ctxt->reqd_perf_lvl =
 		    dev_ctxt->reqd_perf_lvl - cctxt->reqd_perf_lvl +
@@ -391,11 +407,16 @@ u32 vcd_update_clnt_perf_lvl(
 		rc = vcd_set_perf_level(cctxt->dev_ctxt,
 			dev_ctxt->reqd_perf_lvl);
 	}
+<<<<<<< HEAD
 	if (!cctxt->perf_set_by_client)
 		cctxt->reqd_perf_lvl = new_perf_lvl;
 	VCD_MSG_HIGH("%s: updated client perf level = %u, "\
 		"device perf level = %u", __func__,
 		cctxt->reqd_perf_lvl, dev_ctxt->reqd_perf_lvl);
+=======
+
+		cctxt->reqd_perf_lvl = new_perf_lvl;
+>>>>>>> cm/cm-11.0
 	return rc;
 }
 

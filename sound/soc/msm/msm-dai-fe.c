@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -229,6 +233,20 @@ static struct snd_soc_dai_driver msm_fe_dais[] = {
 			.rate_min =	8000,
 			.rate_max = 48000,
 		},
+<<<<<<< HEAD
+=======
+		.capture = {
+			.stream_name = "MultiMedia6 Capture",
+			.aif_name = "MM_UL6",
+			.rates = (SNDRV_PCM_RATE_8000_48000|
+					SNDRV_PCM_RATE_KNOT),
+			.formats = SNDRV_PCM_FMTBIT_S16_LE,
+			.channels_min = 1,
+			.channels_max = 8,
+			.rate_min =     8000,
+			.rate_max =	48000,
+		},
+>>>>>>> cm/cm-11.0
 		.ops = &msm_fe_Multimedia_dai_ops,
 		.name = "MultiMedia6",
 	},
@@ -455,8 +473,13 @@ static struct snd_soc_dai_driver msm_fe_dais[] = {
 	},
 	{
 		.playback = {
+<<<<<<< HEAD
 			.stream_name = "SGLTE Playback",
 			.aif_name = "SGLTE_DL",
+=======
+			.stream_name = "Voice2 Playback",
+			.aif_name = "VOICE2_DL",
+>>>>>>> cm/cm-11.0
 			.rates = SNDRV_PCM_RATE_8000_48000,
 			.formats = SNDRV_PCM_FMTBIT_S16_LE,
 			.channels_min = 1,
@@ -465,8 +488,13 @@ static struct snd_soc_dai_driver msm_fe_dais[] = {
 			.rate_max =     48000,
 		},
 		.capture = {
+<<<<<<< HEAD
 			.stream_name = "SGLTE Capture",
 			.aif_name = "SGLTE_UL",
+=======
+			.stream_name = "Voice2 Capture",
+			.aif_name = "VOICE2_UL",
+>>>>>>> cm/cm-11.0
 			.rates = SNDRV_PCM_RATE_8000_48000,
 			.formats = SNDRV_PCM_FMTBIT_S16_LE,
 			.channels_min = 1,
@@ -475,8 +503,62 @@ static struct snd_soc_dai_driver msm_fe_dais[] = {
 			.rate_max =     48000,
 		},
 		.ops = &msm_fe_dai_ops,
+<<<<<<< HEAD
 		.name = "SGLTE",
 	},
+=======
+		.name = "Voice2",
+	},
+	{
+		.playback = {
+			.stream_name = "VoLTE Stub Playback",
+			.aif_name = "VOLTE_STUB_DL",
+			.rates = SNDRV_PCM_RATE_8000_48000,
+			.formats = SNDRV_PCM_FMTBIT_S16_LE,
+			.channels_min = 1,
+			.channels_max = 2,
+			.rate_min = 8000,
+			.rate_max = 48000,
+		},
+		.capture = {
+			.stream_name = "VoLTE Stub Capture",
+			.aif_name = "VOLTE_STUB_UL",
+			.rates = SNDRV_PCM_RATE_8000_48000,
+			.formats = SNDRV_PCM_FMTBIT_S16_LE,
+			.channels_min = 1,
+			.channels_max = 2,
+			.rate_min = 8000,
+			.rate_max = 48000,
+		},
+		.ops = &msm_fe_dai_ops,
+		.name = "VOLTE_STUB",
+	},
+	{
+		.playback = {
+			.stream_name = "Voice2 Stub Playback",
+			.aif_name = "VOICE2_STUB_DL",
+			.rates = SNDRV_PCM_RATE_8000_48000,
+			.formats = SNDRV_PCM_FMTBIT_S16_LE,
+			.channels_min = 1,
+			.channels_max = 2,
+			.rate_min = 8000,
+			.rate_max = 48000,
+		},
+		.capture = {
+			.stream_name = "VoLTE Stub Capture",
+			.aif_name = "VOICE2_STUB_UL",
+			.rates = SNDRV_PCM_RATE_8000_48000,
+			.formats = SNDRV_PCM_FMTBIT_S16_LE,
+			.channels_min = 1,
+			.channels_max = 2,
+			.rate_min = 8000,
+			.rate_max = 48000,
+		},
+		.ops = &msm_fe_dai_ops,
+		.name = "VOICE2_STUB",
+	},
+
+>>>>>>> cm/cm-11.0
 };
 
 static __devinit int msm_fe_dai_dev_probe(struct platform_device *pdev)

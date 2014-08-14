@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -50,6 +54,10 @@ module_param_named(debug_mask, msm_smux_ctl_debug_mask,
 
 static uint32_t smux_ctl_ch_id[] = {
 	SMUX_DATA_CTL_0,
+<<<<<<< HEAD
+=======
+	SMUX_DATA_CTL_1,
+>>>>>>> cm/cm-11.0
 };
 
 #define SMUX_CTL_NUM_CHANNELS ARRAY_SIZE(smux_ctl_ch_id)
@@ -940,6 +948,10 @@ error0:
 static int smux_ctl_remove(struct platform_device *pdev)
 {
 	int i;
+<<<<<<< HEAD
+=======
+	int ret;
+>>>>>>> cm/cm-11.0
 
 	SMUXCTL_DBG(SMUX_CTL_MODULE_NAME ": %s Begins\n", __func__);
 
@@ -950,6 +962,16 @@ static int smux_ctl_remove(struct platform_device *pdev)
 		devp->abort_wait = 1;
 		wake_up(&devp->write_wait_queue);
 		wake_up(&devp->read_wait_queue);
+<<<<<<< HEAD
+=======
+
+		if (atomic_read(&devp->ref_count)) {
+			ret = msm_smux_close(devp->id);
+			if (ret)
+				pr_err("%s: unable to close ch %d, ret %d\n",
+						__func__, devp->id, ret);
+		}
+>>>>>>> cm/cm-11.0
 		mutex_unlock(&devp->dev_lock);
 
 		/* Empty RX queue */

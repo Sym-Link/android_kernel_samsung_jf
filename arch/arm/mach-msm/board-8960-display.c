@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -578,7 +582,11 @@ static struct msm_panel_common_pdata mdp_pdata = {
 	.mdp_max_clk = 200000000,
 	.mdp_max_bw = 2000000000,
 	.mdp_bw_ab_factor = 115,
+<<<<<<< HEAD
 	.mdp_bw_ib_factor = 125,
+=======
+	.mdp_bw_ib_factor = 150,
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_MSM_BUS_SCALING
 	.mdp_bus_scale_table = &mdp_bus_scale_pdata,
 #endif
@@ -589,6 +597,11 @@ static struct msm_panel_common_pdata mdp_pdata = {
 	.mem_hid = MEMTYPE_EBI1,
 #endif
 	.cont_splash_enabled = 0x01,
+<<<<<<< HEAD
+=======
+	.splash_screen_addr = 0x00,
+	.splash_screen_size = 0x00,
+>>>>>>> cm/cm-11.0
 	.mdp_iommu_split_domain = 0,
 };
 
@@ -601,6 +614,12 @@ void __init msm8960_mdp_writeback(struct memtype_reserve* reserve_table)
 		mdp_pdata.ov0_wb_size;
 	reserve_table[mdp_pdata.mem_hid].size +=
 		mdp_pdata.ov1_wb_size;
+<<<<<<< HEAD
+=======
+
+	pr_info("mem_map: mdp reserved with size 0x%lx in pool\n",
+			mdp_pdata.ov0_wb_size + mdp_pdata.ov1_wb_size);
+>>>>>>> cm/cm-11.0
 #endif
 }
 
@@ -721,6 +740,11 @@ static struct platform_device hdmi_msm_device = {
 	.resource = hdmi_msm_resources,
 	.dev.platform_data = &hdmi_msm_data,
 };
+<<<<<<< HEAD
+=======
+#else
+static int hdmi_panel_power(int on) { return 0; }
+>>>>>>> cm/cm-11.0
 #endif /* CONFIG_FB_MSM_HDMI_MSM_PANEL */
 
 #ifdef CONFIG_FB_MSM_WRITEBACK_MSM_PANEL
@@ -775,6 +799,7 @@ static struct lcdc_platform_data dtv_pdata = {
 	.bus_scale_table = &dtv_bus_scale_pdata,
 	.lcdc_power_save = hdmi_panel_power,
 };
+<<<<<<< HEAD
 
 static int hdmi_panel_power(int on)
 {
@@ -788,6 +813,8 @@ static int hdmi_panel_power(int on)
 	pr_debug("%s: HDMI Core: %s Success\n", __func__, (on ? "ON" : "OFF"));
 	return rc;
 }
+=======
+>>>>>>> cm/cm-11.0
 #endif
 
 #ifdef CONFIG_FB_MSM_HDMI_MSM_PANEL
@@ -985,6 +1012,22 @@ static int hdmi_cec_power(int on)
 error:
 	return rc;
 }
+<<<<<<< HEAD
+=======
+
+static int hdmi_panel_power(int on)
+{
+	int rc;
+
+	pr_debug("%s: HDMI Core: %s\n", __func__, (on ? "ON" : "OFF"));
+	rc = hdmi_core_power(on, 1);
+	if (rc)
+		rc = hdmi_cec_power(on);
+
+	pr_debug("%s: HDMI Core: %s Success\n", __func__, (on ? "ON" : "OFF"));
+	return rc;
+}
+>>>>>>> cm/cm-11.0
 #endif /* CONFIG_FB_MSM_HDMI_MSM_PANEL */
 
 void __init msm8960_init_fb(void)

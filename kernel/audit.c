@@ -416,7 +416,11 @@ static void kauditd_send_skb(struct sk_buff *skb)
 #ifdef CONFIG_PROC_AVC
 		struct nlmsghdr *nlh = nlmsg_hdr(skb);
 		char *data = NLMSG_DATA(nlh);
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 		if (nlh->nlmsg_type != AUDIT_EOE) {
 			sec_avc_log("%s\n", data);
 		}

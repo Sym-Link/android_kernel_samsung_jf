@@ -37,6 +37,10 @@ obj-$(CONFIG_INPUT_MAX8997_HAPTIC)	+= max8997_haptic.o
 obj-$(CONFIG_INPUT_MC13783_PWRBUTTON)	+= mc13783-pwrbutton.o
 obj-$(CONFIG_INPUT_MMA8450)		+= mma8450.o
 obj-$(CONFIG_INPUT_MPU3050)		+= mpu3050.o
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_INPUT_MPU6050)		+= mpu6050/
+>>>>>>> cm/cm-11.0
 obj-$(CONFIG_INPUT_PCAP)		+= pcap_keys.o
 obj-$(CONFIG_INPUT_PCF50633_PMU)	+= pcf50633-input.o
 obj-$(CONFIG_INPUT_PCF8574)		+= pcf8574_keypad.o
@@ -61,3 +65,8 @@ obj-$(CONFIG_PMIC8058_OTHC)             += pmic8058-othc.o
 obj-$(CONFIG_INPUT_PMIC8058_VIBRA_MEMLESS) += pmic8058-vib-memless.o
 obj-$(CONFIG_BOSCH_BMA150)              += bma150.o
 obj-$(CONFIG_STM_LIS3DH)		+= lis3dh_acc.o
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_BMP18X)			+= bmp18x-core.o
+obj-$(CONFIG_BMP18X_I2C)		+= bmp18x-i2c.o
+>>>>>>> cm/cm-11.0

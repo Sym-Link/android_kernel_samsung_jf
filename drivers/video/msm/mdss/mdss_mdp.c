@@ -580,6 +580,7 @@ error:
 	for (i = 0; i < MDSS_MAX_CLK; i++) {
 		if (mdss_res->mdp_clk[i])
 			clk_put(mdss_res->mdp_clk[i]);
+<<<<<<< HEAD
 }
 
 static int mdss_iommu_fault_handler(struct iommu_domain *domain,
@@ -626,6 +627,8 @@ int mdss_iommu_dettach(struct mdss_data_type *mdata)
 	if (!mdata->iommu_attached) {
 		pr_warn("mdp iommu already dettached\n");
 		return 0;
+=======
+>>>>>>> cm/cm-11.0
 	}
 	if (mdss_res->fs)
 		regulator_put(mdss_res->fs);
@@ -640,6 +643,7 @@ static struct msm_panel_common_pdata *mdss_mdp_populate_pdata(
 	struct device *dev)
 {
 	struct msm_panel_common_pdata *pdata;
+<<<<<<< HEAD
 	struct msm_iova_layout layout;
 	struct iommu_domain *domain;
 	struct mdss_iommu_map_type *iomap;
@@ -669,6 +673,8 @@ static struct msm_panel_common_pdata *mdss_mdp_populate_pdata(
 			return -EINVAL;
 		}
 		iommu_set_fault_handler(domain, mdss_iommu_fault_handler, NULL);
+=======
+>>>>>>> cm/cm-11.0
 
 	pdata = devm_kzalloc(dev, sizeof(*pdata), GFP_KERNEL);
 	if (!pdata)

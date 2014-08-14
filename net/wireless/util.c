@@ -876,6 +876,7 @@ int cfg80211_change_iface(struct cfg80211_registered_device *rdev,
 	return err;
 }
 
+<<<<<<< HEAD
 static u32 cfg80211_calculate_bitrate_vht(struct rate_info *rate)
 {
 	static const u32 base[4][10] = {
@@ -945,10 +946,13 @@ static u32 cfg80211_calculate_bitrate_vht(struct rate_info *rate)
 	return (bitrate + 50000) / 100000;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 u16 cfg80211_calculate_bitrate(struct rate_info *rate)
 {
 	int modulation, streams, bitrate;
 
+<<<<<<< HEAD
 	if (!(rate->flags & RATE_INFO_FLAGS_MCS) &&
 	    !(rate->flags & RATE_INFO_FLAGS_VHT_MCS))
 		return rate->legacy;
@@ -956,6 +960,11 @@ u16 cfg80211_calculate_bitrate(struct rate_info *rate)
 	if (rate->flags & RATE_INFO_FLAGS_VHT_MCS)
 		return cfg80211_calculate_bitrate_vht(rate);
 
+=======
+	if (!(rate->flags & RATE_INFO_FLAGS_MCS))
+		return rate->legacy;
+
+>>>>>>> cm/cm-11.0
 	/* the formula below does only work for MCS values smaller than 32 */
 	if (rate->mcs >= 32)
 		return 0;

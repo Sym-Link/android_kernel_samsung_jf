@@ -123,6 +123,11 @@ obj-$(CONFIG_SIGNATURE) += digsig.o
 
 obj-$(CONFIG_CLZ_TAB) += clz_tab.o
 
+<<<<<<< HEAD
+=======
+obj-$(CONFIG_QMI_ENCDEC) += qmi_encdec.o
+
+>>>>>>> cm/cm-11.0
 hostprogs-y	:= gen_crc32table
 clean-files	:= crc32table.h
 

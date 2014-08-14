@@ -169,9 +169,12 @@ int pm8xxx_watchdog_reset_control(int enable);
  */
 int pm8xxx_hard_reset_config(enum pm8xxx_pon_config config);
 
+<<<<<<< HEAD
 int pm8xxx_hard_reset_enabled(void);
 int pm8xxx_hard_reset_control(int enable);
 
+=======
+>>>>>>> cm/cm-11.0
 /**
  * pm8xxx_stay_on - enables stay_on feature
  *
@@ -227,6 +230,19 @@ int pm8xxx_aux_clk_control(enum pm8xxx_aux_clk_id clk_id,
  * RETURNS: an appropriate -ERRNO error value on error, or zero for success.
  */
 int pm8xxx_hsed_bias_control(enum pm8xxx_hsed_bias bias, bool enable);
+<<<<<<< HEAD
+=======
+
+/**
+ * pm8xxx_read_register - Read a PMIC register
+ * @addr: PMIC register address
+ * @value: Output parameter which gets the value of the register read.
+ *
+ * RETURNS: an appropriate -ERRNO error value on error, or zero for success.
+ */
+int pm8xxx_read_register(u16 addr, u8 *value);
+
+>>>>>>> cm/cm-11.0
 #else
 
 static inline int pm8xxx_reset_pwr_off(int reset)

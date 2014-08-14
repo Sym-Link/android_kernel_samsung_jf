@@ -29,13 +29,24 @@
 #define TSP_BOOSTER
 #endif
 #ifdef TSP_BOOSTER
+<<<<<<< HEAD
+=======
+#define DVFS_STAGE_NINTH		9
+>>>>>>> cm/cm-11.0
 #define DVFS_STAGE_DUAL		2
 #define DVFS_STAGE_SINGLE	1
 #define DVFS_STAGE_NONE		0
 #include <linux/cpufreq.h>
 
+<<<<<<< HEAD
 #define TOUCH_BOOSTER_OFF_TIME	3000
 #define TOUCH_BOOSTER_CHG_TIME	300
+=======
+#define TOUCH_BOOSTER_OFF_TIME	300
+#define TOUCH_BOOSTER_CHG_TIME	200
+#define TOUCH_BOOSTER_HIGH_OFF_TIME	1000
+#define TOUCH_BOOSTER_HIGH_CHG_TIME	500
+>>>>>>> cm/cm-11.0
 #endif
 
 /* To support suface touch, firmware should support data
@@ -49,8 +60,11 @@
 #if defined(CONFIG_MACH_JACTIVE_EUR) || defined(CONFIG_MACH_JACTIVE_ATT)
 #define FW_IMAGE_NAME_B0_HSYNC		"tsp_synaptics/jactive/synaptics_b0_hsync.fw"
 #define FW_IMAGE_NAME_B0_HSYNC_FAC	"tsp_synaptics/jactive/synaptics_b0_hsync_fac.fw"
+<<<<<<< HEAD
 #define FW_IMAGE_NAME_B0_HSYNC04	"tsp_synaptics/jactive/synaptics_b0_hsync04.fw"
 #define FW_IMAGE_NAME_B0_HSYNC04_FAC	"tsp_synaptics/jactive/synaptics_b0_hsync04_fac.fw"
+=======
+>>>>>>> cm/cm-11.0
 
 /* NON HYNC F/W will be removed */
 /* PRODUCT ID : SY 01, SY 02, S5000B */
@@ -212,6 +226,21 @@ struct synaptics_finger {
 	unsigned short mcount;
 };
 
+<<<<<<< HEAD
+=======
+#if defined(CONFIG_TOUCHSCREEN_FACTORY_PLATFORM)
+/*
+ * struct synaptics_hover - Represents Hovering.
+ * @ state: Hover status.
+ * @ mcount: moving counter for debug.
+ */
+struct synaptics_hover {
+	unsigned char state;
+	unsigned short mcount;
+};
+#endif
+
+>>>>>>> cm/cm-11.0
 /*
  * struct synaptics_rmi4_data - rmi4 device instance data
  * @i2c_client: pointer to associated i2c client
@@ -259,6 +288,12 @@ struct synaptics_rmi4_data {
 
 	struct completion init_done;
 	struct synaptics_finger finger[MAX_NUMBER_OF_FINGERS];
+<<<<<<< HEAD
+=======
+#if defined (CONFIG_TOUCHSCREEN_FACTORY_PLATFORM)
+	struct synaptics_hover hover;
+#endif
+>>>>>>> cm/cm-11.0
 
 	unsigned char current_page;
 	unsigned char button_0d_enabled;
@@ -296,6 +331,10 @@ struct synaptics_rmi4_data {
 	int fw_version_of_bin;		/* firmware version of binary */
 	int fw_release_date_of_ic;	/* Config release data from IC */
 	int panel_revision;		/* Octa panel revision */
+<<<<<<< HEAD
+=======
+	int factory_read_panel_wakeup;
+>>>>>>> cm/cm-11.0
 	bool doing_reflash;
 
 #ifdef CONFIG_GLOVE_TOUCH

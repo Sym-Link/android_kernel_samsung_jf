@@ -18,7 +18,20 @@
 #include "nl80211.h"
 #include "wext-compat.h"
 
+<<<<<<< HEAD
 #define IEEE80211_SCAN_RESULT_EXPIRE	(3 * HZ)
+=======
+/*
+* Scan result expire time related to scan update.
+* samsung model need more time than google for
+* first connect and update ap list.
+*/
+#if defined (CONFIG_BCM4335)||defined (CONFIG_BCM4335_MODULE)
+#define IEEE80211_SCAN_RESULT_EXPIRE	(6 * HZ)
+#else
+#define IEEE80211_SCAN_RESULT_EXPIRE	(3 * HZ)
+#endif
+>>>>>>> cm/cm-11.0
 
 void ___cfg80211_scan_done(struct cfg80211_registered_device *rdev, bool leak)
 {
@@ -360,8 +373,15 @@ static int cmp_bss_core(struct cfg80211_bss *a,
 {
 	int r;
 
+<<<<<<< HEAD
 	if (a->channel != b->channel)
 		return b->channel->center_freq - a->channel->center_freq;
+=======
+#if !(defined(CONFIG_BCM4335) || defined(CONFIG_BCM4335_MODULE))
+	if (a->channel != b->channel)
+		return b->channel->center_freq - a->channel->center_freq;
+#endif /* CONFIG_BCM4335 */
+>>>>>>> cm/cm-11.0
 
 	if (is_mesh_bss(a) && is_mesh_bss(b)) {
 		r = cmp_ies(WLAN_EID_MESH_ID,
@@ -378,7 +398,18 @@ static int cmp_bss_core(struct cfg80211_bss *a,
 			       b->len_information_elements);
 	}
 
+<<<<<<< HEAD
 	return memcmp(a->bssid, b->bssid, ETH_ALEN);
+=======
+	r = memcmp(a->bssid, b->bssid, ETH_ALEN);
+#if defined(CONFIG_BCM4335) || defined(CONFIG_BCM4335_MODULE)
+	if (r)
+		return r;
+	if (a->channel != b->channel)
+		return b->channel->center_freq - a->channel->center_freq;
+#endif /* CONFIG_BCM4335 */
+	return r;
+>>>>>>> cm/cm-11.0
 }
 
 static int cmp_bss(struct cfg80211_bss *a,

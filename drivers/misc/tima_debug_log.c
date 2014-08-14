@@ -34,6 +34,7 @@ typedef struct debug_log_header_s
 
 unsigned long *tima_debug_log_addr = 0;
 
+<<<<<<< HEAD
 /**
  *      tima_proc_show - Handler for writing TIMA Log into sequential Buffer
  */
@@ -60,6 +61,27 @@ static const struct file_operations tima_proc_fops = {
 	.read		= seq_read,
 	.llseek		= seq_lseek,
 	.release	= single_release,
+=======
+ssize_t	tima_read(struct file *filep, char __user *buf, size_t size, loff_t *offset)
+{
+	/* First check is to get rid of integer overflow exploits */
+	if (size > DEBUG_LOG_SIZE || (*offset) + size > DEBUG_LOG_SIZE) {
+		printk(KERN_ERR"Extra read\n");
+		return -EINVAL;
+	}
+
+	if (copy_to_user(buf, (const char *)tima_debug_log_addr + (*offset), size)) {
+		printk(KERN_ERR"Copy to user failed\n");
+		return -1;
+	} else {
+		*offset += size;
+		return size;
+	}
+}
+
+static const struct file_operations tima_proc_fops = {
+	.read		= tima_read,
+>>>>>>> cm/cm-11.0
 };
 
 /**

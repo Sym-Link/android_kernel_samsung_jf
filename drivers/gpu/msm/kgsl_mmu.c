@@ -68,8 +68,15 @@ static int kgsl_setup_pt(struct kgsl_pagetable *pt)
 	device = kgsl_driver.devp[KGSL_DEVICE_3D0];
 	if (device->mmu.mmu_ops->mmu_setup_pt != NULL) {
 		status = device->mmu.mmu_ops->mmu_setup_pt(&device->mmu, pt);
+<<<<<<< HEAD
 		if (status)
 			goto error_pt;
+=======
+		if (status) {
+			i = KGSL_DEVICE_MAX - 1;
+			goto error_pt;
+		}
+>>>>>>> cm/cm-11.0
 	}
 	return status;
 error_pt:
@@ -134,12 +141,20 @@ kgsl_get_pagetable(unsigned long name)
 static struct kgsl_pagetable *
 _get_pt_from_kobj(struct kobject *kobj)
 {
+<<<<<<< HEAD
 	unsigned long ptname;
+=======
+	unsigned int ptname;
+>>>>>>> cm/cm-11.0
 
 	if (!kobj)
 		return NULL;
 
+<<<<<<< HEAD
 	if (sscanf(kobj->name, "%ld", &ptname) != 1)
+=======
+	if (kstrtou32(kobj->name, 0, &ptname))
+>>>>>>> cm/cm-11.0
 		return NULL;
 
 	return kgsl_get_pagetable(ptname);

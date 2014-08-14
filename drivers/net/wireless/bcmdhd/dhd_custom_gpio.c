@@ -1,7 +1,11 @@
 /*
 * Customer code to add GPIO control during WLAN start/stop
 * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
 * 
+=======
+*
+>>>>>>> cm/cm-11.0
 *      Unless you and Broadcom execute a separate written software license
 * agreement governing use of this software, this software is licensed to you
 * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -54,7 +58,11 @@ int wifi_get_irq_number(unsigned long *irq_flags_ptr) { return -1; }
 int wifi_get_mac_addr(unsigned char *buf) { return -1; }
 void *wifi_get_country_code(char *ccode) { return NULL; }
 #endif /* CONFIG_WIFI_CONTROL_FUNC */
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 #if defined(OOB_INTR_ONLY) || defined(BCMSPI_ANDROID)
 
@@ -110,8 +118,13 @@ int dhd_customer_oob_irq_map(unsigned long *irq_flags_ptr)
 	gpio_request(dhd_oob_gpio_num, "oob irq");
 	host_oob_irq = gpio_to_irq(dhd_oob_gpio_num);
 	gpio_direction_input(dhd_oob_gpio_num);
+<<<<<<< HEAD
 #endif 
 #endif 
+=======
+#endif
+#endif
+>>>>>>> cm/cm-11.0
 
 	return (host_oob_irq);
 }
@@ -275,6 +288,10 @@ void get_customized_country_code(char *country_iso_code, wl_country_t *cspec)
 	cspec->rev = translate_custom_table[0].custom_locale_rev;
 #endif /* EXMAPLE_TABLE */
 	return;
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 }
 #endif /* CUSTOMER_HW4 */

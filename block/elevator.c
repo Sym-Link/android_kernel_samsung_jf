@@ -814,9 +814,16 @@ void elv_completed_request(struct request_queue *q, struct request *rq)
 {
 	struct elevator_queue *e = q->elevator;
 
+<<<<<<< HEAD
 	if (rq->cmd_flags & REQ_URGENT) {
 		q->notified_urgent = false;
 		q->dispatched_urgent = false;
+=======
+	if (test_bit(REQ_ATOM_URGENT, &rq->atomic_flags)) {
+		q->notified_urgent = false;
+		q->dispatched_urgent = false;
+		blk_clear_rq_urgent(rq);
+>>>>>>> cm/cm-11.0
 	}
 	/*
 	 * request is released from the driver, io must be done

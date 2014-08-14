@@ -76,6 +76,7 @@ obj-$(CONFIG_QSEECOM)  += tzic.o
 obj-y += tspdrv/
 obj-$(CONFIG_BCM2079X_NFC_I2C)	+= bcm2079x-i2c.o
 obj-$(CONFIG_SEC_MISC)		+= sec_param.o sec_misc.o
+<<<<<<< HEAD
 obj-$(CONFIG_MFD_MAX77693)	+= max77693-muic.o
 obj-$(CONFIG_SAMSUNG_JACK)	+= sec_jack.o
 obj-$(CONFIG_BU52031NVX) += pm8xxx-cradle.o
@@ -84,3 +85,17 @@ obj-$(CONFIG_SEC_TORCH_FLASH)	+= sec_torch.o
 ifeq ($(TIMA_ENABLED),1)
 obj-$(CONFIG_TIMA_LOG)		+= tima_debug_log.o
 endif
+=======
+ifdef CONFIG_MACH_MELIUS
+obj-$(CONFIG_MFD_MAX77693)      += max77693-muic_melius.o
+endif
+ifdef CONFIG_MACH_JF
+obj-$(CONFIG_MFD_MAX77693)      += max77693-muic.o
+endif
+obj-$(CONFIG_SAMSUNG_JACK)	+= sec_jack.o
+obj-$(CONFIG_BU52031NVX) += pm8xxx-cradle.o
+obj-$(CONFIG_SLIMPORT_ANX7808)	+= slimport_anx7808/
+obj-$(CONFIG_2MIC_ES305)		+= a2220.o
+obj-$(CONFIG_SEC_TORCH_FLASH)	+= sec_torch.o
+obj-$(CONFIG_TIMA_LOG)		+= tima_debug_log.o
+>>>>>>> cm/cm-11.0

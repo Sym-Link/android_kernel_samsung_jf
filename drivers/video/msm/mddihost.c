@@ -11,6 +11,10 @@
  *
  */
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cm/cm-11.0
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/slab.h>

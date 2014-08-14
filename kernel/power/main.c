@@ -22,10 +22,13 @@
 #include <linux/cpufreq.h>
 #endif
 
+<<<<<<< HEAD
 #include <linux/mfd/pm8xxx/misc.h>
 #include <mach/sec_debug.h>
 #include <mach/restart.h>
 
+=======
+>>>>>>> cm/cm-11.0
 #define MAX_BUF 100
 
 DEFINE_MUTEX(pm_mutex);
@@ -715,6 +718,7 @@ power_attr(cpufreq_min_limit);
 power_attr(cpufreq_table);
 #endif
 
+<<<<<<< HEAD
 static ssize_t hard_reset_ctl_show(struct kobject *kobj,
 		struct kobj_attribute *attr, char *buf)
 {
@@ -748,6 +752,8 @@ static ssize_t hard_reset_ctl_store(struct kobject *kobj,
 
 power_attr(hard_reset_ctl);
 
+=======
+>>>>>>> cm/cm-11.0
 static struct attribute *g[] = {
 	&state_attr.attr,
 #ifdef CONFIG_PM_TRACE
@@ -772,7 +778,10 @@ static struct attribute *g[] = {
 	&cpufreq_max_limit_attr.attr,
 	&cpufreq_table_attr.attr,
 #endif
+<<<<<<< HEAD
 	&hard_reset_ctl_attr.attr,
+=======
+>>>>>>> cm/cm-11.0
 	NULL,
 };
 

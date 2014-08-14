@@ -754,6 +754,21 @@ ENDPROC(__switch_to)
 #endif
 	.endm
 
+<<<<<<< HEAD
+=======
+	.macro	kuser_pad, sym, size
+	.if	(. - \sym) & 3
+	.rept	4 - (. - \sym) & 3
+	.byte	0
+	.endr
+	.endif
+	.rept	(\size - (. - \sym)) / 4
+	.word	0xe7fddef1
+	.endr
+	.endm
+
+#ifdef CONFIG_KUSER_HELPERS
+>>>>>>> cm/cm-11.0
 	.align	5
 	.globl	__kuser_helper_start
 __kuser_helper_start:
@@ -935,18 +950,26 @@ kuser_cmpxchg64_fixup:
 #error "incoherent kernel configuration"
 #endif
 
+<<<<<<< HEAD
 	/* pad to next slot */
 	.rept	(16 - (. - __kuser_cmpxchg64)/4)
 	.word	0
 	.endr
 
 	.align	5
+=======
+	kuser_pad __kuser_cmpxchg64, 64
+>>>>>>> cm/cm-11.0
 
 __kuser_memory_barrier:				@ 0xffff0fa0
 	smp_dmb	arm
 	usr_ret	lr
 
+<<<<<<< HEAD
 	.align	5
+=======
+	kuser_pad __kuser_memory_barrier, 32
+>>>>>>> cm/cm-11.0
 
 __kuser_cmpxchg:				@ 0xffff0fc0
 
@@ -1019,13 +1042,22 @@ kuser_cmpxchg32_fixup:
 
 #endif
 
+<<<<<<< HEAD
 	.align	5
+=======
+	kuser_pad __kuser_cmpxchg, 32
+>>>>>>> cm/cm-11.0
 
 __kuser_get_tls:				@ 0xffff0fe0
 	ldr	r0, [pc, #(16 - 8)]	@ read TLS, set in kuser_get_tls_init
 	usr_ret	lr
 	mrc	p15, 0, r0, c13, c0, 3	@ 0xffff0fe8 hardware TLS code
+<<<<<<< HEAD
 	.rep	4
+=======
+	kuser_pad __kuser_get_tls, 16
+	.rep	3
+>>>>>>> cm/cm-11.0
 	.word	0			@ 0xffff0ff0 software TLS value, then
 	.endr				@ pad up to __kuser_helper_version
 
@@ -1035,14 +1067,25 @@ __kuser_helper_version:				@ 0xffff0ffc
 	.globl	__kuser_helper_end
 __kuser_helper_end:
 
+<<<<<<< HEAD
+=======
+#endif
+
+>>>>>>> cm/cm-11.0
  THUMB(	.thumb	)
 
 /*
  * Vector stubs.
  *
+<<<<<<< HEAD
  * This code is copied to 0xffff0200 so we can use branches in the
  * vectors, rather than ldr's.  Note that this code must not
  * exceed 0x300 bytes.
+=======
+ * This code is copied to 0xffff1000 so we can use branches in the
+ * vectors, rather than ldr's.  Note that this code must not exceed
+ * a page size.
+>>>>>>> cm/cm-11.0
  *
  * Common stub entry macro:
  *   Enter in IRQ mode, spsr = SVC/USR CPSR, lr = SVC/USR PC
@@ -1101,8 +1144,22 @@ ENDPROC(vector_\name)
 1:
 	.endm
 
+<<<<<<< HEAD
 	.globl	__stubs_start
 __stubs_start:
+=======
+	.section .stubs, "ax", %progbits
+__stubs_start:
+	@ This must be the first word
+	.word	vector_swi
+
+vector_rst:
+ ARM(	swi	SYS_ERROR0	)
+ THUMB(	svc	#0		)
+ THUMB(	nop			)
+	b	vector_und
+
+>>>>>>> cm/cm-11.0
 /*
  * Interrupt dispatcher
  */
@@ -1197,6 +1254,19 @@ __stubs_start:
 	.align	5
 
 /*=============================================================================
+<<<<<<< HEAD
+=======
+ * Address exception handler
+ *-----------------------------------------------------------------------------
+ * These aren't too critical.
+ * (they're not supposed to happen, and won't happen in 32-bit data mode).
+ */
+
+vector_addrexcptn:
+	b	vector_addrexcptn
+
+/*=============================================================================
+>>>>>>> cm/cm-11.0
  * Undefined FIQs
  *-----------------------------------------------------------------------------
  * Enter in FIQ mode, spsr = ANY CPSR, lr = ANY PC
@@ -1209,6 +1279,7 @@ __stubs_start:
 vector_fiq:
 	subs	pc, lr, #4
 
+<<<<<<< HEAD
 /*=============================================================================
  * Address exception handler
  *-----------------------------------------------------------------------------
@@ -1250,6 +1321,24 @@ __vectors_start:
 
 	.globl	__vectors_end
 __vectors_end:
+=======
+.krait_fixup:
+	.word	msm_krait_need_wfe_fixup
+
+	.globl	vector_fiq_offset
+	.equ	vector_fiq_offset, vector_fiq
+
+	.section .vectors, "ax", %progbits
+__vectors_start:
+	W(b)	vector_rst
+	W(b)	vector_und
+	W(ldr)	pc, __vectors_start + 0x1000
+	W(b)	vector_pabt
+	W(b)	vector_dabt
+	W(b)	vector_addrexcptn
+	W(b)	vector_irq
+	W(b)	vector_fiq
+>>>>>>> cm/cm-11.0
 
 	.data
 

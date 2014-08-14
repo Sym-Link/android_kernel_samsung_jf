@@ -15,7 +15,10 @@
 #include "vidc_hwio.h"
 #include "vidc_pix_cache.h"
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 #define VIDC_TILE_MULTIPLY_FACTOR 8192
 
 void vidc_pix_cache_sw_reset(void)

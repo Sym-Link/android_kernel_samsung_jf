@@ -302,6 +302,7 @@ unsigned long vmalloc_to_pfn(const void *addr);
  * On nommu, vmalloc/vfree wrap through kmalloc/kfree directly, so there
  * is no special casing required.
  */
+<<<<<<< HEAD
 static inline int is_vmalloc_addr(const void *x)
 {
 #ifdef CONFIG_MMU
@@ -312,6 +313,18 @@ static inline int is_vmalloc_addr(const void *x)
 	return 0;
 #endif
 }
+=======
+
+#ifdef CONFIG_MMU
+extern int is_vmalloc_addr(const void *x);
+#else
+static inline int is_vmalloc_addr(const void *x)
+{
+	return 0;
+}
+#endif
+
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_MMU
 extern int is_vmalloc_or_module_addr(const void *x);
 #else
@@ -894,7 +907,12 @@ extern void pagefault_out_of_memory(void);
  * Flags passed to show_mem() and show_free_areas() to suppress output in
  * various contexts.
  */
+<<<<<<< HEAD
 #define SHOW_MEM_FILTER_NODES	(0x0001u)	/* filter disallowed nodes */
+=======
+#define SHOW_MEM_FILTER_NODES		(0x0001u)	/* disallowed nodes */
+#define SHOW_MEM_FILTER_PAGE_COUNT	(0x0002u)	/* page type count */
+>>>>>>> cm/cm-11.0
 
 extern void show_free_areas(unsigned int flags);
 extern bool skip_free_areas_node(unsigned int flags, int nid);
@@ -1536,6 +1554,11 @@ int vm_insert_pfn(struct vm_area_struct *vma, unsigned long addr,
 			unsigned long pfn);
 int vm_insert_mixed(struct vm_area_struct *vma, unsigned long addr,
 			unsigned long pfn);
+<<<<<<< HEAD
+=======
+int vm_iomap_memory(struct vm_area_struct *vma, phys_addr_t start, unsigned long len);
+
+>>>>>>> cm/cm-11.0
 
 struct page *follow_page(struct vm_area_struct *, unsigned long address,
 			unsigned int foll_flags);

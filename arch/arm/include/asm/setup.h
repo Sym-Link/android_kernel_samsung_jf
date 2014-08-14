@@ -196,7 +196,11 @@ static const struct tagtable __tagtable_##fn __tag = { tag, fn }
 
 struct membank {
 	phys_addr_t start;
+<<<<<<< HEAD
 	phys_addr_t size;
+=======
+	unsigned long size;
+>>>>>>> cm/cm-11.0
 	unsigned int highmem;
 };
 
@@ -218,6 +222,7 @@ extern struct meminfo meminfo;
 #define bank_phys_end(bank)	((bank)->start + (bank)->size)
 #define bank_phys_size(bank)	(bank)->size
 
+<<<<<<< HEAD
 extern int arm_add_memory(phys_addr_t start, phys_addr_t size);
 extern void early_print(const char *str, ...);
 extern void dump_machine_table(void);
@@ -234,6 +239,12 @@ struct early_params {
 static struct early_params __early_##fn __used			\
 __attribute__((__section__(".early_param.init"))) = { name, fn }
 
+=======
+extern int arm_add_memory(phys_addr_t start, unsigned long size);
+extern void early_print(const char *str, ...);
+extern void dump_machine_table(void);
+
+>>>>>>> cm/cm-11.0
 #endif  /*  __KERNEL__  */
 
 #endif

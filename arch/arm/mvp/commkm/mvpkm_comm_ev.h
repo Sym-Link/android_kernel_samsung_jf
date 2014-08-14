@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Guest Communications
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -27,7 +31,11 @@
 #ifndef _MVPKM_COMM_EV_H
 #define _MVPKM_COMM_EV_H
 
+<<<<<<< HEAD
 extern int (*CommTranspEvProcess)(CommTranspID* id, CommTranspIOEvent event);
+=======
+extern int (*CommTranspEvProcess)(CommTranspID *id, CommTranspIOEvent event);
+>>>>>>> cm/cm-11.0
 
 /**
  * @brief Forward any guest signal requests to the commkm module
@@ -36,19 +44,33 @@ extern int (*CommTranspEvProcess)(CommTranspID* id, CommTranspIOEvent event);
  */
 
 static inline void
+<<<<<<< HEAD
 Mvpkm_CommEvSignal(CommTranspID *id, CommTranspIOEvent event)
 {
    if (CommTranspEvProcess) {
       CommTranspEvProcess(id, event);
    }
+=======
+Mvpkm_CommEvSignal(CommTranspID *id,
+		   CommTranspIOEvent event)
+{
+	if (CommTranspEvProcess)
+		CommTranspEvProcess(id, event);
+>>>>>>> cm/cm-11.0
 }
 
 void
 Mvpkm_CommEvRegisterProcessCB(int (*commProcessFunc)(CommTranspID*,
+<<<<<<< HEAD
                                                      CommTranspIOEvent));
 void Mvpkm_CommEvUnregisterProcessCB(void);
 
 
 
+=======
+						     CommTranspIOEvent));
+void Mvpkm_CommEvUnregisterProcessCB(void);
+
+>>>>>>> cm/cm-11.0
 #endif
 

@@ -239,7 +239,11 @@ void timer_stats_update_stats(void *timer, pid_t pid, void *startf,
 	 * It doesn't matter which lock we take:
 	 */
 	raw_spinlock_t *lock;
+<<<<<<< HEAD
 	struct entry *entry, input;
+=======
+	struct entry *entry, input = {0};
+>>>>>>> cm/cm-11.0
 	unsigned long flags;
 
 	if (likely(!timer_stats_active))

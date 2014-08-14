@@ -52,9 +52,12 @@
 #define EXT4_EXT_MARK_UNINIT1	0x2  /* mark first half uninitialized */
 #define EXT4_EXT_MARK_UNINIT2	0x4  /* mark second half uninitialized */
 
+<<<<<<< HEAD
 #define EXT4_EXT_DATA_VALID1	0x8  /* first half contains valid data */
 #define EXT4_EXT_DATA_VALID2	0x10 /* second half contains valid data */
 
+=======
+>>>>>>> cm/cm-11.0
 static int ext4_split_extent(handle_t *handle,
 				struct inode *inode,
 				struct ext4_ext_path *path,
@@ -2110,14 +2113,22 @@ ext4_ext_in_cache(struct inode *inode, ext4_lblk_t block,
  * removes index from the index block.
  */
 static int ext4_ext_rm_idx(handle_t *handle, struct inode *inode,
+<<<<<<< HEAD
 			struct ext4_ext_path *path, int depth)
+=======
+			struct ext4_ext_path *path)
+>>>>>>> cm/cm-11.0
 {
 	int err;
 	ext4_fsblk_t leaf;
 
 	/* free index block */
+<<<<<<< HEAD
 	depth--;
 	path = path + depth;
+=======
+	path--;
+>>>>>>> cm/cm-11.0
 	leaf = ext4_idx_pblock(path->p_idx);
 	if (unlikely(path->p_hdr->eh_entries == 0)) {
 		EXT4_ERROR_INODE(inode, "path->p_hdr->eh_entries == 0");
@@ -2142,6 +2153,7 @@ static int ext4_ext_rm_idx(handle_t *handle, struct inode *inode,
 
 	ext4_free_blocks(handle, inode, NULL, leaf, 1,
 			 EXT4_FREE_BLOCKS_METADATA | EXT4_FREE_BLOCKS_FORGET);
+<<<<<<< HEAD
 
 	while (--depth >= 0) {
 		if (path->p_idx != EXT_FIRST_INDEX(path->p_hdr))
@@ -2155,6 +2167,8 @@ static int ext4_ext_rm_idx(handle_t *handle, struct inode *inode,
 		if (err)
 			break;
 	}
+=======
+>>>>>>> cm/cm-11.0
 	return err;
 }
 
@@ -2225,6 +2239,7 @@ static int ext4_remove_blocks(handle_t *handle, struct inode *inode,
 	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
 	unsigned short ee_len =  ext4_ext_get_actual_len(ex);
 	ext4_fsblk_t pblk;
+<<<<<<< HEAD
 	int flags = 0;
 
 	if (S_ISDIR(inode->i_mode) || S_ISLNK(inode->i_mode))
@@ -2232,6 +2247,12 @@ static int ext4_remove_blocks(handle_t *handle, struct inode *inode,
 	else if (ext4_should_journal_data(inode))
 		flags |= EXT4_FREE_BLOCKS_FORGET;
 
+=======
+	int flags = EXT4_FREE_BLOCKS_FORGET;
+
+	if (S_ISDIR(inode->i_mode) || S_ISLNK(inode->i_mode))
+		flags |= EXT4_FREE_BLOCKS_METADATA;
+>>>>>>> cm/cm-11.0
 	/*
 	 * For bigalloc file systems, we never free a partial cluster
 	 * at the beginning of the extent.  Instead, we make a note
@@ -2491,7 +2512,11 @@ ext4_ext_rm_leaf(handle_t *handle, struct inode *inode,
 	/* if this leaf is free, then we should
 	 * remove it from index block above */
 	if (err == 0 && eh->eh_entries == 0 && path[depth].p_bh != NULL)
+<<<<<<< HEAD
 		err = ext4_ext_rm_idx(handle, inode, path, depth);
+=======
+		err = ext4_ext_rm_idx(handle, inode, path + depth);
+>>>>>>> cm/cm-11.0
 
 out:
 	return err;
@@ -2523,10 +2548,17 @@ static int ext4_ext_remove_space(struct inode *inode, ext4_lblk_t start,
 {
 	struct super_block *sb = inode->i_sb;
 	int depth = ext_depth(inode);
+<<<<<<< HEAD
 	struct ext4_ext_path *path = NULL;
 	ext4_fsblk_t partial_cluster = 0;
 	handle_t *handle;
 	int i = 0, err;
+=======
+	struct ext4_ext_path *path;
+	ext4_fsblk_t partial_cluster = 0;
+	handle_t *handle;
+	int i, err;
+>>>>>>> cm/cm-11.0
 
 	ext_debug("truncate since %u to %u\n", start, end);
 
@@ -2559,12 +2591,17 @@ again:
 		}
 		depth = ext_depth(inode);
 		ex = path[depth].p_ext;
+<<<<<<< HEAD
 		if (!ex) {
 			ext4_ext_drop_refs(path);
 			kfree(path);
 			path = NULL;
 			goto cont;
 		}
+=======
+		if (!ex)
+			goto cont;
+>>>>>>> cm/cm-11.0
 
 		ee_block = le32_to_cpu(ex->ee_block);
 
@@ -2594,6 +2631,11 @@ again:
 			if (err < 0)
 				goto out;
 		}
+<<<<<<< HEAD
+=======
+		ext4_ext_drop_refs(path);
+		kfree(path);
+>>>>>>> cm/cm-11.0
 	}
 cont:
 
@@ -2602,6 +2644,7 @@ cont:
 	 * after i_size and walking into the tree depth-wise.
 	 */
 	depth = ext_depth(inode);
+<<<<<<< HEAD
 	if (path) {
 		int k = i = depth;
 		while (--k > 0)
@@ -2624,6 +2667,21 @@ cont:
 		}
 	}
 	err = 0;
+=======
+	path = kzalloc(sizeof(struct ext4_ext_path) * (depth + 1), GFP_NOFS);
+	if (path == NULL) {
+		ext4_journal_stop(handle);
+		return -ENOMEM;
+	}
+	path[0].p_depth = depth;
+	path[0].p_hdr = ext_inode_hdr(inode);
+
+	if (ext4_ext_check(inode, path[0].p_hdr, depth)) {
+		err = -EIO;
+		goto out;
+	}
+	i = err = 0;
+>>>>>>> cm/cm-11.0
 
 	while (i >= 0 && err == 0) {
 		if (i == depth) {
@@ -2692,7 +2750,11 @@ cont:
 				/* index is empty, remove it;
 				 * handle must be already prepared by the
 				 * truncatei_leaf() */
+<<<<<<< HEAD
 				err = ext4_ext_rm_idx(handle, inode, path, i);
+=======
+				err = ext4_ext_rm_idx(handle, inode, path + i);
+>>>>>>> cm/cm-11.0
 			}
 			/* root level has p_bh == NULL, brelse() eats this */
 			brelse(path[i].p_bh);
@@ -2737,10 +2799,15 @@ cont:
 out:
 	ext4_ext_drop_refs(path);
 	kfree(path);
+<<<<<<< HEAD
 	if (err == -EAGAIN) {
 		path = NULL;
 		goto again;
 	}
+=======
+	if (err == -EAGAIN)
+		goto again;
+>>>>>>> cm/cm-11.0
 	ext4_journal_stop(handle);
 
 	return err;
@@ -2849,9 +2916,12 @@ static int ext4_split_extent_at(handle_t *handle,
 	unsigned int ee_len, depth;
 	int err = 0;
 
+<<<<<<< HEAD
 	BUG_ON((split_flag & (EXT4_EXT_DATA_VALID1 | EXT4_EXT_DATA_VALID2)) ==
 	       (EXT4_EXT_DATA_VALID1 | EXT4_EXT_DATA_VALID2));
 
+=======
+>>>>>>> cm/cm-11.0
 	ext_debug("ext4_split_extents_at: inode %lu, logical"
 		"block %llu\n", inode->i_ino, (unsigned long long)split);
 
@@ -2910,6 +2980,7 @@ static int ext4_split_extent_at(handle_t *handle,
 
 	err = ext4_ext_insert_extent(handle, inode, path, &newex, flags);
 	if (err == -ENOSPC && (EXT4_EXT_MAY_ZEROOUT & split_flag)) {
+<<<<<<< HEAD
 		if (split_flag & (EXT4_EXT_DATA_VALID1|EXT4_EXT_DATA_VALID2)) {
 			if (split_flag & EXT4_EXT_DATA_VALID1)
 				err = ext4_ext_zeroout(inode, ex2);
@@ -2918,6 +2989,9 @@ static int ext4_split_extent_at(handle_t *handle,
 		} else
 			err = ext4_ext_zeroout(inode, &orig_ex);
 
+=======
+		err = ext4_ext_zeroout(inode, &orig_ex);
+>>>>>>> cm/cm-11.0
 		if (err)
 			goto fix_extent_len;
 		/* update the extent length and mark as initialized */
@@ -2962,7 +3036,10 @@ static int ext4_split_extent(handle_t *handle,
 	int err = 0;
 	int uninitialized;
 	int split_flag1, flags1;
+<<<<<<< HEAD
 	int allocated = map->m_len;
+=======
+>>>>>>> cm/cm-11.0
 
 	depth = ext_depth(inode);
 	ex = path[depth].p_ext;
@@ -2971,19 +3048,30 @@ static int ext4_split_extent(handle_t *handle,
 	uninitialized = ext4_ext_is_uninitialized(ex);
 
 	if (map->m_lblk + map->m_len < ee_block + ee_len) {
+<<<<<<< HEAD
 		split_flag1 = split_flag & EXT4_EXT_MAY_ZEROOUT;
+=======
+		split_flag1 = split_flag & EXT4_EXT_MAY_ZEROOUT ?
+			      EXT4_EXT_MAY_ZEROOUT : 0;
+>>>>>>> cm/cm-11.0
 		flags1 = flags | EXT4_GET_BLOCKS_PRE_IO;
 		if (uninitialized)
 			split_flag1 |= EXT4_EXT_MARK_UNINIT1 |
 				       EXT4_EXT_MARK_UNINIT2;
+<<<<<<< HEAD
 		if (split_flag & EXT4_EXT_DATA_VALID2)
 			split_flag1 |= EXT4_EXT_DATA_VALID1;
+=======
+>>>>>>> cm/cm-11.0
 		err = ext4_split_extent_at(handle, inode, path,
 				map->m_lblk + map->m_len, split_flag1, flags1);
 		if (err)
 			goto out;
+<<<<<<< HEAD
 	} else {
 		allocated = ee_len - (map->m_lblk - ee_block);
+=======
+>>>>>>> cm/cm-11.0
 	}
 
 	ext4_ext_drop_refs(path);
@@ -2992,8 +3080,13 @@ static int ext4_split_extent(handle_t *handle,
 		return PTR_ERR(path);
 
 	if (map->m_lblk >= ee_block) {
+<<<<<<< HEAD
 		split_flag1 = split_flag & (EXT4_EXT_MAY_ZEROOUT |
 					    EXT4_EXT_DATA_VALID2);
+=======
+		split_flag1 = split_flag & EXT4_EXT_MAY_ZEROOUT ?
+			      EXT4_EXT_MAY_ZEROOUT : 0;
+>>>>>>> cm/cm-11.0
 		if (uninitialized)
 			split_flag1 |= EXT4_EXT_MARK_UNINIT1;
 		if (split_flag & EXT4_EXT_MARK_UNINIT2)
@@ -3006,7 +3099,11 @@ static int ext4_split_extent(handle_t *handle,
 
 	ext4_ext_show_leaf(inode, path);
 out:
+<<<<<<< HEAD
 	return err ? err : allocated;
+=======
+	return err ? err : map->m_len;
+>>>>>>> cm/cm-11.0
 }
 
 #define EXT4_EXT_ZERO_LEN 7
@@ -3271,13 +3368,18 @@ static int ext4_split_unwritten_extents(handle_t *handle,
 
 	split_flag |= ee_block + ee_len <= eof_block ? EXT4_EXT_MAY_ZEROOUT : 0;
 	split_flag |= EXT4_EXT_MARK_UNINIT2;
+<<<<<<< HEAD
 	if (flags & EXT4_GET_BLOCKS_CONVERT)
 		split_flag |= EXT4_EXT_DATA_VALID2;
+=======
+
+>>>>>>> cm/cm-11.0
 	flags |= EXT4_GET_BLOCKS_PRE_IO;
 	return ext4_split_extent(handle, inode, path, map, split_flag, flags);
 }
 
 static int ext4_convert_unwritten_extents_endio(handle_t *handle,
+<<<<<<< HEAD
 						struct inode *inode,
 						struct ext4_map_blocks *map,
 						struct ext4_ext_path *path)
@@ -3285,11 +3387,18 @@ static int ext4_convert_unwritten_extents_endio(handle_t *handle,
 	struct ext4_extent *ex;
 	ext4_lblk_t ee_block;
 	unsigned int ee_len;
+=======
+					      struct inode *inode,
+					      struct ext4_ext_path *path)
+{
+	struct ext4_extent *ex;
+>>>>>>> cm/cm-11.0
 	int depth;
 	int err = 0;
 
 	depth = ext_depth(inode);
 	ex = path[depth].p_ext;
+<<<<<<< HEAD
 	ee_block = le32_to_cpu(ex->ee_block);
 	ee_len = ext4_ext_get_actual_len(ex);
 
@@ -3312,6 +3421,13 @@ static int ext4_convert_unwritten_extents_endio(handle_t *handle,
 		depth = ext_depth(inode);
 		ex = path[depth].p_ext;
 	}
+=======
+
+	ext_debug("ext4_convert_unwritten_extents_endio: inode %lu, logical"
+		"block %llu, max_blocks %u\n", inode->i_ino,
+		(unsigned long long)le32_to_cpu(ex->ee_block),
+		ext4_ext_get_actual_len(ex));
+>>>>>>> cm/cm-11.0
 
 	err = ext4_ext_get_access(handle, inode, path + depth);
 	if (err)
@@ -3619,7 +3735,11 @@ ext4_ext_handle_uninitialized_extents(handle_t *handle, struct inode *inode,
 	}
 	/* IO end_io complete, convert the filled extent to written */
 	if ((flags & EXT4_GET_BLOCKS_CONVERT)) {
+<<<<<<< HEAD
 		ret = ext4_convert_unwritten_extents_endio(handle, inode, map,
+=======
+		ret = ext4_convert_unwritten_extents_endio(handle, inode,
+>>>>>>> cm/cm-11.0
 							path);
 		if (ret >= 0) {
 			ext4_update_inode_fsync_trans(handle, inode, 1);
@@ -3674,7 +3794,10 @@ out:
 					allocated - map->m_len);
 		allocated = map->m_len;
 	}
+<<<<<<< HEAD
 	map->m_len = allocated;
+=======
+>>>>>>> cm/cm-11.0
 
 	/*
 	 * If we have done fallocate with the offset that is already
@@ -4716,7 +4839,11 @@ static int ext4_xattr_fiemap(struct inode *inode,
 		error = ext4_get_inode_loc(inode, &iloc);
 		if (error)
 			return error;
+<<<<<<< HEAD
 		physical = (__u64)iloc.bh->b_blocknr << blockbits;
+=======
+		physical = iloc.bh->b_blocknr << blockbits;
+>>>>>>> cm/cm-11.0
 		offset = EXT4_GOOD_OLD_INODE_SIZE +
 				EXT4_I(inode)->i_extra_isize;
 		physical += offset;
@@ -4724,7 +4851,11 @@ static int ext4_xattr_fiemap(struct inode *inode,
 		flags |= FIEMAP_EXTENT_DATA_INLINE;
 		brelse(iloc.bh);
 	} else { /* external block */
+<<<<<<< HEAD
 		physical = (__u64)EXT4_I(inode)->i_file_acl << blockbits;
+=======
+		physical = EXT4_I(inode)->i_file_acl << blockbits;
+>>>>>>> cm/cm-11.0
 		length = inode->i_sb->s_blocksize;
 	}
 

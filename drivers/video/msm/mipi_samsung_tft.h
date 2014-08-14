@@ -50,10 +50,13 @@ enum mipi_samsung_cmd_list {
 	PANEL_CABC_ENABLE,
 	PANEL_CABC_DISABLE,
 #endif
+<<<<<<< HEAD
 #if defined(CONFIG_TOUCHSCREEN_SYNAPTICS_PREVENT_HSYNC_LEAKAGE)
 	PANEL_HSYNC_ON,
 	PANEL_HSYNC_OFF,
 #endif
+=======
+>>>>>>> cm/cm-11.0
 };
 
 enum {
@@ -99,10 +102,13 @@ struct mipi_panel_data {
 	struct cmd_set cabc_enable;
 	struct cmd_set cabc_disable;
 #endif
+<<<<<<< HEAD
 #if defined(CONFIG_TOUCHSCREEN_SYNAPTICS_PREVENT_HSYNC_LEAKAGE)
 	struct cmd_set hsync_on;
 	struct cmd_set hsync_off;
 #endif
+=======
+>>>>>>> cm/cm-11.0
 
 	unsigned int manufacture_id;
 	struct mipi_samsung_driver_data *msd;

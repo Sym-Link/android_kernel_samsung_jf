@@ -1212,7 +1212,10 @@ int sec_debug_subsys_add_varmon(char *name, unsigned int size, unsigned int pa)
 
 	return 0;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_SEC_DEBUG_MDM_FILE_INFO
 void sec_set_mdm_subsys_info(char *str_buf)
 {

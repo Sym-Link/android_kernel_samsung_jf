@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -266,11 +270,23 @@ int wfd_allocate_input_buffers(struct wfd_device *wfd_dev,
 		mmap_context.ion_client = wfd_dev->ion_client;
 		rc = v4l2_subdev_call(&wfd_dev->enc_sdev, core, ioctl,
 				ENC_MMAP, &mmap_context);
+<<<<<<< HEAD
 		if (rc || !enc_mregion->paddr) {
 			WFD_MSG_ERR("Failed to map input memory\n");
 			goto alloc_fail;
 		}
 
+=======
+		if (rc) {
+			WFD_MSG_ERR("Failed to map input memory\n");
+			goto alloc_fail;
+		} else if (!enc_mregion->paddr) {
+			WFD_MSG_ERR("ENC_MMAP returned success" \
+				"but failed to map input memory\n");
+			rc = -EINVAL;
+			goto alloc_fail;
+		}
+>>>>>>> cm/cm-11.0
 		WFD_MSG_DBG("NOTE: enc paddr = [%p->%p], kvaddr = %p\n",
 				enc_mregion->paddr, (int8_t *)
 				enc_mregion->paddr + enc_mregion->size,
@@ -298,7 +314,11 @@ int wfd_allocate_input_buffers(struct wfd_device *wfd_dev,
 		rc = v4l2_subdev_call(&wfd_dev->mdp_sdev, core, ioctl,
 				MDP_MMAP, (void *)&mmap_context);
 
+<<<<<<< HEAD
 		if (rc || !mdp_mregion->paddr) {
+=======
+		if (rc) {
+>>>>>>> cm/cm-11.0
 			WFD_MSG_ERR(
 				"Failed to map to mdp, rc = %d, paddr = 0x%p\n",
 				rc, mdp_mregion->paddr);
@@ -306,6 +326,17 @@ int wfd_allocate_input_buffers(struct wfd_device *wfd_dev,
 			mdp_mregion->paddr = NULL;
 			mdp_mregion->ion_handle = NULL;
 			goto mdp_mmap_fail;
+<<<<<<< HEAD
+=======
+		} else if (!mdp_mregion->paddr) {
+			WFD_MSG_ERR("MDP_MMAP returned success" \
+				"but failed to map to MDP\n");
+			rc = -EINVAL;
+			mdp_mregion->kvaddr = NULL;
+			mdp_mregion->paddr = NULL;
+			mdp_mregion->ion_handle = NULL;
+			goto mdp_mmap_fail;
+>>>>>>> cm/cm-11.0
 		}
 
 		mdp_buf.inst = inst->mdp_inst;
@@ -494,7 +525,11 @@ int wfd_vidbuf_buf_init(struct vb2_buffer *vb)
 		WFD_MSG_ERR("not init buffers since allocation failed");
 		return -ENOBUFS;
 	}
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	mregion.fd = minfo->fd;
 	mregion.offset = minfo->offset;
 	mregion.cookie = (u32)vb;
@@ -674,6 +709,14 @@ int wfd_vidbuf_stop_streaming(struct vb2_queue *q)
 	if (rc)
 		WFD_MSG_ERR("Failed to stop MDP\n");
 
+<<<<<<< HEAD
+=======
+	rc = v4l2_subdev_call(&wfd_dev->enc_sdev, core, ioctl,
+			ENCODE_FLUSH, (void *)inst->venc_inst);
+	if (rc)
+		WFD_MSG_ERR("Failed to flush encoder\n");
+
+>>>>>>> cm/cm-11.0
 	WFD_MSG_DBG("vsg stop\n");
 	rc = v4l2_subdev_call(&wfd_dev->vsg_sdev, core, ioctl,
 			 VSG_STOP, NULL);
@@ -682,10 +725,13 @@ int wfd_vidbuf_stop_streaming(struct vb2_queue *q)
 
 	complete(&inst->stop_mdp_thread);
 	kthread_stop(inst->mdp_task);
+<<<<<<< HEAD
 	rc = v4l2_subdev_call(&wfd_dev->enc_sdev, core, ioctl,
 			ENCODE_FLUSH, (void *)inst->venc_inst);
 	if (rc)
 		WFD_MSG_ERR("Failed to flush encoder\n");
+=======
+>>>>>>> cm/cm-11.0
 	WFD_MSG_DBG("enc stop\n");
 	rc = v4l2_subdev_call(&wfd_dev->enc_sdev, core, ioctl,
 			ENCODE_STOP, (void *)inst->venc_inst);

@@ -982,6 +982,11 @@ static int max77693_muic_attach_usb_type(struct max77693_muic_info *info,
 		info->cable_type = CABLE_TYPE_JIG_USB_ON_MUIC;
 		path = AP_USB_MODE;
 		break;
+<<<<<<< HEAD
+=======
+	case ADC_CEA936ATYPE1_CHG:
+	case ADC_CEA936ATYPE2_CHG:
+>>>>>>> cm/cm-11.0
 	case ADC_OPEN:
 		if (info->cable_type == CABLE_TYPE_USB_MUIC) {
 			dev_info(info->dev, "%s: duplicated(USB)\n", __func__);
@@ -1088,10 +1093,17 @@ static int max77693_muic_attach_dock_type(struct max77693_muic_info *info,
 		msleep(40);
 
 		max77693_muic_set_charging_type(info, false);
+<<<<<<< HEAD
                 
 		if (mdata->usb_cb && info->is_usb_ready)
 			mdata->usb_cb(USB_POWERED_HOST_ATTACHED);
 		                                                 
+=======
+
+		if (mdata->usb_cb && info->is_usb_ready)
+			mdata->usb_cb(USB_POWERED_HOST_ATTACHED);
+
+>>>>>>> cm/cm-11.0
 		if (mdata->audiodock_cb)
 			mdata->audiodock_cb(MAX77693_MUIC_ATTACHED);
 
@@ -1331,10 +1343,17 @@ void otg_control(int enable)
 	 * CABLE_TYPE : CABLE_TYPE_JIG_UART_OFF_MUIC*/
 	if ( gInfo->cable_type!=CABLE_TYPE_OTG_MUIC) {
 		if ( !(gInfo->muic_data->jig_state) &&
+<<<<<<< HEAD
 			gInfo->cable_type==CABLE_TYPE_NONE_MUIC){ 
 			pr_info("%s set some reg values directly"
 				"jig:(%d), CTRL1(%x), ST1(%x), ST2(%x), CABLE(%d)",
 				 __func__, 1, 0x1B, 0x3C, 0x00, 
+=======
+			gInfo->cable_type==CABLE_TYPE_NONE_MUIC){
+			pr_info("%s set some reg values directly"
+				"jig:(%d), CTRL1(%x), ST1(%x), ST2(%x), CABLE(%d)",
+				 __func__, 1, 0x1B, 0x3C, 0x00,
+>>>>>>> cm/cm-11.0
 				 CABLE_TYPE_JIG_UART_OFF_MUIC);
 			gInfo->muic_data->jig_state(true);
 			ret = max77693_write_reg(gInfo->max77693->muic,
@@ -1658,9 +1677,15 @@ static int max77693_muic_handle_attach(struct max77693_muic_info *info,
 		}
 		break;
 	case CABLE_TYPE_AUDIODOCK_MUIC:
+<<<<<<< HEAD
 		if ((adc != ADC_AUDIODOCK) || (!vbvolt)) {                  	
         		dev_warn(info->dev, "%s: assume audiodock detach\n",
         			__func__);
+=======
+		if ((adc != ADC_AUDIODOCK) || (!vbvolt)) {
+			dev_warn(info->dev, "%s: assume audiodock detach\n",
+				__func__);
+>>>>>>> cm/cm-11.0
 			dev_info(info->dev, "%s: AUDIODOCK\n", __func__);
 			info->cable_type = CABLE_TYPE_NONE_MUIC;
 			if (mdata->audiodock_cb)
@@ -1670,7 +1695,21 @@ static int max77693_muic_handle_attach(struct max77693_muic_info *info,
 				mdata->usb_cb(USB_POWERED_HOST_DETACHED);
 			ret = max77693_muic_set_charging_type(info, false);
 			max77693_muic_set_charging_type(info, false);
+<<<<<<< HEAD
 	       	}
+=======
+		}
+		break;
+	case CABLE_TYPE_TA_MUIC:
+		if (((adc != ADC_OPEN) && (adc != ADC_CEA936ATYPE1_CHG) && (adc != ADC_CEA936ATYPE2_CHG))
+			|| (!vbvolt)) {
+			dev_warn(info->dev, "%s: assume ta detach\n",
+				__func__);
+			info->cable_type = CABLE_TYPE_NONE_MUIC;
+			max77693_muic_set_charging_type(info, false);
+			return 0;
+		}
+>>>>>>> cm/cm-11.0
 		break;
 	default:
 		break;
@@ -1800,12 +1839,16 @@ static int max77693_muic_handle_attach(struct max77693_muic_info *info,
 		break;
 	case ADC_CEA936ATYPE1_CHG:
 	case ADC_CEA936ATYPE2_CHG:
+<<<<<<< HEAD
 	case ADC_INCOMPATIBLE1_CHG:
 	case ADC_INCOMPATIBLE2_CHG:
+=======
+>>>>>>> cm/cm-11.0
 	case ADC_OPEN:
 		switch (chgtyp) {
 		case CHGTYP_USB:
 		case CHGTYP_DOWNSTREAM_PORT:
+<<<<<<< HEAD
 			if (adc == ADC_CEA936ATYPE1_CHG
 			    || adc == ADC_CEA936ATYPE2_CHG
 			    || adc == ADC_INCOMPATIBLE1_CHG
@@ -1825,13 +1868,22 @@ static int max77693_muic_handle_attach(struct max77693_muic_info *info,
 					info->cable_type = CABLE_TYPE_NONE_MUIC;
 				break;
 			}
+=======
+#ifdef CONFIG_USBHUB_USB3803
+			/* setting usb hub in default mode (standby) */
+			usb3803_set_mode(USB_3803_MODE_STANDBY);
+#endif /* CONFIG_USBHUB_USB3803 */
+>>>>>>> cm/cm-11.0
 			if (chgtyp == CHGTYP_DOWNSTREAM_PORT) {
 				dev_info(info->dev, "%s, CDP(charging)\n",
 					__func__);
 				info->cable_type = CABLE_TYPE_CDP_MUIC;
+<<<<<<< HEAD
 				ret = max77693_muic_set_charging_type(info, !vbvolt);
 				if(ret)
 					info->cable_type = CABLE_TYPE_NONE_MUIC;
+=======
+>>>>>>> cm/cm-11.0
 			}
 			if (info->cable_type == CABLE_TYPE_MHL_MUIC) {
 				dev_info(info->dev, "%s: MHL(charging)\n",
@@ -1847,6 +1899,7 @@ static int max77693_muic_handle_attach(struct max77693_muic_info *info,
 		case CHGTYP_500MA:
 		case CHGTYP_1A:
 		default:
+<<<<<<< HEAD
 			if (adc == ADC_INCOMPATIBLE1_CHG
 			    || adc == ADC_INCOMPATIBLE2_CHG) {
 				dev_info(info->dev, "%s: INCOMPATIBLE TA\n", __func__);
@@ -1855,6 +1908,10 @@ static int max77693_muic_handle_attach(struct max77693_muic_info *info,
 				dev_info(info->dev, "%s:TA\n", __func__);
 				info->cable_type = CABLE_TYPE_TA_MUIC;
 			}
+=======
+			dev_info(info->dev, "%s:TA\n", __func__);
+			info->cable_type = CABLE_TYPE_TA_MUIC;
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_USBHUB_USB3803
 			/* setting usb hub in default mode (standby) */
 			usb3803_set_mode(USB_3803_MODE_STANDBY);
@@ -1868,6 +1925,14 @@ static int max77693_muic_handle_attach(struct max77693_muic_info *info,
 	default:
 		dev_warn(info->dev, "%s: unsupported adc=0x%x\n", __func__,
 			 adc);
+<<<<<<< HEAD
+=======
+		info->cable_type = CABLE_TYPE_INCOMPATIBLE_MUIC;
+
+		ret = max77693_muic_set_charging_type(info, !vbvolt);
+		if (ret)
+			info->cable_type = CABLE_TYPE_NONE_MUIC;
+>>>>>>> cm/cm-11.0
 		break;
 	}
 	return ret;
@@ -2110,6 +2175,12 @@ static void max77693_muic_detect_dev(struct max77693_muic_info *info, int irq)
 			if (info->cable_type == CABLE_TYPE_OTG_MUIC ||
 			    info->cable_type == CABLE_TYPE_DESKDOCK_MUIC ||
 			    info->cable_type == CABLE_TYPE_CARDOCK_MUIC ||
+<<<<<<< HEAD
+=======
+			    info->cable_type == CABLE_TYPE_SMARTDOCK_MUIC ||
+			    info->cable_type == CABLE_TYPE_SMARTDOCK_TA_MUIC ||
+			    info->cable_type == CABLE_TYPE_SMARTDOCK_USB_MUIC ||
+>>>>>>> cm/cm-11.0
 			    info->cable_type == CABLE_TYPE_AUDIODOCK_MUIC)
 				intr = INT_DETACH;
 		}
@@ -2578,6 +2649,10 @@ static int __devinit max77693_muic_probe(struct platform_device *pdev)
 		MAX77693_MUIC_REG_CDETCTRL1, cdetctrl1);
 	pr_info("%s: CDETCTRL1(0x%02x)\n", __func__, cdetctrl1);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cm/cm-11.0
 	/* Show Register State */
 	max77693_muic_monitor_status();
 
@@ -2608,7 +2683,10 @@ static int __devinit max77693_muic_probe(struct platform_device *pdev)
 	INIT_DELAYED_WORK(&info->mhl_work, max77693_muic_mhl_detect);
 	schedule_delayed_work(&info->mhl_work, msecs_to_jiffies(25000));
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 	return 0;
 
  fail:

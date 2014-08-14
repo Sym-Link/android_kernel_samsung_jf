@@ -1164,6 +1164,7 @@ static void lis3dh_acc_input_work_func(struct work_struct *work)
 	mutex_unlock(&acc->lock);
 }
 
+<<<<<<< HEAD
 int lis3dh_acc_input_open(struct input_dev *input)
 {
 	struct lis3dh_acc_data *acc = input_get_drvdata(input);
@@ -1178,6 +1179,8 @@ void lis3dh_acc_input_close(struct input_dev *dev)
 	lis3dh_acc_disable(acc);
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static int lis3dh_acc_validate_pdata(struct lis3dh_acc_data *acc)
 {
 	acc->pdata->poll_interval = max(acc->pdata->poll_interval,
@@ -1224,8 +1227,11 @@ static int lis3dh_acc_input_init(struct lis3dh_acc_data *acc)
 		goto err0;
 	}
 
+<<<<<<< HEAD
 	acc->input_dev->open = lis3dh_acc_input_open;
 	acc->input_dev->close = lis3dh_acc_input_close;
+=======
+>>>>>>> cm/cm-11.0
 	acc->input_dev->name = LIS3DH_ACC_DEV_NAME;
 	acc->input_dev->id.bustype = BUS_I2C;
 	acc->input_dev->dev.parent = &acc->client->dev;

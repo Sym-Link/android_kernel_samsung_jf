@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -13,6 +17,10 @@
 #ifndef __EXTERNAL_COMMON_H__
 #define __EXTERNAL_COMMON_H__
 #include <linux/switch.h>
+<<<<<<< HEAD
+=======
+#include <video/msm_hdmi_modes.h>
+>>>>>>> cm/cm-11.0
 
 #ifdef DEBUG
 #ifndef DEV_DBG_PREFIX
@@ -26,6 +34,7 @@
 #define DEV_WARN(args...)	dev_warn(external_common_state->dev, args)
 #define DEV_ERR(args...)	dev_err(external_common_state->dev, args)
 
+<<<<<<< HEAD
 #ifdef CONFIG_FB_MSM_TVOUT
 #define TVOUT_VFRMT_NTSC_M_720x480i		0
 #define TVOUT_VFRMT_NTSC_J_720x480i		1
@@ -190,6 +199,15 @@ struct hdmi_disp_mode_timing_type {
  * hardware and driver.  Use HDMI_SETUP_LUT in the module init to
  * setup the LUT with the supported modes. */
 extern struct hdmi_disp_mode_timing_type
+=======
+#if defined(CONFIG_FB_MSM_HDMI_COMMON)
+extern int ext_resolution;
+
+/* A lookup table for all the supported display modes by the HDMI
+ * hardware and driver.  Use HDMI_SETUP_LUT in the module init to
+ * setup the LUT with the supported modes. */
+extern struct msm_hdmi_mode_timing_info
+>>>>>>> cm/cm-11.0
 	hdmi_common_supported_video_mode_lut[HDMI_VFRMT_MAX];
 
 /* Structure that encapsulates all the supported display modes by the HDMI sink
@@ -216,10 +234,17 @@ struct hdmi_disp_mode_list_type {
 
 struct external_common_state_type {
 	boolean hpd_state;
+<<<<<<< HEAD
 	struct kobject *uevent_kobj;
 	struct msm_fb_data_type *mfd;
 	uint32 video_resolution;
 	boolean default_res_supported;
+=======
+	boolean pre_suspend_hpd_state;
+	struct kobject *uevent_kobj;
+	struct msm_fb_data_type *mfd;
+	uint32 video_resolution;
+>>>>>>> cm/cm-11.0
 	struct device *dev;
 	struct switch_dev sdev;
 	struct switch_dev audio_sdev;
@@ -240,8 +265,13 @@ struct external_common_state_type {
 	uint8 pt_scan_info;
 	uint8 it_scan_info;
 	uint8 ce_scan_info;
+<<<<<<< HEAD
 	uint8 spd_vendor_name[8];
 	uint8 spd_product_description[16];
+=======
+	uint8 spd_vendor_name[9];
+	uint8 spd_product_description[17];
+>>>>>>> cm/cm-11.0
 	boolean present_3d;
 	boolean present_hdcp;
 	uint32 audio_data_blocks[16];
@@ -262,6 +292,7 @@ extern struct mutex external_common_state_hpd_mutex;
 extern struct mutex hdmi_msm_state_mutex;
 
 #ifdef CONFIG_FB_MSM_HDMI_COMMON
+<<<<<<< HEAD
 #define VFRMT_NOT_SUPPORTED(VFRMT) \
 	{VFRMT, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FALSE}
 #define HDMI_SETUP_LUT(MODE) do {					\
@@ -283,6 +314,20 @@ const struct hdmi_disp_mode_timing_type *hdmi_mhl_get_supported_mode(
 void hdmi_common_init_panel_info(struct msm_panel_info *pinfo);
 
 ssize_t video_3d_format_2string(uint32 format, char *buf);
+=======
+int hdmi_common_read_edid(void);
+const char *video_format_2string(uint32 format);
+bool hdmi_common_get_video_format_from_drv_data(struct msm_fb_data_type *mfd);
+const struct msm_hdmi_mode_timing_info *hdmi_common_get_mode(uint32 mode);
+const struct msm_hdmi_mode_timing_info *hdmi_common_get_supported_mode(
+	uint32 mode);
+const struct msm_hdmi_mode_timing_info *hdmi_mhl_get_mode(uint32 mode);
+const struct msm_hdmi_mode_timing_info *hdmi_mhl_get_supported_mode(
+	uint32 mode);
+void hdmi_common_init_panel_info(struct msm_panel_info *pinfo);
+
+ssize_t video_3d_format_2string(uint32 format, char *buf, u32 size);
+>>>>>>> cm/cm-11.0
 #endif
 
 int external_common_state_create(struct platform_device *pdev);

@@ -62,8 +62,13 @@
 
 #define MAX_LUT_SIZE	256
 
+<<<<<<< HEAD
 #define PAYLOAD1 mdni_tune_cmd[3]
 #define PAYLOAD2 mdni_tune_cmd[2]
+=======
+#define PAYLOAD1 mdni_tune_cmd[2]
+#define PAYLOAD2 mdni_tune_cmd[1]
+>>>>>>> cm/cm-11.0
 
 #define INPUT_PAYLOAD1(x) PAYLOAD1.payload = x
 #define INPUT_PAYLOAD2(x) PAYLOAD2.payload = x
@@ -71,7 +76,11 @@
 
 int play_speed_1_5;
 #if defined(CONFIG_FB_MSM_MIPI_RENESAS_TFT_VIDEO_FULL_HD_PT_PANEL)
+<<<<<<< HEAD
 static int cabc = -1;
+=======
+static int cabc = 0;
+>>>>>>> cm/cm-11.0
 extern int mipi_samsung_cabc_onoff ( int enable );
 #endif
 
@@ -112,11 +121,20 @@ const char scenario_name[MAX_mDNIe_MODE][16] = {
 #endif
 };
 
+<<<<<<< HEAD
 static char level1_key[] = {
+=======
+static char tune_data1[MDNIE_TUNE_FIRST_SIZE] = {0,};
+static char tune_data2[MDNIE_TUNE_SECOND_SIZE] = {0,};
+
+#if defined(CONFIG_DISPLAY_DISABLE_TEST_KEY)
+static char level1_key_enable[] = {
+>>>>>>> cm/cm-11.0
 	0xF0,
 	0x5A, 0x5A,
 };
 
+<<<<<<< HEAD
 static char level2_key[] = {
 	0xF1,
 	0x5A, 0x5A,
@@ -124,18 +142,49 @@ static char level2_key[] = {
 
 static char tune_data1[MDNIE_TUNE_FIRST_SIZE] = {0,};
 static char tune_data2[MDNIE_TUNE_SECOND_SIZE] = {0,};
+=======
+static char level1_key_disable[] = {
+	0xF0,
+	0xA5, 0xA5,
+};
+
+static struct dsi_cmd_desc mdni_tune_cmd[] = {
+	{DTYPE_DCS_LWRITE, 1, 0, 0, 0,
+		sizeof(level1_key_enable), level1_key_enable},
+
+	{DTYPE_DCS_LWRITE, 1, 0, 0, 0,
+		sizeof(tune_data1), tune_data1},
+	{DTYPE_DCS_LWRITE, 1, 0, 0, 0,
+		sizeof(tune_data2), tune_data2},
+
+	{DTYPE_DCS_LWRITE, 1, 0, 0, 0,
+		sizeof(level1_key_disable), level1_key_disable},
+};
+#else
+static char level1_key[] = {
+	0xF0,
+	0x5A, 0x5A,
+};
+>>>>>>> cm/cm-11.0
 
 static struct dsi_cmd_desc mdni_tune_cmd[] = {
 	{DTYPE_DCS_LWRITE, 1, 0, 0, 0,
 		sizeof(level1_key), level1_key},
+<<<<<<< HEAD
 	{DTYPE_DCS_LWRITE, 1, 0, 0, 0,
 		sizeof(level2_key), level2_key},
+=======
+>>>>>>> cm/cm-11.0
 
 	{DTYPE_DCS_LWRITE, 1, 0, 0, 0,
 		sizeof(tune_data1), tune_data1},
 	{DTYPE_DCS_LWRITE, 1, 0, 0, 0,
 		sizeof(tune_data2), tune_data2},
 };
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 void print_tun_data(void)
 {
@@ -996,11 +1045,14 @@ static ssize_t cabc_store(struct device *dev,
 	return size;
 }
 
+<<<<<<< HEAD
 int is_cabc_on ( void )
 {
 	return cabc;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static DEVICE_ATTR(cabc, 0664,
 			cabc_show,
 			cabc_store);

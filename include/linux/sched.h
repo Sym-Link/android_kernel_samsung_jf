@@ -141,9 +141,15 @@ extern unsigned long nr_uninterruptible(void);
 extern unsigned long nr_iowait(void);
 extern unsigned long nr_iowait_cpu(int cpu);
 extern unsigned long this_cpu_load(void);
+<<<<<<< HEAD
 #ifdef CONFIG_ZRAM_FOR_ANDROID
 extern unsigned long this_cpu_loadx(int i);
 #endif
+=======
+#ifdef CONFIG_RUNTIME_COMPCACHE
+extern unsigned long this_cpu_loadx(int i);
+#endif /* CONFIG_RUNTIME_COMPCACHE */
+>>>>>>> cm/cm-11.0
 extern void sched_update_nr_prod(int cpu, unsigned long nr, bool inc);
 extern void sched_get_nr_running_avg(int *avg, int *iowait_avg);
 
@@ -195,9 +201,16 @@ print_cfs_rq(struct seq_file *m, int cpu, struct cfs_rq *cfs_rq)
 #define TASK_DEAD		64
 #define TASK_WAKEKILL		128
 #define TASK_WAKING		256
+<<<<<<< HEAD
 #define TASK_STATE_MAX		512
 
 #define TASK_STATE_TO_CHAR_STR "RSDTtZXxKW"
+=======
+#define TASK_PARKED		512
+#define TASK_STATE_MAX		1024
+
+#define TASK_STATE_TO_CHAR_STR "RSDTtZXxKWP"
+>>>>>>> cm/cm-11.0
 
 extern char ___assert_task_state[1 - 2*!!(
 		sizeof(TASK_STATE_TO_CHAR_STR)-1 != ilog2(TASK_STATE_MAX)+1)];
@@ -365,7 +378,14 @@ extern signed long schedule_timeout_killable(signed long timeout);
 extern signed long schedule_timeout_uninterruptible(signed long timeout);
 asmlinkage void schedule(void);
 extern void schedule_preempt_disabled(void);
+<<<<<<< HEAD
 extern int mutex_spin_on_owner(struct mutex *lock, struct task_struct *owner);
+=======
+#ifdef CONFIG_MUTEX_SPIN_ON_OWNER
+extern int mutex_spin_on_owner(struct mutex *lock, struct task_struct *owner);
+extern int mutex_can_spin_on_owner(struct mutex *lock);
+#endif
+>>>>>>> cm/cm-11.0
 
 struct nsproxy;
 struct user_namespace;
@@ -1275,6 +1295,12 @@ struct task_struct {
 #ifdef CONFIG_SMP
 	struct llist_node wake_entry;
 	int on_cpu;
+<<<<<<< HEAD
+=======
+	struct task_struct *last_wakee;
+	unsigned long wakee_flips;
+	unsigned long wakee_flip_decay_ts;
+>>>>>>> cm/cm-11.0
 #endif
 	int on_rq;
 
@@ -2306,7 +2332,11 @@ static inline void mmdrop(struct mm_struct * mm)
 }
 
 /* mmput gets rid of the mappings and all user-space */
+<<<<<<< HEAD
 extern void mmput(struct mm_struct *);
+=======
+extern int mmput(struct mm_struct *);
+>>>>>>> cm/cm-11.0
 /* Grab a reference to a task's mm, if it is not already going away */
 extern struct mm_struct *get_task_mm(struct task_struct *task);
 /*
@@ -2701,7 +2731,20 @@ static inline void thread_group_cputime_init(struct signal_struct *sig)
 extern void recalc_sigpending_and_wake(struct task_struct *t);
 extern void recalc_sigpending(void);
 
+<<<<<<< HEAD
 extern void signal_wake_up(struct task_struct *t, int resume_stopped);
+=======
+extern void signal_wake_up_state(struct task_struct *t, unsigned int state);
+
+static inline void signal_wake_up(struct task_struct *t, bool resume)
+{
+	signal_wake_up_state(t, resume ? TASK_WAKEKILL : 0);
+}
+static inline void ptrace_signal_wake_up(struct task_struct *t, bool resume)
+{
+	signal_wake_up_state(t, resume ? __TASK_TRACED : 0);
+}
+>>>>>>> cm/cm-11.0
 
 /*
  * Wrappers for p->thread_info->cpu access. No-op on UP.

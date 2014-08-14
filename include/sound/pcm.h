@@ -446,6 +446,10 @@ struct snd_pcm_str {
 	struct snd_info_entry *proc_xrun_debug_entry;
 #endif
 #endif
+<<<<<<< HEAD
+=======
+	struct snd_kcontrol *vol_kctl; /* volume controls */
+>>>>>>> cm/cm-11.0
 };
 
 struct snd_pcm {
@@ -1080,4 +1084,31 @@ static inline void snd_pcm_limit_isa_dma_size(int dma, size_t *max)
 
 const char *snd_pcm_format_name(snd_pcm_format_t format);
 
+<<<<<<< HEAD
+=======
+/*
+ * PCM Volume control API
+ */
+/* array element of volume */
+struct snd_pcm_volume_elem {
+	int volume;
+};
+
+/* pp information; retrieved via snd_kcontrol_chip() */
+struct snd_pcm_volume {
+	struct snd_pcm *pcm;	/* assigned PCM instance */
+	int stream;		/* PLAYBACK or CAPTURE */
+	struct snd_kcontrol *kctl;
+	const struct snd_pcm_volume_elem *volume;
+	int max_length;
+	void *private_data;	/* optional: private data pointer */
+};
+
+int snd_pcm_add_volume_ctls(struct snd_pcm *pcm, int stream,
+			   const struct snd_pcm_volume_elem *volume,
+			   int max_length,
+			   unsigned long private_value,
+			   struct snd_pcm_volume **info_ret);
+
+>>>>>>> cm/cm-11.0
 #endif /* __SOUND_PCM_H */

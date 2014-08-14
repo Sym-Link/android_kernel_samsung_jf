@@ -1,6 +1,10 @@
 /* include/linux/smux.h
  *
+<<<<<<< HEAD
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -79,6 +83,11 @@ enum {
 	SMUX_HIGH_WM_HIT,     /* @metadata is NULL */
 	SMUX_RX_RETRY_HIGH_WM_HIT,  /* @metadata is NULL */
 	SMUX_RX_RETRY_LOW_WM_HIT,   /* @metadata is NULL */
+<<<<<<< HEAD
+=======
+	SMUX_LOCAL_CLOSED,
+	SMUX_REMOTE_CLOSED,
+>>>>>>> cm/cm-11.0
 };
 
 /**

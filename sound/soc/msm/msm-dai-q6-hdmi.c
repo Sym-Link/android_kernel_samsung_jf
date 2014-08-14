@@ -91,11 +91,31 @@ static int msm_dai_q6_hdmi_hw_params(struct snd_pcm_substream *substream,
 	u32 channel_allocation = 0;
 	u32 level_shift  = 0; /* 0dB */
 	bool down_mix = FALSE;
+<<<<<<< HEAD
+=======
+	int sample_rate = 48000;
+>>>>>>> cm/cm-11.0
 
 	dai_data->channels = params_channels(params);
 	dai_data->rate = params_rate(params);
 	dai_data->port_config.hdmi_multi_ch.reserved = 0;
 
+<<<<<<< HEAD
+=======
+	switch (dai_data->rate) {
+	case 48000:
+		sample_rate = HDMI_SAMPLE_RATE_48KHZ;
+		break;
+	case 44100:
+		sample_rate = HDMI_SAMPLE_RATE_44_1KHZ;
+		break;
+	case 32000:
+		sample_rate = HDMI_SAMPLE_RATE_32KHZ;
+		break;
+	}
+	hdmi_msm_audio_sample_rate_reset(sample_rate);
+
+>>>>>>> cm/cm-11.0
 	switch (dai_data->channels) {
 	case 2:
 		channel_allocation  = 0;

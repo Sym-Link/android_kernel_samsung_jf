@@ -38,6 +38,17 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_CRYPTO_FIPS
+bool in_fips_err()
+{
+	return false;
+}
+EXPORT_SYMBOL_GPL(in_fips_err);
+#endif
+
+>>>>>>> cm/cm-11.0
 #else
 
 #include "testmgr.h"
@@ -65,6 +76,15 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 #define ENCRYPT 1
 #define DECRYPT 0
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_CRYPTO_FIPS
+#define FIPS_ERR 1
+#define FIPS_NO_ERR 0
+static int IN_FIPS_ERROR = FIPS_NO_ERR;
+#endif
+
+>>>>>>> cm/cm-11.0
 struct tcrypt_result {
 	struct completion completion;
 	int err;
@@ -126,7 +146,28 @@ struct alg_test_desc {
 
 static unsigned int IDX[8] = { IDX1, IDX2, IDX3, IDX4, IDX5, IDX6, IDX7, IDX8 };
 
+<<<<<<< HEAD
 static void hexdump(unsigned char *buf, unsigned int len)
+=======
+#ifdef CONFIG_CRYPTO_FIPS
+bool in_fips_err()
+{
+	return (IN_FIPS_ERROR == FIPS_ERR);
+}
+
+void set_in_fips_err()
+{
+	IN_FIPS_ERROR = FIPS_ERR;
+}
+#endif
+
+
+#if FIPS_FUNC_TEST == 4
+void hexdump(unsigned char *buf, unsigned int len)
+#else
+static void hexdump(unsigned char *buf, unsigned int len)
+#endif
+>>>>>>> cm/cm-11.0
 {
 	print_hex_dump(KERN_CONT, "", DUMP_PREFIX_OFFSET,
 			16, 1,
@@ -2755,7 +2796,11 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 {
 	int i;
 	int j;
+<<<<<<< HEAD
 	int rc;
+=======
+	int rc = 0;
+>>>>>>> cm/cm-11.0
 
 	if ((type & CRYPTO_ALG_TYPE_MASK) == CRYPTO_ALG_TYPE_CIPHER) {
 		char nalg[CRYPTO_MAX_ALG_NAME];
@@ -2779,6 +2824,16 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 	j = alg_find_test(driver);
 	if (i < 0 && j < 0)
 		goto notest;
+<<<<<<< HEAD
+=======
+		
+#if FIPS_FUNC_TEST == 3
+    // change@wtl.rsengott - FIPS mode self test Functional Test
+    if (fips_enabled)
+        printk(KERN_INFO "FIPS: %s: %s alg self test START in fips mode!\n",
+               driver, alg);
+#endif
+>>>>>>> cm/cm-11.0
 
 	if (fips_enabled && ((i >= 0 && !alg_test_descs[i].fips_allowed) ||
 			     (j >= 0 && !alg_test_descs[j].fips_allowed)))
@@ -2793,20 +2848,62 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 					     type, mask);
 
 test_done:
+<<<<<<< HEAD
 	if (fips_enabled && rc)
 		panic("%s: %s alg self test failed in fips mode!\n", driver, alg);
 
 	if (fips_enabled && !rc)
 		printk(KERN_INFO "alg: self-tests for %s (%s) passed\n",
 		       driver, alg);
+=======
+	if (fips_enabled && rc) {
+		printk(KERN_INFO
+			"FIPS: %s: %s alg self test failed\n",
+			driver, alg);
+#ifdef CONFIG_CRYPTO_FIPS
+		IN_FIPS_ERROR = FIPS_ERR;
+#else
+		panic("%s: %s alg self test failed in fips mode!\n", driver, alg);		
+#endif
+		return rc;
+	}
+
+	if (fips_enabled && !rc)
+		printk(KERN_INFO "FIPS: self-tests for %s (%s) passed\n",
+			driver, alg);
+>>>>>>> cm/cm-11.0
 
 	return rc;
 
 notest:
+<<<<<<< HEAD
 	printk(KERN_INFO "alg: No test for %s (%s)\n", alg, driver);
 	return 0;
 non_fips_alg:
 	return -EINVAL;
+=======
+	printk(KERN_INFO "FIPS: No test for %s (%s)\n", alg, driver);
+	return 0;
+non_fips_alg:
+	if (!rc)
+		printk(KERN_INFO
+			"FIPS: self-tests for non-FIPS %s (%s) passed\n",
+			driver, alg);
+	else
+		printk(KERN_INFO
+			"FIPS: self-tests for non-FIPS %s (%s) failed\n",
+			alg, driver);
+	return rc;
+}
+int testmgr_crypto_proc_init(void)
+{
+#ifdef CONFIG_CRYPTO_FIPS
+	crypto_init_proc(&IN_FIPS_ERROR);
+#else
+	crypto_init_proc();
+#endif
+	return 0;
+>>>>>>> cm/cm-11.0
 }
 
 #endif /* CONFIG_CRYPTO_MANAGER_DISABLE_TESTS */

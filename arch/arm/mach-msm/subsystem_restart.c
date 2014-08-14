@@ -55,6 +55,21 @@ struct restart_log {
 	struct list_head list;
 };
 
+<<<<<<< HEAD
+=======
+enum subsys_state {
+	SUBSYS_OFFLINE,
+	SUBSYS_ONLINE,
+	SUBSYS_CRASHED,
+};
+
+static const char * const subsys_states[] = {
+	[SUBSYS_OFFLINE] = "OFFLINE",
+	[SUBSYS_ONLINE] = "ONLINE",
+	[SUBSYS_CRASHED] = "CRASHED",
+};
+
+>>>>>>> cm/cm-11.0
 struct subsys_device {
 	struct subsys_desc *desc;
 	struct list_head list;
@@ -62,7 +77,12 @@ struct subsys_device {
 	char wlname[64];
 	struct work_struct work;
 	spinlock_t restart_lock;
+<<<<<<< HEAD
 	int restart_count;
+=======
+	bool restarting;
+	enum subsys_state state;
+>>>>>>> cm/cm-11.0
 
 	void *notify;
 
@@ -118,6 +138,23 @@ static struct subsys_soc_restart_order *restart_orders_8960_sglte[] = {
 	&restart_orders_8960_fusion_sglte,
 	};
 
+<<<<<<< HEAD
+=======
+/* SGLTE2 restart ordering info*/
+static const char * const order_8064_sglte2[] = {"external_modem",
+						"external_modem_mdm"};
+
+static struct subsys_soc_restart_order restart_orders_8064_fusion_sglte2 = {
+	.subsystem_list = order_8064_sglte2,
+	.count = ARRAY_SIZE(order_8064_sglte2),
+	.subsys_ptrs = {[ARRAY_SIZE(order_8064_sglte2)] = NULL}
+	};
+
+static struct subsys_soc_restart_order *restart_orders_8064_sglte2[] = {
+	&restart_orders_8064_fusion_sglte2,
+	};
+
+>>>>>>> cm/cm-11.0
 /* These will be assigned to one of the sets above after
  * runtime SoC identification.
  */
@@ -136,6 +173,10 @@ static int restart_level_set(const char *val, struct kernel_param *kp)
 {
 	int ret;
 	int old_val = restart_level;
+<<<<<<< HEAD
+=======
+	int subtype;
+>>>>>>> cm/cm-11.0
 
 	if (cpu_is_msm9615()) {
 		pr_err("Only Phase 1 subsystem restart is supported\n");
@@ -148,7 +189,13 @@ static int restart_level_set(const char *val, struct kernel_param *kp)
 
 	switch (restart_level) {
 	case RESET_SUBSYS_INDEPENDENT:
+<<<<<<< HEAD
 		if (socinfo_get_platform_subtype() == PLATFORM_SUBTYPE_SGLTE) {
+=======
+		subtype = socinfo_get_platform_subtype();
+		if ((subtype == PLATFORM_SUBTYPE_SGLTE) ||
+			(subtype == PLATFORM_SUBTYPE_SGLTE2)) {
+>>>>>>> cm/cm-11.0
 			pr_info("Phase 3 is currently unsupported. Using phase 2 instead.\n");
 			restart_level = RESET_SUBSYS_COUPLED;
 		}
@@ -166,6 +213,23 @@ static int restart_level_set(const char *val, struct kernel_param *kp)
 module_param_call(restart_level, restart_level_set, param_get_int,
 			&restart_level, 0644);
 
+<<<<<<< HEAD
+=======
+static void subsys_set_state(struct subsys_device *subsys,
+			     enum subsys_state state)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&subsys->restart_lock, flags);
+	if (subsys->state != state) {
+		subsys->state = state;
+		spin_unlock_irqrestore(&subsys->restart_lock, flags);
+		return;
+	}
+	spin_unlock_irqrestore(&subsys->restart_lock, flags);
+}
+
+>>>>>>> cm/cm-11.0
 static struct subsys_soc_restart_order *
 update_restart_order(struct subsys_device *dev)
 {
@@ -246,7 +310,11 @@ static void do_epoch_check(struct subsys_device *dev)
 	if (time_first && n >= max_restarts_check) {
 		if ((curr_time->tv_sec - time_first->tv_sec) <
 				max_history_time_check) {
+<<<<<<< HEAD
 			WARN(1, "Subsystems have crashed %d times in less than "\
+=======
+			panic("Subsystems have crashed %d times in less than "\
+>>>>>>> cm/cm-11.0
 				"%ld seconds!", max_restarts_check,
 				max_history_time_check);
 		}
@@ -286,9 +354,16 @@ static void subsystem_shutdown(struct subsys_device *dev, void *data)
 
 	pr_info("[%p]: Shutting down %s\n", current, name);
 	if (dev->desc->shutdown(dev->desc) < 0) {
+<<<<<<< HEAD
 		WARN(1, "subsys-restart: [%p]: Failed to shutdown %s!",
 			current, name);
 	}
+=======
+		panic("subsys-restart: [%p]: Failed to shutdown %s!",
+			current, name);
+	}
+	subsys_set_state(dev, SUBSYS_OFFLINE);
+>>>>>>> cm/cm-11.0
 }
 
 static void subsystem_ramdump(struct subsys_device *dev, void *data)
@@ -306,8 +381,14 @@ static void subsystem_powerup(struct subsys_device *dev, void *data)
 
 	pr_info("[%p]: Powering up %s\n", current, name);
 	if (dev->desc->powerup(dev->desc) < 0) {
+<<<<<<< HEAD
 		WARN(1, "[%p]: Failed to powerup %s!", current, name);
 	}
+=======
+		panic("[%p]: Failed to powerup %s!", current, name);
+	}
+	subsys_set_state(dev, SUBSYS_ONLINE);
+>>>>>>> cm/cm-11.0
 }
 
 static void subsystem_restart_wq_func(struct work_struct *work)
@@ -357,10 +438,20 @@ static void subsystem_restart_wq_func(struct work_struct *work)
 	 * Now that we've acquired the shutdown lock, either we're the first to
 	 * restart these subsystems or some other thread is doing the powerup
 	 * sequence for these subsystems. In the latter case, panic and bail
+<<<<<<< HEAD
 	 * out, since a subsystem died in its powerup sequence.
 	 */
 	if (!mutex_trylock(powerup_lock)) {
 		WARN(1, "%s[%p]: Subsystem died during powerup!",
+=======
+	 * out, since a subsystem died in its powerup sequence. This catches
+	 * the case where a subsystem in a restart order isn't the one
+	 * who initiated the original restart but has crashed while the restart
+	 * order is being rebooted.
+	 */
+	if (!mutex_trylock(powerup_lock)) {
+		panic("%s[%p]: Subsystem died during powerup!",
+>>>>>>> cm/cm-11.0
 						__func__, current);
 	}
 
@@ -405,19 +496,29 @@ static void subsystem_restart_wq_func(struct work_struct *work)
 
 out:
 	spin_lock_irqsave(&dev->restart_lock, flags);
+<<<<<<< HEAD
 	dev->restart_count--;
 	if (!dev->restart_count)
 		wake_unlock(&dev->wake_lock);
+=======
+	dev->restarting = false;
+	wake_unlock(&dev->wake_lock);
+>>>>>>> cm/cm-11.0
 	spin_unlock_irqrestore(&dev->restart_lock, flags);
 }
 
 static void __subsystem_restart_dev(struct subsys_device *dev)
 {
 	struct subsys_desc *desc = dev->desc;
+<<<<<<< HEAD
+=======
+	const char *name = dev->desc->name;
+>>>>>>> cm/cm-11.0
 	unsigned long flags;
 
 	pr_debug("Restarting %s [level=%d]!\n", desc->name, restart_level);
 
+<<<<<<< HEAD
 	spin_lock_irqsave(&dev->restart_lock, flags);
 	if (!dev->restart_count)
 		wake_lock(&dev->wake_lock);
@@ -431,12 +532,45 @@ static void __subsystem_restart_dev(struct subsys_device *dev)
 			wake_unlock(&dev->wake_lock);
 		spin_unlock_irqrestore(&dev->restart_lock, flags);
 	}
+=======
+	/*
+	 * We want to allow drivers to call subsystem_restart{_dev}() as many
+	 * times as they want up until the point where the subsystem is
+	 * shutdown.
+	 */
+	spin_lock_irqsave(&dev->restart_lock, flags);
+	if (dev->state != SUBSYS_CRASHED) {
+		if (dev->state == SUBSYS_ONLINE && !dev->restarting) {
+			dev->restarting = true;
+			dev->state = SUBSYS_CRASHED;
+			wake_lock(&dev->wake_lock);
+			queue_work(ssr_wq, &dev->work);
+		} else {
+			panic("Subsystem %s crashed during SSR!", name);
+		}
+	}
+	spin_unlock_irqrestore(&dev->restart_lock, flags);
+>>>>>>> cm/cm-11.0
 }
 
 int subsystem_restart_dev(struct subsys_device *dev)
 {
 	const char *name = dev->desc->name;
 
+<<<<<<< HEAD
+=======
+	/*
+	 * If a system reboot/shutdown is underway, ignore subsystem errors.
+	 * However, print a message so that we know that a subsystem behaved
+	 * unexpectedly here.
+	 */
+	if (system_state == SYSTEM_RESTART
+		|| system_state == SYSTEM_POWER_OFF) {
+		pr_err("%s crashed during a system poweroff/shutdown.\n", name);
+		return -EBUSY;
+	}
+
+>>>>>>> cm/cm-11.0
 	pr_info("Restart sequence requested for %s, restart_level = %d.\n",
 		name, restart_level);
 
@@ -498,6 +632,10 @@ struct subsys_device *subsys_register(struct subsys_desc *desc)
 	dev->desc = desc;
 	dev->notify = subsys_notif_add_subsys(desc->name);
 	dev->restart_order = update_restart_order(dev);
+<<<<<<< HEAD
+=======
+	dev->state = SUBSYS_ONLINE; /* Until proper refcounting appears */
+>>>>>>> cm/cm-11.0
 
 	snprintf(dev->wlname, sizeof(dev->wlname), "ssr(%s)", desc->name);
 	wake_lock_init(&dev->wake_lock, WAKE_LOCK_SUSPEND, dev->wlname);
@@ -569,6 +707,14 @@ static int __init ssr_init_soc_restart_orders(void)
 		n_restart_orders = ARRAY_SIZE(restart_orders_8960_sglte);
 	}
 
+<<<<<<< HEAD
+=======
+	if (socinfo_get_platform_subtype() == PLATFORM_SUBTYPE_SGLTE2) {
+		restart_orders = restart_orders_8064_sglte2;
+		n_restart_orders = ARRAY_SIZE(restart_orders_8064_sglte2);
+	}
+
+>>>>>>> cm/cm-11.0
 	for (i = 0; i < n_restart_orders; i++) {
 		mutex_init(&restart_orders[i]->powerup_lock);
 		mutex_init(&restart_orders[i]->shutdown_lock);
@@ -582,11 +728,17 @@ static int __init subsys_restart_init(void)
 #ifdef CONFIG_SEC_DEBUG_MDM_FILE_INFO
 	restart_level = RESET_SUBSYS_INDEPENDENT_SOC;
 #endif
+<<<<<<< HEAD
 	ssr_wq = alloc_workqueue("ssr_wq", 0, 0);
 	if (!ssr_wq) {
 		pr_err("%s: out of memory\n", __func__);
 		return -ENOMEM;
 	}
+=======
+	ssr_wq = alloc_workqueue("ssr_wq", WQ_CPU_INTENSIVE, 0);
+	if (!ssr_wq)
+		panic("%s: out of memory\n", __func__);
+>>>>>>> cm/cm-11.0
 
 	return ssr_init_soc_restart_orders();
 }

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -36,7 +40,11 @@ struct wfd_stats_encode_sample {
 
 struct wfd_stats {
 	struct mutex mutex;
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	/* Output Buffers */
 	uint32_t v4l2_buf_count;
 

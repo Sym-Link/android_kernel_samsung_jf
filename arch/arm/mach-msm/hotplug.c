@@ -11,6 +11,10 @@
 #include <linux/errno.h>
 #include <linux/smp.h>
 #include <linux/cpu.h>
+<<<<<<< HEAD
+=======
+#include <linux/ratelimit.h>
+>>>>>>> cm/cm-11.0
 
 #include <asm/cacheflush.h>
 #include <asm/smp_plat.h>
@@ -150,6 +154,32 @@ static struct notifier_block hotplug_rtb_notifier = {
 	.notifier_call = hotplug_rtb_callback,
 };
 
+<<<<<<< HEAD
+=======
+static int hotplug_cpu_check_callback(struct notifier_block *nfb,
+				      unsigned long action, void *hcpu)
+{
+	int cpu = (int)hcpu;
+
+	switch (action & (~CPU_TASKS_FROZEN)) {
+	case CPU_DOWN_PREPARE:
+		if (cpu == 0) {
+			pr_err_ratelimited("CPU0 hotplug is not supported\n");
+			return NOTIFY_BAD;
+		}
+		break;
+	default:
+		break;
+	}
+
+	return NOTIFY_OK;
+}
+static struct notifier_block hotplug_cpu_check_notifier = {
+	.notifier_call = hotplug_cpu_check_callback,
+	.priority = INT_MAX,
+};
+
+>>>>>>> cm/cm-11.0
 int msm_platform_secondary_init(unsigned int cpu)
 {
 	int ret;
@@ -170,6 +200,16 @@ int msm_platform_secondary_init(unsigned int cpu)
 
 static int __init init_hotplug(void)
 {
+<<<<<<< HEAD
 	return register_hotcpu_notifier(&hotplug_rtb_notifier);
+=======
+	int rc;
+
+	rc = register_hotcpu_notifier(&hotplug_rtb_notifier);
+	if (rc)
+		return rc;
+
+	return register_hotcpu_notifier(&hotplug_cpu_check_notifier);
+>>>>>>> cm/cm-11.0
 }
 early_initcall(init_hotplug);

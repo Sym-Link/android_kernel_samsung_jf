@@ -144,6 +144,11 @@ def build(target):
 
     devnull = open('/dev/null', 'r')
     subprocess.check_call(['make', 'O=%s' % dest_dir,
+<<<<<<< HEAD
+=======
+        'SELINUX_DEFCONFIG=selinux_defconfig',
+        'SELINUX_LOG_DEFCONFIG=selinux_log_defconfig',
+>>>>>>> cm/cm-11.0
         '%s_defconfig' % target], env=make_env, stdin=devnull)
     devnull.close()
 

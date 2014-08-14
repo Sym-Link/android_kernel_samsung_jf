@@ -440,6 +440,7 @@ static ssize_t mmc_wr_pack_stats_read(struct file *filp, char __user *ubuf,
 			pack_stats->pack_stop_reason[LARGE_SEC_ALIGN]);
 		strlcat(ubuf, temp_buf, cnt);
 	}
+<<<<<<< HEAD
 	if (pack_stats->pack_stop_reason[RANDOM]) {
 		snprintf(temp_buf, TEMP_BUF_SIZE,
 			 "%s: %d times: random request\n",
@@ -447,6 +448,8 @@ static ssize_t mmc_wr_pack_stats_read(struct file *filp, char __user *ubuf,
 			pack_stats->pack_stop_reason[RANDOM]);
 		strlcat(ubuf, temp_buf, cnt);
 	}
+=======
+>>>>>>> cm/cm-11.0
 
 	spin_unlock(&pack_stats->lock);
 

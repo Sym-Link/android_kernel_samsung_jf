@@ -1218,11 +1218,29 @@ void ip_mc_inc_group(struct in_device *in_dev, __be32 addr)
 {
 	struct ip_mc_list *im;
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_WIFI_MULTICAST_LOG
+	struct net_device *dev = in_dev->dev;
+	char buf[MAX_ADDR_LEN];
+
+	arp_mc_map(addr, buf, dev, 0);
+	printk("CONV_WIFI - %s: [%s] addr[%x]\n"
+			,__func__, dev->name, addr);
+#endif
+
+>>>>>>> cm/cm-11.0
 	ASSERT_RTNL();
 
 	for_each_pmc_rtnl(in_dev, im) {
 		if (im->multiaddr == addr) {
 			im->users++;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_WIFI_MULTICAST_LOG
+			printk("CONV_WIFI - %s: [%s] Users count increase. im->users[%d]\n",__func__, dev->name, im->users);
+#endif
+>>>>>>> cm/cm-11.0
 			ip_mc_add_src(in_dev, &addr, MCAST_EXCLUDE, 0, NULL, 0);
 			goto out;
 		}
@@ -1233,6 +1251,12 @@ void ip_mc_inc_group(struct in_device *in_dev, __be32 addr)
 		goto out;
 
 	im->users = 1;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_WIFI_MULTICAST_LOG
+	printk("CONV_WIFI - %s: [%s] Users count initilize. im->users[%d]\n",__func__, dev->name, im->users);
+#endif
+>>>>>>> cm/cm-11.0
 	im->interface = in_dev;
 	in_dev_hold(in_dev);
 	im->multiaddr = addr;
@@ -1299,6 +1323,25 @@ void ip_mc_dec_group(struct in_device *in_dev, __be32 addr)
 	struct ip_mc_list *i;
 	struct ip_mc_list __rcu **ip;
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_WIFI_MULTICAST_LOG
+	struct net_device *dev = NULL;
+	if (in_dev)
+		dev= in_dev->dev;
+
+	if (dev) {
+		char buf[MAX_ADDR_LEN];
+		arp_mc_map(addr, buf, dev, 0);
+		printk("CONV_WIFI - %s: [%s] addr[%x]\n"
+				,__func__, dev->name, addr);
+	} else {
+		printk("CONV_WIFI - %s: [-] addr[%x] \n"
+				,__func__, addr)
+	}
+#endif
+
+>>>>>>> cm/cm-11.0
 	ASSERT_RTNL();
 
 	for (ip = &in_dev->mc_list;
@@ -1308,6 +1351,15 @@ void ip_mc_dec_group(struct in_device *in_dev, __be32 addr)
 			if (--i->users == 0) {
 				*ip = i->next_rcu;
 				in_dev->mc_count--;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_WIFI_MULTICAST_LOG
+				if (dev)
+					printk("CONV_WIFI - %s: [%s] Users count is zero. i->users[%d]\n",__func__, dev->name, i->users);
+				else
+					printk("CONV_WIFI - %s: [-] Users count is zero. i->users[%d]\n",__func__, i->users);
+#endif
+>>>>>>> cm/cm-11.0
 				igmp_group_dropped(i);
 				ip_mc_clear_src(i);
 
@@ -1317,6 +1369,15 @@ void ip_mc_dec_group(struct in_device *in_dev, __be32 addr)
 				ip_ma_put(i);
 				return;
 			}
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_WIFI_MULTICAST_LOG
+			if (dev)
+				printk("CONV_WIFI - %s: [%s] Users count decrease. i->users[%d]\n",__func__, dev->name, i->users);
+			else
+				printk("CONV_WIFI - %s: [-] Users count decrease. i->users[%d]\n",__func__,  i->users);
+#endif
+>>>>>>> cm/cm-11.0
 			break;
 		}
 	}
@@ -1801,6 +1862,18 @@ int ip_mc_join_group(struct sock *sk , struct ip_mreqn *imr)
 		goto done;
 	}
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_WIFI_MULTICAST_LOG
+	if (in_dev) {
+		struct net_device *dev = in_dev->dev;
+		printk("CONV_WIFI - %s: [%s] Igmp join\n",__func__, dev->name);
+	} else {
+		printk("CONV_WIFI - %s: [-] Igmp join\n",__func__);
+	}
+#endif
+
+>>>>>>> cm/cm-11.0
 	err = -EADDRINUSE;
 	ifindex = imr->imr_ifindex;
 	for_each_pmc_rtnl(inet, i) {
@@ -1867,6 +1940,17 @@ int ip_mc_leave_group(struct sock *sk, struct ip_mreqn *imr)
 	rtnl_lock();
 	in_dev = ip_mc_find_dev(net, imr);
 	ifindex = imr->imr_ifindex;
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_WIFI_MULTICAST_LOG
+	if (in_dev) {
+		struct net_device *dev = in_dev->dev;
+		printk("CONV_WIFI - %s: [%s] Igmp leave\n",__func__, dev->name);
+	} else {
+		printk("CONV_WIFI - %s: [-] Igmp leave\n",__func__);
+	}
+#endif
+>>>>>>> cm/cm-11.0
 	for (imlp = &inet->mc_list;
 	     (iml = rtnl_dereference(*imlp)) != NULL;
 	     imlp = &iml->next_rcu) {

@@ -1,7 +1,11 @@
 /* arch/arm/mach-msm/include/mach/memory.h
  *
  * Copyright (C) 2007 Google, Inc.
+<<<<<<< HEAD
  * Copyright (c) 2009-2013, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2009-2012, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -72,6 +76,10 @@ extern unsigned long ebi1_phys_offset;
 #endif
 
 #ifndef __ASSEMBLY__
+<<<<<<< HEAD
+=======
+void *alloc_bootmem_aligned(unsigned long size, unsigned long alignment);
+>>>>>>> cm/cm-11.0
 void *allocate_contiguous_ebi(unsigned long, unsigned long, int);
 unsigned long allocate_contiguous_ebi_nomap(unsigned long, unsigned long);
 void clean_and_invalidate_caches(unsigned long, unsigned long, unsigned long);
@@ -99,6 +107,7 @@ extern void store_dac(void);
 #define finish_arch_switch(prev)	do { store_ttbr0(); } while (0)
 #endif
 
+<<<<<<< HEAD
 #define MAX_HOLE_ADDRESS    (PHYS_OFFSET + 0x10000000)
 extern phys_addr_t memory_hole_offset;
 extern phys_addr_t memory_hole_start;
@@ -124,6 +133,28 @@ void find_memory_hole(void);
 	((MEM_HOLE_END_PHYS_OFFSET && ((virt) >= MEM_HOLE_PAGE_OFFSET)) ? \
 	(virt) - MEM_HOLE_PAGE_OFFSET + MEM_HOLE_END_PHYS_OFFSET :	\
 	(virt) - PAGE_OFFSET + PHYS_OFFSET)
+=======
+#ifdef CONFIG_DONT_MAP_HOLE_AFTER_MEMBANK0
+extern unsigned long membank0_size;
+extern unsigned long membank1_start;
+void find_membank0_hole(void);
+
+#define MEMBANK0_PHYS_OFFSET PHYS_OFFSET
+#define MEMBANK0_PAGE_OFFSET PAGE_OFFSET
+
+#define MEMBANK1_PHYS_OFFSET (membank1_start)
+#define MEMBANK1_PAGE_OFFSET (MEMBANK0_PAGE_OFFSET + (membank0_size))
+
+#define __phys_to_virt(phys)				\
+	((MEMBANK1_PHYS_OFFSET && ((phys) >= MEMBANK1_PHYS_OFFSET)) ?	\
+	(phys) - MEMBANK1_PHYS_OFFSET + MEMBANK1_PAGE_OFFSET :	\
+	(phys) - MEMBANK0_PHYS_OFFSET + MEMBANK0_PAGE_OFFSET)
+
+#define __virt_to_phys(virt)				\
+	((MEMBANK1_PHYS_OFFSET && ((virt) >= MEMBANK1_PAGE_OFFSET)) ?	\
+	(virt) - MEMBANK1_PAGE_OFFSET + MEMBANK1_PHYS_OFFSET :	\
+	(virt) - MEMBANK0_PAGE_OFFSET + MEMBANK0_PHYS_OFFSET)
+>>>>>>> cm/cm-11.0
 #endif
 
 /*

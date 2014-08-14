@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -18,6 +22,12 @@
 #include <linux/errno.h>
 #include <linux/proc_fs.h>
 #include <linux/cpu.h>
+<<<<<<< HEAD
+=======
+#include <mach/usb_trace.h>
+
+DEFINE_TRACE(usb_daytona_invalid_access);
+>>>>>>> cm/cm-11.0
 
 #define MODULE_NAME "msm_ebi_erp"
 
@@ -113,6 +123,14 @@ static irqreturn_t msm_ebi_irq(int irq, void *dev_id)
 	err_cntl |= CNTL_CLEAR_ERR;
 	writel_relaxed(err_cntl, base + SLV_ERR_CNTL);
 	mb();	/* Ensure interrupt is cleared before returning */
+<<<<<<< HEAD
+=======
+
+	if ((err_apacket0 & AMID_MASK) == 0x00000102)
+		trace_usb_daytona_invalid_access(err_addr, err_apacket0,
+							 err_apacket1);
+
+>>>>>>> cm/cm-11.0
 	return IRQ_HANDLED;
 }
 

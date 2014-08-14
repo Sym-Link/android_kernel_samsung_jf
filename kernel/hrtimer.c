@@ -62,6 +62,10 @@
 DEFINE_PER_CPU(struct hrtimer_cpu_base, hrtimer_bases) =
 {
 
+<<<<<<< HEAD
+=======
+	.lock = __RAW_SPIN_LOCK_UNLOCKED(hrtimer_bases.lock),
+>>>>>>> cm/cm-11.0
 	.clock_base =
 	{
 		{

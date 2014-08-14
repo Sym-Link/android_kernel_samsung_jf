@@ -136,9 +136,22 @@ __packed struct qseecom_command_scm_resp {
 	unsigned int data;
 };
 
+<<<<<<< HEAD
 static struct class *driver_class;
 static dev_t qseecom_device_no;
 static struct cdev qseecom_cdev;
+=======
+enum qseecom_client_handle_type {
+	QSEECOM_CLIENT_APP = 1,
+	QSEECOM_LISTENER_SERVICE,
+	QSEECOM_SECURE_SERVICE,
+	QSEECOM_GENERIC,
+	QSEECOM_UNAVAILABLE_CLIENT_APP,
+};
+
+static struct class *driver_class;
+static dev_t qseecom_device_no;
+>>>>>>> cm/cm-11.0
 
 /* Data structures used in legacy support */
 static void *pil;
@@ -192,6 +205,10 @@ struct qseecom_control {
 
 	uint32_t          qseos_version;
 	struct device *pdev;
+<<<<<<< HEAD
+=======
+	struct cdev cdev;
+>>>>>>> cm/cm-11.0
 };
 
 struct qseecom_client_handle {
@@ -210,7 +227,11 @@ struct qseecom_listener_handle {
 static struct qseecom_control qseecom;
 
 struct qseecom_dev_handle {
+<<<<<<< HEAD
 	bool               service;
+=======
+	enum qseecom_client_handle_type type;
+>>>>>>> cm/cm-11.0
 	union {
 		struct qseecom_client_handle client;
 		struct qseecom_listener_handle listener;
@@ -265,6 +286,15 @@ static struct qseecom_registered_listener_list *__qseecom_find_svc(
 			break;
 	}
 	spin_unlock_irqrestore(&qseecom.registered_listener_list_lock, flags);
+<<<<<<< HEAD
+=======
+
+	if ((entry != NULL) && (entry->svc.listener_id != listener_id)) {
+		pr_err("Service id: %u is not found\n", listener_id);
+		return NULL;
+	}
+
+>>>>>>> cm/cm-11.0
 	return entry;
 }
 
@@ -280,7 +310,11 @@ static int __qseecom_set_sb_memory(struct qseecom_registered_listener_list *svc,
 	/* Get the handle of the shared fd */
 	svc->ihandle = ion_import_dma_buf(qseecom.ion_clnt,
 					listener->ifd_data_fd);
+<<<<<<< HEAD
 	if (svc->ihandle == NULL) {
+=======
+	if (IS_ERR_OR_NULL(svc->ihandle)) {
+>>>>>>> cm/cm-11.0
 		pr_err("Ion client could not retrieve the handle\n");
 		return -ENOMEM;
 	}
@@ -367,7 +401,11 @@ static int qseecom_register_listener(struct qseecom_dev_handle *data,
 		return ret;
 	}
 	data->listener.id = 0;
+<<<<<<< HEAD
 	data->service = true;
+=======
+	data->type = QSEECOM_LISTENER_SERVICE;
+>>>>>>> cm/cm-11.0
 	if (!__qseecom_is_svc_unique(data, &rcvd_lstnr)) {
 		pr_err("Service is not unique and is already registered\n");
 		data->released = true;
@@ -515,7 +553,11 @@ static int qseecom_set_client_mem_param(struct qseecom_dev_handle *data,
 	uint32_t len;
 
 	/* Copy the relevant information needed for loading the image */
+<<<<<<< HEAD
 	if (__copy_from_user(&req, (void __user *)argp, sizeof(req)))
+=======
+	if (copy_from_user(&req, (void __user *)argp, sizeof(req)))
+>>>>>>> cm/cm-11.0
 		return -EFAULT;
 
 	/* Get the handle of the shared fd */
@@ -570,6 +612,14 @@ static int __qseecom_process_incomplete_cmd(struct qseecom_dev_handle *data,
 		}
 		spin_unlock_irqrestore(&qseecom.registered_listener_list_lock,
 				flags);
+<<<<<<< HEAD
+=======
+
+		if (ptr_svc == NULL) {
+			pr_err("Listener Svc %d does not exist\n", lstnr);
+			return -EINVAL;
+		}
+>>>>>>> cm/cm-11.0
 		if (ptr_svc->svc.listener_id != lstnr) {
 			pr_warning("Service requested for does on exist\n");
 			return -ERESTARTSYS;
@@ -657,7 +707,11 @@ static int qseecom_load_app(struct qseecom_dev_handle *data, void __user *argp)
 	struct qseecom_load_app_ireq load_req;
 
 	/* Copy the relevant information needed for loading the image */
+<<<<<<< HEAD
 	if (__copy_from_user(&load_img_req,
+=======
+	if (copy_from_user(&load_img_req,
+>>>>>>> cm/cm-11.0
 				(void __user *)argp,
 				sizeof(struct qseecom_load_img_req))) {
 		pr_err("copy_from_user failed\n");
@@ -668,6 +722,10 @@ static int qseecom_load_app(struct qseecom_dev_handle *data, void __user *argp)
 	if (ret)
 		pr_warning("Unable to vote for SFPB clock");
 	req.qsee_cmd_id = QSEOS_APP_LOOKUP_COMMAND;
+<<<<<<< HEAD
+=======
+	load_img_req.img_name[MAX_APP_NAME_SIZE-1] = '\0';
+>>>>>>> cm/cm-11.0
 	memcpy(req.app_name, load_img_req.img_name, MAX_APP_NAME_SIZE);
 
 	ret = __qseecom_check_app_exists(req);
@@ -800,6 +858,20 @@ static int __qseecom_cleanup_app(struct qseecom_dev_handle *data)
 	return 1;
 }
 
+<<<<<<< HEAD
+=======
+static int qseecom_unmap_ion_allocated_memory(struct qseecom_dev_handle *data)
+{
+	int ret = 0;
+	if (!IS_ERR_OR_NULL(data->client.ihandle)) {
+		ion_unmap_kernel(qseecom.ion_clnt, data->client.ihandle);
+		ion_free(qseecom.ion_clnt, data->client.ihandle);
+		data->client.ihandle = NULL;
+	}
+	return ret;
+}
+
+>>>>>>> cm/cm-11.0
 static int qseecom_unload_app(struct qseecom_dev_handle *data)
 {
 	unsigned long flags;
@@ -882,11 +954,15 @@ static int qseecom_unload_app(struct qseecom_dev_handle *data)
 			}
 		}
 	}
+<<<<<<< HEAD
 	if (!IS_ERR_OR_NULL(data->client.ihandle)) {
 		ion_unmap_kernel(qseecom.ion_clnt, data->client.ihandle);
 		ion_free(qseecom.ion_clnt, data->client.ihandle);
 		data->client.ihandle = NULL;
 	}
+=======
+	qseecom_unmap_ion_allocated_memory(data);
+>>>>>>> cm/cm-11.0
 	data->released = true;
 	return ret;
 }
@@ -1001,9 +1077,28 @@ static int __qseecom_send_cmd(struct qseecom_dev_handle *data,
 		pr_err("cmd buffer or response buffer is null\n");
 		return -EINVAL;
 	}
+<<<<<<< HEAD
 
 	if (req->cmd_req_len <= 0 ||
 		req->resp_len <= 0 ||
+=======
+	if (((uint32_t)req->cmd_req_buf < data->client.user_virt_sb_base) ||
+		((uint32_t)req->cmd_req_buf >= (data->client.user_virt_sb_base +
+					data->client.sb_length))) {
+		pr_err("cmd buffer address not within shared bufffer\n");
+		return -EINVAL;
+	}
+
+
+	if (((uint32_t)req->resp_buf < data->client.user_virt_sb_base)  ||
+		((uint32_t)req->resp_buf >= (data->client.user_virt_sb_base +
+					data->client.sb_length))){
+		pr_err("response buffer address not within shared bufffer\n");
+		return -EINVAL;
+	}
+
+	if ((req->cmd_req_len == 0) || (req->resp_len == 0) ||
+>>>>>>> cm/cm-11.0
 		req->cmd_req_len > data->client.sb_length ||
 		req->resp_len > data->client.sb_length) {
 		pr_err("cmd buffer length or "
@@ -1011,6 +1106,14 @@ static int __qseecom_send_cmd(struct qseecom_dev_handle *data,
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
+=======
+	if (req->cmd_req_len > UINT_MAX - req->resp_len) {
+		pr_err("Integer overflow detected in req_len & rsp_len, exiting now\n");
+		return -EINVAL;
+	}
+
+>>>>>>> cm/cm-11.0
 	reqd_len_sb_in = req->cmd_req_len + req->resp_len;
 	if (reqd_len_sb_in > data->client.sb_length) {
 		pr_debug("Not enough memory to fit cmd_buf and "
@@ -1070,8 +1173,11 @@ static int qseecom_send_cmd(struct qseecom_dev_handle *data, void __user *argp)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
 	pr_debug("sending cmd_req->rsp size: %u, ptr: 0x%p\n",
 			req.resp_len, req.resp_buf);
+=======
+>>>>>>> cm/cm-11.0
 	return ret;
 }
 
@@ -1136,6 +1242,10 @@ static int qseecom_send_modfd_cmd(struct qseecom_dev_handle *data,
 					void __user *argp)
 {
 	int ret = 0;
+<<<<<<< HEAD
+=======
+	int i;
+>>>>>>> cm/cm-11.0
 	struct qseecom_send_modfd_cmd_req req;
 	struct qseecom_send_cmd_req send_cmd_req;
 
@@ -1149,6 +1259,17 @@ static int qseecom_send_modfd_cmd(struct qseecom_dev_handle *data,
 	send_cmd_req.resp_buf = req.resp_buf;
 	send_cmd_req.resp_len = req.resp_len;
 
+<<<<<<< HEAD
+=======
+	/* validate offsets */
+	for (i = 0; i < MAX_ION_FD; i++) {
+		if (req.ifd_data[i].cmd_buf_offset >= req.cmd_req_len) {
+			pr_err("Invalid offset %d = 0x%x\n",
+				i, req.ifd_data[i].cmd_buf_offset);
+			return -EINVAL;
+		}
+	}
+>>>>>>> cm/cm-11.0
 	ret = __qseecom_update_with_phy_addr(&req);
 	if (ret)
 		return ret;
@@ -1161,8 +1282,11 @@ static int qseecom_send_modfd_cmd(struct qseecom_dev_handle *data,
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
 	pr_debug("sending cmd_req->rsp size: %u, ptr: 0x%p\n",
 			req.resp_len, req.resp_buf);
+=======
+>>>>>>> cm/cm-11.0
 	return ret;
 }
 
@@ -1180,6 +1304,14 @@ static int qseecom_receive_req(struct qseecom_dev_handle *data)
 	struct qseecom_registered_listener_list *this_lstnr;
 
 	this_lstnr = __qseecom_find_svc(data->listener.id);
+<<<<<<< HEAD
+=======
+	if (!this_lstnr) {
+		pr_err("Invalid listener ID\n");
+		return -ENODATA;
+	}
+
+>>>>>>> cm/cm-11.0
 	while (1) {
 		if (wait_event_freezable(this_lstnr->rcv_req_wq,
 				__qseecom_listener_has_rcvd_req(data,
@@ -1427,7 +1559,11 @@ int qseecom_start_app(struct qseecom_handle **handle,
 		return -ENOMEM;
 	}
 	data->abort = 0;
+<<<<<<< HEAD
 	data->service = false;
+=======
+	data->type = QSEECOM_CLIENT_APP;
+>>>>>>> cm/cm-11.0
 	data->released = false;
 	data->client.app_id = ret;
 	data->client.sb_length = size;
@@ -1785,7 +1921,11 @@ static int qseecom_load_external_elf(struct qseecom_dev_handle *data,
 	struct qseecom_command_scm_resp resp;
 
 	/* Copy the relevant information needed for loading the image */
+<<<<<<< HEAD
 	if (__copy_from_user(&load_img_req,
+=======
+	if (copy_from_user(&load_img_req,
+>>>>>>> cm/cm-11.0
 				(void __user *)argp,
 				sizeof(struct qseecom_load_img_req))) {
 		pr_err("copy_from_user failed\n");
@@ -1869,6 +2009,12 @@ static int qseecom_unload_external_elf(struct qseecom_dev_handle *data)
 	struct qseecom_unload_app_ireq req;
 	struct cpumask mask;
 
+<<<<<<< HEAD
+=======
+	/* unavailable client app */
+	data->type = QSEECOM_UNAVAILABLE_CLIENT_APP;
+
+>>>>>>> cm/cm-11.0
 	/* Populate the structure for sending scm call to unload image */
 	req.qsee_cmd_id = QSEOS_UNLOAD_EXTERNAL_ELF_COMMAND;
 
@@ -1928,7 +2074,11 @@ static int qseecom_query_app_loaded(struct qseecom_dev_handle *data,
 	unsigned long flags = 0;
 
 	/* Copy the relevant information needed for loading the image */
+<<<<<<< HEAD
 	if (__copy_from_user(&query_req,
+=======
+	if (copy_from_user(&query_req,
+>>>>>>> cm/cm-11.0
 				(void __user *)argp,
 				sizeof(struct qseecom_qseos_app_load_query))) {
 		pr_err("copy_from_user failed\n");
@@ -1936,6 +2086,10 @@ static int qseecom_query_app_loaded(struct qseecom_dev_handle *data,
 	}
 
 	req.qsee_cmd_id = QSEOS_APP_LOOKUP_COMMAND;
+<<<<<<< HEAD
+=======
+	query_req.app_name[MAX_APP_NAME_SIZE-1] = '\0';
+>>>>>>> cm/cm-11.0
 	memcpy(req.app_name, query_req.app_name, MAX_APP_NAME_SIZE);
 
 	ret = __qseecom_check_app_exists(req);
@@ -2155,7 +2309,11 @@ static int qseecom_open(struct inode *inode, struct file *file)
 	}
 	file->private_data = data;
 	data->abort = 0;
+<<<<<<< HEAD
 	data->service = false;
+=======
+	data->type = QSEECOM_GENERIC;
+>>>>>>> cm/cm-11.0
 	data->released = false;
 	init_waitqueue_head(&data->abort_wq);
 	atomic_set(&data->ioctl_count, 0);
@@ -2186,6 +2344,7 @@ static int qseecom_release(struct inode *inode, struct file *file)
 
 	if (data->released == false) {
 		pr_warn("data->released == false\n");
+<<<<<<< HEAD
 		if (data->service)
 			ret = qseecom_unregister_listener(data);
 		else
@@ -2193,6 +2352,28 @@ static int qseecom_release(struct inode *inode, struct file *file)
 		if (ret) {
 			pr_err("Close failed\n");
 			return ret;
+=======
+		switch (data->type) {
+		case QSEECOM_LISTENER_SERVICE:
+			ret = qseecom_unregister_listener(data);
+			break;
+		case QSEECOM_CLIENT_APP:
+			ret = qseecom_unload_app(data);
+			break;
+		case QSEECOM_SECURE_SERVICE:
+			ret = qseecom_unmap_ion_allocated_memory(data);
+			if (ret) {
+				pr_err("Close failed\n");
+				return ret;
+			}
+			break;
+		case QSEECOM_UNAVAILABLE_CLIENT_APP:
+			break;
+		default:
+			pr_err("Unsupported clnt_handle_type %d",
+				data->type);
+			break;
+>>>>>>> cm/cm-11.0
 		}
 	}
 	if (qseecom.qseos_version == QSEOS_VERSION_13) {
@@ -2355,7 +2536,11 @@ static int __devinit qseecom_probe(struct platform_device *pdev)
 	if (IS_ERR(driver_class)) {
 		rc = -ENOMEM;
 		pr_err("class_create failed %d\n", rc);
+<<<<<<< HEAD
 		goto unregister_chrdev_region;
+=======
+		goto exit_unreg_chrdev_region;
+>>>>>>> cm/cm-11.0
 	}
 
 	class_dev = device_create(driver_class, NULL, qseecom_device_no, NULL,
@@ -2363,6 +2548,7 @@ static int __devinit qseecom_probe(struct platform_device *pdev)
 	if (!class_dev) {
 		pr_err("class_device_create failed %d\n", rc);
 		rc = -ENOMEM;
+<<<<<<< HEAD
 		goto class_destroy;
 	}
 
@@ -2373,6 +2559,18 @@ static int __devinit qseecom_probe(struct platform_device *pdev)
 	if (rc < 0) {
 		pr_err("cdev_add failed %d\n", rc);
 		goto err;
+=======
+		goto exit_destroy_class;
+	}
+
+	cdev_init(&qseecom.cdev, &qseecom_fops);
+	qseecom.cdev.owner = THIS_MODULE;
+
+	rc = cdev_add(&qseecom.cdev, MKDEV(MAJOR(qseecom_device_no), 0), 1);
+	if (rc < 0) {
+		pr_err("cdev_add failed %d\n", rc);
+		goto exit_destroy_device;
+>>>>>>> cm/cm-11.0
 	}
 
 	INIT_LIST_HEAD(&qseecom.registered_listener_list_head);
@@ -2388,7 +2586,11 @@ static int __devinit qseecom_probe(struct platform_device *pdev)
 				&qsee_not_legacy, sizeof(qsee_not_legacy));
 	if (rc) {
 		pr_err("Failed to retrieve QSEE version information %d\n", rc);
+<<<<<<< HEAD
 		goto err;
+=======
+		goto exit_del_cdev;
+>>>>>>> cm/cm-11.0
 	}
 	if (qsee_not_legacy)
 		qseecom.qseos_version = QSEOS_VERSION_14;
@@ -2404,14 +2606,22 @@ static int __devinit qseecom_probe(struct platform_device *pdev)
 	if (qseecom.ion_clnt == NULL) {
 		pr_err("Ion client cannot be created\n");
 		rc = -ENOMEM;
+<<<<<<< HEAD
 		goto err;
+=======
+		goto exit_del_cdev;
+>>>>>>> cm/cm-11.0
 	}
 
 	/* register client for bus scaling */
 	if (pdev->dev.of_node) {
 		ret = __qseecom_init_clk();
 		if (ret)
+<<<<<<< HEAD
 			goto err;
+=======
+			goto exit_destroy_ion_client;
+>>>>>>> cm/cm-11.0
 		qseecom_platform_support = (struct msm_bus_scale_pdata *)
 						msm_bus_cl_get_pdata(pdev);
 	} else {
@@ -2425,11 +2635,24 @@ static int __devinit qseecom_probe(struct platform_device *pdev)
 	if (!qsee_perf_client)
 		pr_err("Unable to register bus client\n");
 	return 0;
+<<<<<<< HEAD
 err:
 	device_destroy(driver_class, qseecom_device_no);
 class_destroy:
 	class_destroy(driver_class);
 unregister_chrdev_region:
+=======
+
+exit_destroy_ion_client:
+	ion_client_destroy(qseecom.ion_clnt);
+exit_del_cdev:
+	cdev_del(&qseecom.cdev);
+exit_destroy_device:
+	device_destroy(driver_class, qseecom_device_no);
+exit_destroy_class:
+	class_destroy(driver_class);
+exit_unreg_chrdev_region:
+>>>>>>> cm/cm-11.0
 	unregister_chrdev_region(qseecom_device_no, 1);
 	return rc;
 }
@@ -2440,6 +2663,7 @@ static int __devinit qseecom_remove(struct platform_device *pdev)
 	unsigned long flags = 0;
 	int ret = 0;
 
+<<<<<<< HEAD
 	if (pdev->dev.platform_data != NULL)
 		msm_bus_scale_unregister_client(qsee_perf_client);
 
@@ -2463,10 +2687,30 @@ static int __devinit qseecom_remove(struct platform_device *pdev)
 	while (kclient->handle != NULL) {
 		ret = qseecom_unload_app(kclient->handle->dev);
 		if (ret == 0) {
+=======
+	spin_lock_irqsave(&qseecom.registered_kclient_list_lock, flags);
+
+	list_for_each_entry(kclient, &qseecom.registered_kclient_list_head,
+								list) {
+		if (!kclient)
+			goto exit_irqrestore;
+
+		/* Break the loop if client handle is NULL */
+		if (!kclient->handle)
+			goto exit_free_kclient;
+
+		if (list_empty(&kclient->list))
+			goto exit_free_kc_handle;
+
+		list_del(&kclient->list);
+		ret = qseecom_unload_app(kclient->handle->dev);
+		if (!ret) {
+>>>>>>> cm/cm-11.0
 			kzfree(kclient->handle->dev);
 			kzfree(kclient->handle);
 			kzfree(kclient);
 		}
+<<<<<<< HEAD
 		spin_lock_irqsave(&qseecom.registered_kclient_list_lock, flags);
 		kclient = list_entry(
 				(&qseecom.registered_kclient_list_head)->next,
@@ -2491,6 +2735,38 @@ static int __devinit qseecom_remove(struct platform_device *pdev)
 	}
 	return ret;
 };
+=======
+	}
+
+exit_free_kc_handle:
+	kzfree(kclient->handle);
+exit_free_kclient:
+	kzfree(kclient);
+exit_irqrestore:
+	spin_unlock_irqrestore(&qseecom.registered_kclient_list_lock, flags);
+
+	if (qsee_perf_client)
+		msm_bus_scale_client_update_request(qsee_perf_client, 0);
+
+	if (pdev->dev.platform_data)
+		msm_bus_scale_unregister_client(qsee_perf_client);
+
+	if (pdev->dev.of_node)
+		__qseecom_disable_clk();
+
+	ion_client_destroy(qseecom.ion_clnt);
+
+	cdev_del(&qseecom.cdev);
+
+	device_destroy(driver_class, qseecom_device_no);
+
+	class_destroy(driver_class);
+
+	unregister_chrdev_region(qseecom_device_no, 1);
+
+	return ret;
+}
+>>>>>>> cm/cm-11.0
 
 static struct of_device_id qseecom_match[] = {
 	{
@@ -2516,6 +2792,7 @@ static int __devinit qseecom_init(void)
 
 static void __devexit qseecom_exit(void)
 {
+<<<<<<< HEAD
 
 	__qseecom_disable_clk();
 
@@ -2523,6 +2800,9 @@ static void __devexit qseecom_exit(void)
 	class_destroy(driver_class);
 	unregister_chrdev_region(qseecom_device_no, 1);
 	ion_client_destroy(qseecom.ion_clnt);
+=======
+	platform_driver_unregister(&qseecom_plat_driver);
+>>>>>>> cm/cm-11.0
 }
 
 MODULE_LICENSE("GPL v2");

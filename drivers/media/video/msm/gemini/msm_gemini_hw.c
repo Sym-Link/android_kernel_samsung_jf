@@ -499,6 +499,7 @@ int msm_gemini_hw_exec_cmds(struct msm_gemini_hw_cmd *hw_cmd_p, uint32_t m_cmds)
 	return is_copy_to_user;
 }
 
+<<<<<<< HEAD
 void msm_gemini_hw_region_dump(uint32_t size)
 {
 	uint32_t *p;
@@ -543,6 +544,8 @@ void msm_gemini_hw_region_dump(uint32_t size)
 	}
 }
 
+=======
+>>>>>>> cm/cm-11.0
 void msm_gemini_io_dump(int size)
 {
 	char line_str[128], *p_str;

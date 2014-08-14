@@ -3,7 +3,11 @@
  * Linux cfg80211 driver
  *
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -22,7 +26,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: wl_cfg80211.c 429125 2013-10-11 10:43:53Z $
+=======
+ * $Id: wl_cfg80211.c 431563 2013-10-24 01:50:16Z $
+>>>>>>> cm/cm-11.0
  */
 /* */
 #include <typedefs.h>
@@ -1358,7 +1366,11 @@ wl_cfg80211_add_virtual_iface(struct wiphy *wiphy,
 
 		wl_cfg80211_scan_abort(wl);
 #ifdef PROP_TXSTATUS_VSDB
+<<<<<<< HEAD
 		if (!wl->wlfc_on && !disable_proptx) {
+=======
+		if (dhd->op_mode != DHD_FLAG_IBSS_MODE && !wl->wlfc_on && !disable_proptx) {
+>>>>>>> cm/cm-11.0
 			dhd->wlfc_enabled = true;
 			dhd_wlfc_init(dhd);
 			err = wldev_ioctl(_ndev, WLC_UP, &up, sizeof(s32), true);
@@ -1433,7 +1445,11 @@ wl_cfg80211_add_virtual_iface(struct wiphy *wiphy,
 					dhd_mode = DHD_FLAG_P2P_GO_MODE;
 				DNGL_FUNC(dhd_cfg80211_set_p2p_info, (wl, dhd_mode));
 #ifdef PROP_TXSTATUS_VSDB
+<<<<<<< HEAD
 				if (dhd->plat_enable)
+=======
+				if (dhd->op_mode != DHD_FLAG_IBSS_MODE && dhd->plat_enable)
+>>>>>>> cm/cm-11.0
 					dhd->plat_enable((void *)dhd);
 #endif /* PROP_TXSTATUS_VSDB */
 				/* reinitialize completion to clear previous count */
@@ -1454,7 +1470,11 @@ wl_cfg80211_add_virtual_iface(struct wiphy *wiphy,
 			memset(wl->p2p->vir_ifname, '\0', IFNAMSIZ);
 			wl->p2p->vif_created = false;
 #ifdef PROP_TXSTATUS_VSDB
+<<<<<<< HEAD
 		if (dhd->wlfc_enabled && wl->wlfc_on) {
+=======
+		if (dhd->op_mode != DHD_FLAG_IBSS_MODE && dhd->wlfc_enabled && wl->wlfc_on) {
+>>>>>>> cm/cm-11.0
 			dhd->wlfc_enabled = false;
 			dhd_wlfc_deinit(dhd);
 			if (dhd->plat_deinit)
@@ -1760,7 +1780,11 @@ wl_cfg80211_ifdel_ops(struct net_device *ndev)
 
 		WL_DBG(("type : %d\n", type));
 #ifdef PROP_TXSTATUS_VSDB
+<<<<<<< HEAD
 		if (dhd->wlfc_enabled && wl->wlfc_on) {
+=======
+		if (dhd->op_mode != DHD_FLAG_IBSS_MODE && dhd->wlfc_enabled && wl->wlfc_on) {
+>>>>>>> cm/cm-11.0
 			dhd->wlfc_enabled = false;
 			dhd_wlfc_deinit(dhd);
 			if (dhd->plat_deinit)
@@ -2988,7 +3012,11 @@ wl_cfg80211_join_ibss(struct wiphy *wiphy, struct net_device *dev,
 	if (chan) {
 		if (chan->band == IEEE80211_BAND_5GHZ)
 			param[0] = WLC_BAND_5G;
+<<<<<<< HEAD
 		else if (chan->band == IEEE80211_BAND_5GHZ)
+=======
+		else if (chan->band == IEEE80211_BAND_2GHZ)
+>>>>>>> cm/cm-11.0
 			param[0] = WLC_BAND_2G;
 		err = wldev_iovar_getint(dev, "bw_cap", param);
 		if (unlikely(err)) {
@@ -3057,9 +3085,15 @@ wl_cfg80211_join_ibss(struct wiphy *wiphy, struct net_device *dev,
 	}
 	wl_update_prof(wl, dev, NULL, &join_params.ssid, WL_PROF_SSID);
 	wl_update_prof(wl, dev, NULL, &wl->channel, WL_PROF_CHAN);
+<<<<<<< HEAD
 #if defined(CUSTOMER_HW4) && defined(SUPPORT_AIBSS)
 	wl->aibss_txfail_seq = 0;	/* initialize the sequence */
 #endif /* CUSTOMER_HW4 && SUPPORT_AIBSS */
+=======
+#ifdef SUPPORT_AIBSS
+	wl->aibss_txfail_seq = 0;	/* initialize the sequence */
+#endif /* SUPPORT_AIBSS */
+>>>>>>> cm/cm-11.0
 	return err;
 }
 
@@ -3639,6 +3673,10 @@ wl_cfg80211_connect(struct wiphy *wiphy, struct net_device *dev,
 	size_t join_params_size;
 #if defined(ROAM_ENABLE) && defined(ROAM_AP_ENV_DETECTION)
 	dhd_pub_t *dhd =  (dhd_pub_t *)(wl->pub);
+<<<<<<< HEAD
+=======
+	s32 roam_trigger[2] = {0, 0};
+>>>>>>> cm/cm-11.0
 #endif /* ROAM_AP_ENV_DETECTION */
 	s32 err = 0;
 	wpa_ie_fixed_t *wpa_ie;
@@ -3776,6 +3814,7 @@ wl_cfg80211_connect(struct wiphy *wiphy, struct net_device *dev,
 		}
 	}
 #if defined(ROAM_ENABLE) && defined(ROAM_AP_ENV_DETECTION)
+<<<<<<< HEAD
 	if (dhd->roam_env_detection && (wldev_iovar_setint(dev, "roam_env_detection",
 		AP_ENV_DETECT_NOT_USED) == BCME_OK)) {
 		s32 roam_trigger[2] = {WL_AUTO_ROAM_TRIGGER, WLC_BAND_ALL};
@@ -3783,6 +3822,28 @@ wl_cfg80211_connect(struct wiphy *wiphy, struct net_device *dev,
 			sizeof(roam_trigger), true);
 		if (unlikely(err)) {
 			WL_ERR((" failed to restore roam_trigger for auto env detection\n"));
+=======
+	if (dhd->roam_env_detection) {
+		bool is_auto_roam_trigger = TRUE;
+		bool is_roam_env_ok = (wldev_iovar_setint(dev, "roam_env_detection",
+				AP_ENV_DETECT_NOT_USED) == BCME_OK);
+#ifdef CUSTOMER_HW4
+		roam_trigger[1] = WLC_BAND_2G;
+		is_auto_roam_trigger =
+			(wldev_ioctl(dev, WLC_GET_ROAM_TRIGGER, roam_trigger,
+			sizeof(roam_trigger), 0) == BCME_OK) &&
+			(roam_trigger[0] == WL_AUTO_ROAM_TRIGGER-10);
+#endif /* CUSTOMER_HW4 */
+		if (is_auto_roam_trigger && is_roam_env_ok) {
+			roam_trigger[0] = WL_AUTO_ROAM_TRIGGER;
+			roam_trigger[1] = WLC_BAND_ALL;
+			err = wldev_ioctl(dev, WLC_SET_ROAM_TRIGGER, roam_trigger,
+				sizeof(roam_trigger), true);
+			if (unlikely(err)) {
+				WL_ERR((" failed to restore roam_trigger for auto env"
+					" detection\n"));
+			}
+>>>>>>> cm/cm-11.0
 		}
 	}
 #endif /* ROAM_AP_ENV_DETECTION */
@@ -7379,6 +7440,19 @@ static s32 wl_setup_wiphy(struct wireless_dev *wdev, struct device *sdiofunc_dev
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(3, 2, 0)) || defined(WL_COMPAT_WIRELESS)
 	wdev->wiphy->flags |= WIPHY_FLAG_SUPPORTS_TDLS;
 #endif
+<<<<<<< HEAD
+=======
+
+#if defined(CONFIG_PM) && defined(WL_CFG80211_P2P_DEV_IF)
+	/*
+	 * From linux-3.10 kernel, wowlan packet filter is mandated to avoid the
+	 * disconnection of connected network before suspend. So a dummy wowlan
+	 * filter is configured for kernels linux-3.8 and above.
+	 */
+	wdev->wiphy->wowlan.flags = WIPHY_WOWLAN_ANY;
+#endif /* CONFIG_PM && WL_CFG80211_P2P_DEV_IF */
+
+>>>>>>> cm/cm-11.0
 	WL_DBG(("Registering custom regulatory)\n"));
 	wdev->wiphy->flags |= WIPHY_FLAG_CUSTOM_REGULATORY;
 	wiphy_apply_custom_regulatory(wdev->wiphy, &brcm_regdom);
@@ -7996,7 +8070,11 @@ wl_notify_connect_status(struct wl_priv *wl, bcm_struct_cfgdev *cfgdev,
 	return err;
 }
 
+<<<<<<< HEAD
 #if defined(CUSTOMER_HW4) && defined(SUPPORT_AIBSS)
+=======
+#ifdef SUPPORT_AIBSS
+>>>>>>> cm/cm-11.0
 void wl_cfg80211_set_txfail_pid(int pid)
 {
 	struct wl_priv *wl = wlcfg_drv_priv;
@@ -8013,6 +8091,7 @@ wl_notify_aibss_txfail(struct wl_priv *wl, struct net_device *ndev,
 	int ret = -1;
 
 	if (wl->aibss_txfail_pid != 0) {
+<<<<<<< HEAD
 		ret = wl_netlink_send_msg(wl->aibss_txfail_pid, wl->aibss_txfail_seq++, data, 6);
 	}
 
@@ -8020,6 +8099,18 @@ wl_notify_aibss_txfail(struct wl_priv *wl, struct net_device *ndev,
 	return ret;
 }
 #endif /* CUSTOMER_HW4 && SUPPORT_AIBSS */
+=======
+		ret = wl_netlink_send_msg(wl->aibss_txfail_pid, wl->aibss_txfail_seq++,
+			(void *)&e->addr, ETHER_ADDR_LEN);
+	}
+
+	WL_DBG(("txfail : evt=%d, pid=%d, ret=%d, mac=" MACF "\n",
+		evt, wl->aibss_txfail_pid, ret, ETHERP_TO_MACF(&e->addr)));
+
+	return ret;
+}
+#endif /* SUPPORT_AIBSS */
+>>>>>>> cm/cm-11.0
 
 static s32
 wl_notify_roaming_status(struct wl_priv *wl, bcm_struct_cfgdev *cfgdev,
@@ -9073,9 +9164,15 @@ static void wl_init_event_handler(struct wl_priv *wl)
 #ifdef WLTDLS
 	wl->evt_handler[WLC_E_TDLS_PEER_EVENT] = wl_tdls_event_handler;
 #endif /* WLTDLS */
+<<<<<<< HEAD
 #if defined(CUSTOMER_HW4) && defined(SUPPORT_AIBSS)
 	wl->evt_handler[WLC_E_AIBSS_TXFAIL] = wl_notify_aibss_txfail;
 #endif /* CUSTOMER_HW4 && SUPPORT_AIBSS */
+=======
+#ifdef SUPPORT_AIBSS
+	wl->evt_handler[WLC_E_AIBSS_TXFAIL] = wl_notify_aibss_txfail;
+#endif /* SUPPORT_AIBSS */
+>>>>>>> cm/cm-11.0
 #ifdef BCMCCX_S69
 	wl->evt_handler[WLC_E_CCX_S69_RESP_RX] = wl_ccx_s69_response;
 #endif
@@ -10301,7 +10398,11 @@ static s32  wl_cfg80211_detach_p2p(void)
 s32 wl_cfg80211_attach_post(struct net_device *ndev)
 {
 	struct wl_priv * wl = NULL;
+<<<<<<< HEAD
 	s32 err = 0;
+=======
+	s32 err = ENODEV;
+>>>>>>> cm/cm-11.0
 	WL_TRACE(("In\n"));
 	if (unlikely(!ndev)) {
 		WL_ERR(("ndev is invaild\n"));
@@ -10313,7 +10414,12 @@ s32 wl_cfg80211_attach_post(struct net_device *ndev)
 		return -EINVAL;
 	}
 	if (!wl_get_drv_status(wl, READY, ndev)) {
+<<<<<<< HEAD
 			if (wl->wdev && wl_cfgp2p_supported(wl, ndev)) {
+=======
+		if (wl->wdev) {
+			if( wl_cfgp2p_supported(wl, ndev) >= 0) {
+>>>>>>> cm/cm-11.0
 #if !defined(WL_ENABLE_P2P_IF)
 					wl->wdev->wiphy->interface_modes |=
 					(BIT(NL80211_IFTYPE_P2P_CLIENT)|
@@ -10338,8 +10444,17 @@ s32 wl_cfg80211_attach_post(struct net_device *ndev)
 #endif /* WL_ENABLE_P2P_IF */
 
 				wl->p2p_supported = true;
+<<<<<<< HEAD
 			}
 		}
+=======
+			} else {
+				/* SDIO bus timeout */
+				goto fail;
+			}
+		}
+	}
+>>>>>>> cm/cm-11.0
 	wl_set_drv_status(wl, READY, ndev);
 fail:
 	return err;
@@ -10411,7 +10526,11 @@ s32 wl_cfg80211_attach(struct net_device *ndev, void *data)
 	err = wl_cfg80211_btcoex_init(wl);
 	if (err)
 		goto cfg80211_attach_out;
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 	wlcfg_drv_priv = wl;
 
@@ -10440,7 +10559,11 @@ void wl_cfg80211_detach(void *para)
 
 #if defined(COEX_DHCP)
 	wl_cfg80211_btcoex_deinit(wl);
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 	wl_setup_rfkill(wl, FALSE);
 #ifdef DEBUGFS_CFG80211
@@ -11136,7 +11259,12 @@ static s32 __wl_cfg80211_down(struct wl_priv *wl)
 		wl_clr_p2p_status(wl, GO_NEG_PHASE);
 #ifdef PROP_TXSTATUS_VSDB
 		if (wl->p2p->vif_created) {
+<<<<<<< HEAD
 			if (dhd->wlfc_enabled && wl->wlfc_on) {
+=======
+			if (dhd-> op_mode != DHD_FLAG_IBSS_MODE &&
+				dhd->wlfc_enabled && wl->wlfc_on) {
+>>>>>>> cm/cm-11.0
 				dhd->wlfc_enabled = false;
 				dhd_wlfc_deinit(dhd);
 				if (dhd->plat_deinit)

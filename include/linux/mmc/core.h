@@ -96,7 +96,10 @@ struct mmc_command {
  */
 
 	unsigned int		cmd_timeout_ms;	/* in milliseconds */
+<<<<<<< HEAD
 	bool			bkops_busy;
+=======
+>>>>>>> cm/cm-11.0
 	/* Set this flag only for commands which can be HPIed */
 	bool			ignore_timeout;
 

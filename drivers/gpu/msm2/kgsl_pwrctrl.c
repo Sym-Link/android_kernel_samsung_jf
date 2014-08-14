@@ -34,6 +34,13 @@
 #define UPDATE_BUSY_VAL		1000000
 #define UPDATE_BUSY		50
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MSM_KGSL_KERNEL_API_ENABLE
+struct device *stored_dev;
+#endif
+
+>>>>>>> cm/cm-11.0
 /*
  * Expected delay for post-interrupt processing on A3xx.
  * The delay may be longer, gradually increase the delay
@@ -642,6 +649,55 @@ static int kgsl_pwrctrl_reset_count_show(struct device *dev,
 	return snprintf(buf, PAGE_SIZE, "%d\n", device->reset_counter);
 }
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MSM_KGSL_KERNEL_API_ENABLE
+int kgsl_pwrctrl_min_pwrlevel_store_kernel(int level)
+{
+	struct device *dev = stored_dev;
+	struct kgsl_device *device;
+	int request_level = level;
+	char buf_level[2] = {0,};
+
+	if (!dev) {
+		printk("%s, dev is null\n", __func__);
+		return -EINVAL;
+	}
+
+	device = kgsl_device_from_dev(dev);
+
+	if (!device) {
+		printk("%s, fail to get device\n", __func__);
+		return -EINVAL;
+	}
+
+	if (request_level < 0) {
+		printk("%s, invalid level : %d\n", __func__, request_level);
+		return -EINVAL;
+	}
+
+	if (request_level > device->pwrctrl.num_pwrlevels - 2)
+		request_level = device->pwrctrl.num_pwrlevels - 2;
+
+	buf_level[0] = (char)(request_level + '0');
+
+	return kgsl_pwrctrl_min_pwrlevel_store(dev, NULL, buf_level, sizeof(buf_level));
+}
+
+int kgsl_pwrctrl_num_pwrlevels_show_kernel(void)
+{
+
+	struct kgsl_device *device = kgsl_device_from_dev(stored_dev);
+	struct kgsl_pwrctrl *pwr;
+	if (device == NULL)
+		return 0;
+
+	pwr = &device->pwrctrl;
+	return pwr->num_pwrlevels - 1;
+}
+#endif
+
+>>>>>>> cm/cm-11.0
 static void __force_on(struct kgsl_device *device, int flag, int on)
 {
 	if (on) {
@@ -803,6 +859,12 @@ static const struct device_attribute *pwrctrl_attr_list[] = {
 
 int kgsl_pwrctrl_init_sysfs(struct kgsl_device *device)
 {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MSM_KGSL_KERNEL_API_ENABLE
+	stored_dev = device->dev;
+#endif
+>>>>>>> cm/cm-11.0
 	return kgsl_create_device_sysfs_files(device->dev, pwrctrl_attr_list);
 }
 
@@ -1399,9 +1461,22 @@ int kgsl_pwrctrl_sleep(struct kgsl_device *device)
 }
 EXPORT_SYMBOL(kgsl_pwrctrl_sleep);
 
+<<<<<<< HEAD
 /******************************************************************/
 /* Caller must hold the device mutex. */
 int kgsl_pwrctrl_wake(struct kgsl_device *device)
+=======
+/**
+ * kgsl_pwrctrl_wake() - Power up the GPU from a slumber/sleep state
+ * @device - Pointer to the kgsl_device struct
+ * @priority - Boolean flag to indicate that the GPU start should be run in the
+ * higher priority thread
+ *
+ * Resume the GPU from a lower power state to ACTIVE.  The caller to this
+ * fucntion must host the kgsl_device mutex.
+ */
+int kgsl_pwrctrl_wake(struct kgsl_device *device, int priority)
+>>>>>>> cm/cm-11.0
 {
 	int status = 0;
 	unsigned int context_id;
@@ -1412,7 +1487,12 @@ int kgsl_pwrctrl_wake(struct kgsl_device *device)
 	kgsl_pwrctrl_request_state(device, KGSL_STATE_ACTIVE);
 	switch (device->state) {
 	case KGSL_STATE_SLUMBER:
+<<<<<<< HEAD
 		status = device->ftbl->start(device);
+=======
+		status = device->ftbl->start(device, priority);
+
+>>>>>>> cm/cm-11.0
 		if (status) {
 			kgsl_pwrctrl_request_state(device, KGSL_STATE_NONE);
 			KGSL_DRV_ERR(device, "start failed %d\n", status);
@@ -1545,7 +1625,11 @@ int kgsl_active_count_get(struct kgsl_device *device)
 			mutex_lock(&device->mutex);
 		}
 
+<<<<<<< HEAD
 		ret = kgsl_pwrctrl_wake(device);
+=======
+		ret = kgsl_pwrctrl_wake(device, 1);
+>>>>>>> cm/cm-11.0
 	}
 	if (ret == 0)
 		atomic_inc(&device->active_cnt);

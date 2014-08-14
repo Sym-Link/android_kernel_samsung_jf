@@ -127,9 +127,12 @@ struct mdnie_lite_tun_type {
 void mdnie_lite_tuning_init(void);
 void init_mdnie_class(void);
 void is_negative_on(void);
+<<<<<<< HEAD
 #if defined(CONFIG_FB_MSM_MIPI_RENESAS_TFT_VIDEO_FULL_HD_PT_PANEL)
 int is_cabc_on ( void );
 #endif
+=======
+>>>>>>> cm/cm-11.0
 
 void coordinate_tunning(int x, int y);
 

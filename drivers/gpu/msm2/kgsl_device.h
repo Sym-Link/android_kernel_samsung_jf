@@ -62,6 +62,11 @@
 #define KGSL_EVENT_TIMESTAMP_RETIRED 0
 #define KGSL_EVENT_CANCELLED 1
 
+<<<<<<< HEAD
+=======
+#define KGSL_FLAG_WAKE_ON_TOUCH BIT(0)
+
+>>>>>>> cm/cm-11.0
 /*
  * "list" of event types for ftrace symbolic magic
  */
@@ -91,7 +96,11 @@ struct kgsl_functable {
 	bool (*isidle) (struct kgsl_device *device);
 	int (*suspend_context) (struct kgsl_device *device);
 	int (*init) (struct kgsl_device *device);
+<<<<<<< HEAD
 	int (*start) (struct kgsl_device *device);
+=======
+	int (*start) (struct kgsl_device *device, int priority);
+>>>>>>> cm/cm-11.0
 	int (*stop) (struct kgsl_device *device);
 	int (*getproperty) (struct kgsl_device *device,
 		enum kgsl_property_type type, void *value,

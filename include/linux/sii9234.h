@@ -25,7 +25,11 @@ struct sii9234_platform_data {
 	int gpio;
 	void (*mhl_sel)(bool);
 	void (*gpio_cfg)(void);
+<<<<<<< HEAD
 #ifdef CONFIG_VIDEO_MHL_V2
+=======
+#if defined(CONFIG_VIDEO_MHL_V2) || defined(CONFIG_VIDEO_MHL_TAB_V2)
+>>>>>>> cm/cm-11.0
 	int prio;
 	void (*enable)(bool enable);
 	void (*power)(int on);

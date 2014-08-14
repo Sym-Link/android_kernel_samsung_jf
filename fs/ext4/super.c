@@ -437,6 +437,7 @@ static void ext4_journal_commit_callback(journal_t *journal, transaction_t *txn)
 	struct super_block		*sb = journal->j_private;
 	struct ext4_sb_info		*sbi = EXT4_SB(sb);
 	int				error = is_journal_aborted(journal);
+<<<<<<< HEAD
 	struct ext4_journal_cb_entry	*jce;
 
 	BUG_ON(txn->t_state == T_FINISHED);
@@ -444,6 +445,12 @@ static void ext4_journal_commit_callback(journal_t *journal, transaction_t *txn)
 	while (!list_empty(&txn->t_private_list)) {
 		jce = list_entry(txn->t_private_list.next,
 				 struct ext4_journal_cb_entry, jce_list);
+=======
+	struct ext4_journal_cb_entry	*jce, *tmp;
+
+	spin_lock(&sbi->s_md_lock);
+	list_for_each_entry_safe(jce, tmp, &txn->t_private_list, jce_list) {
+>>>>>>> cm/cm-11.0
 		list_del_init(&jce->jce_list);
 		spin_unlock(&sbi->s_md_lock);
 		jce->jce_func(sb, jce, error);
@@ -500,7 +507,10 @@ void __ext4_error(struct super_block *sb, const char *function,
 	printk(KERN_CRIT "EXT4-fs error (device %s): %s:%d: comm %s: %pV\n",
 	       sb->s_id, function, line, current->comm, &vaf);
 	va_end(args);
+<<<<<<< HEAD
 	save_error_info(sb, function, line);
+=======
+>>>>>>> cm/cm-11.0
 
 	ext4_handle_error(sb);
 }
@@ -935,7 +945,10 @@ static struct inode *ext4_alloc_inode(struct super_block *sb)
 	ei->i_reserved_meta_blocks = 0;
 	ei->i_allocated_meta_blocks = 0;
 	ei->i_da_metadata_calc_len = 0;
+<<<<<<< HEAD
 	ei->i_da_metadata_calc_last_lblock = 0;
+=======
+>>>>>>> cm/cm-11.0
 	spin_lock_init(&(ei->i_block_reservation_lock));
 #ifdef CONFIG_QUOTA
 	ei->i_reserved_quota = 0;
@@ -1602,7 +1615,13 @@ static int parse_options(char *options, struct super_block *sb,
 			 unsigned int *journal_ioprio,
 			 int is_remount)
 {
+<<<<<<< HEAD
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
+=======
+#ifdef CONFIG_QUOTA
+	struct ext4_sb_info *sbi = EXT4_SB(sb);
+#endif
+>>>>>>> cm/cm-11.0
 	char *p;
 	substring_t args[MAX_OPT_ARGS];
 	int token;
@@ -1651,6 +1670,7 @@ static int parse_options(char *options, struct super_block *sb,
 		}
 	}
 #endif
+<<<<<<< HEAD
 	if (test_opt(sb, DIOREAD_NOLOCK)) {
 		int blocksize =
 			BLOCK_SIZE << le32_to_cpu(sbi->s_es->s_log_block_size);
@@ -1661,6 +1681,8 @@ static int parse_options(char *options, struct super_block *sb,
 			return 0;
 		}
 	}
+=======
+>>>>>>> cm/cm-11.0
 	return 1;
 }
 
@@ -1703,7 +1725,11 @@ static inline void ext4_show_quota_options(struct seq_file *seq,
 
 static const char *token2str(int token)
 {
+<<<<<<< HEAD
 	const struct match_token *t;
+=======
+	static const struct match_token *t;
+>>>>>>> cm/cm-11.0
 
 	for (t = tokens; t->token != Opt_err; t++)
 		if (t->token == token && !strchr(t->pattern, '='))
@@ -1910,8 +1936,13 @@ static int ext4_fill_flex_info(struct super_block *sb)
 		flex_group = ext4_flex_group(sbi, i);
 		atomic_add(ext4_free_inodes_count(sb, gdp),
 			   &sbi->s_flex_groups[flex_group].free_inodes);
+<<<<<<< HEAD
 		atomic64_add(ext4_free_group_clusters(sb, gdp),
 			     &sbi->s_flex_groups[flex_group].free_clusters);
+=======
+		atomic_add(ext4_free_group_clusters(sb, gdp),
+			   &sbi->s_flex_groups[flex_group].free_clusters);
+>>>>>>> cm/cm-11.0
 		atomic_add(ext4_used_dirs_count(sb, gdp),
 			   &sbi->s_flex_groups[flex_group].used_dirs);
 	}
@@ -2123,9 +2154,13 @@ static void ext4_orphan_cleanup(struct super_block *sb,
 				__func__, inode->i_ino, inode->i_size);
 			jbd_debug(2, "truncating inode %lu to %lld bytes\n",
 				  inode->i_ino, inode->i_size);
+<<<<<<< HEAD
 			mutex_lock(&inode->i_mutex);
 			ext4_truncate(inode);
 			mutex_unlock(&inode->i_mutex);
+=======
+			ext4_truncate(inode);
+>>>>>>> cm/cm-11.0
 			nr_truncates++;
 		} else {
 			ext4_msg(sb, KERN_DEBUG,
@@ -2958,6 +2993,7 @@ static void ext4_destroy_lazyinit_thread(void)
 	kthread_stop(ext4_lazyinit_task);
 }
 
+<<<<<<< HEAD
 /*
  * Note: calculating the overhead so we can be compatible with
  * historical BSD practice is quite difficult in the face of
@@ -3070,6 +3106,8 @@ int ext4_calculate_overhead(struct super_block *sb)
 	return 0;
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 {
 	char *orig_data = kstrdup(data, GFP_KERNEL);
@@ -3232,13 +3270,29 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		}
 		if (test_opt(sb, DIOREAD_NOLOCK)) {
 			ext4_msg(sb, KERN_ERR, "can't mount with "
+<<<<<<< HEAD
 				 "both data=journal and dioread_nolock");
+=======
+				 "both data=journal and delalloc");
+>>>>>>> cm/cm-11.0
 			goto failed_mount;
 		}
 		if (test_opt(sb, DELALLOC))
 			clear_opt(sb, DELALLOC);
 	}
 
+<<<<<<< HEAD
+=======
+	blocksize = BLOCK_SIZE << le32_to_cpu(es->s_log_block_size);
+	if (test_opt(sb, DIOREAD_NOLOCK)) {
+		if (blocksize < PAGE_SIZE) {
+			ext4_msg(sb, KERN_ERR, "can't mount with "
+				 "dioread_nolock if block size != PAGE_SIZE");
+			goto failed_mount;
+		}
+	}
+
+>>>>>>> cm/cm-11.0
 	sb->s_flags = (sb->s_flags & ~MS_POSIXACL) |
 		(test_opt(sb, POSIX_ACL) ? MS_POSIXACL : 0);
 
@@ -3280,7 +3334,10 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	if (!ext4_feature_set_ok(sb, (sb->s_flags & MS_RDONLY)))
 		goto failed_mount;
 
+<<<<<<< HEAD
 	blocksize = BLOCK_SIZE << le32_to_cpu(es->s_log_block_size);
+=======
+>>>>>>> cm/cm-11.0
 	if (blocksize < EXT4_MIN_BLOCK_SIZE ||
 	    blocksize > EXT4_MAX_BLOCK_SIZE) {
 		ext4_msg(sb, KERN_ERR,
@@ -3677,6 +3734,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 
 no_journal:
 	/*
+<<<<<<< HEAD
 	 * Get the # of file system overhead blocks from the
 	 * superblock if present.
 	 */
@@ -3689,6 +3747,8 @@ no_journal:
 	}
 
 	/*
+=======
+>>>>>>> cm/cm-11.0
 	 * The maximum number of concurrent works can be high and
 	 * concurrency isn't really necessary.  Limit it to 1.
 	 */
@@ -3723,8 +3783,12 @@ no_journal:
 		goto failed_mount4;
 	}
 
+<<<<<<< HEAD
 	if (ext4_setup_super(sb, es, sb->s_flags & MS_RDONLY))
 		sb->s_flags |= MS_RDONLY;
+=======
+	ext4_setup_super(sb, es, sb->s_flags & MS_RDONLY);
+>>>>>>> cm/cm-11.0
 
 	/* determine the minimum size of new large inodes, if present */
 	if (sbi->s_inode_size > EXT4_GOOD_OLD_INODE_SIZE) {
@@ -4244,7 +4308,10 @@ static void ext4_clear_journal_err(struct super_block *sb,
 		ext4_commit_super(sb, 1);
 
 		jbd2_journal_clear_err(journal);
+<<<<<<< HEAD
 		jbd2_journal_update_sb_errno(journal);
+=======
+>>>>>>> cm/cm-11.0
 	}
 }
 
@@ -4404,6 +4471,7 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
 		goto restore_opts;
 	}
 
+<<<<<<< HEAD
 	if (test_opt(sb, DATA_FLAGS) == EXT4_MOUNT_JOURNAL_DATA) {
 		if (test_opt2(sb, EXPLICIT_DELALLOC)) {
 			ext4_msg(sb, KERN_ERR, "can't mount with "
@@ -4419,6 +4487,8 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
 		}
 	}
 
+=======
+>>>>>>> cm/cm-11.0
 	if (sbi->s_mount_flags & EXT4_MF_FS_ABORTED)
 		ext4_abort(sb, "Abort forced by user");
 
@@ -4533,7 +4603,11 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
 	}
 
 	ext4_setup_system_zone(sb);
+<<<<<<< HEAD
 	if (sbi->s_journal == NULL && !(old_sb_flags & MS_RDONLY))
+=======
+	if (sbi->s_journal == NULL)
+>>>>>>> cm/cm-11.0
 		ext4_commit_super(sb, 1);
 
 #ifdef CONFIG_QUOTA
@@ -4574,11 +4648,30 @@ restore_opts:
 	return err;
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Note: calculating the overhead so we can be compatible with
+ * historical BSD practice is quite difficult in the face of
+ * clusters/bigalloc.  This is because multiple metadata blocks from
+ * different block group can end up in the same allocation cluster.
+ * Calculating the exact overhead in the face of clustered allocation
+ * requires either O(all block bitmaps) in memory or O(number of block
+ * groups**2) in time.  We will still calculate the superblock for
+ * older file systems --- and if we come across with a bigalloc file
+ * system with zero in s_overhead_clusters the estimate will be close to
+ * correct especially for very large cluster sizes --- but for newer
+ * file systems, it's better to calculate this figure once at mkfs
+ * time, and store it in the superblock.  If the superblock value is
+ * present (even for non-bigalloc file systems), we will use it.
+ */
+>>>>>>> cm/cm-11.0
 static int ext4_statfs(struct dentry *dentry, struct kstatfs *buf)
 {
 	struct super_block *sb = dentry->d_sb;
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 	struct ext4_super_block *es = sbi->s_es;
+<<<<<<< HEAD
 	ext4_fsblk_t overhead = 0;
 	u64 fsid;
 	s64 bfree;
@@ -4589,6 +4682,49 @@ static int ext4_statfs(struct dentry *dentry, struct kstatfs *buf)
 	buf->f_type = EXT4_SUPER_MAGIC;
 	buf->f_bsize = sb->s_blocksize;
 	buf->f_blocks = ext4_blocks_count(es) - EXT4_C2B(sbi, sbi->s_overhead);
+=======
+	struct ext4_group_desc *gdp;
+	u64 fsid;
+	s64 bfree;
+
+	if (test_opt(sb, MINIX_DF)) {
+		sbi->s_overhead_last = 0;
+	} else if (es->s_overhead_clusters) {
+		sbi->s_overhead_last = le32_to_cpu(es->s_overhead_clusters);
+	} else if (sbi->s_blocks_last != ext4_blocks_count(es)) {
+		ext4_group_t i, ngroups = ext4_get_groups_count(sb);
+		ext4_fsblk_t overhead = 0;
+
+		/*
+		 * Compute the overhead (FS structures).  This is constant
+		 * for a given filesystem unless the number of block groups
+		 * changes so we cache the previous value until it does.
+		 */
+
+		/*
+		 * All of the blocks before first_data_block are
+		 * overhead
+		 */
+		overhead = EXT4_B2C(sbi, le32_to_cpu(es->s_first_data_block));
+
+		/*
+		 * Add the overhead found in each block group
+		 */
+		for (i = 0; i < ngroups; i++) {
+			gdp = ext4_get_group_desc(sb, i, NULL);
+			overhead += ext4_num_overhead_clusters(sb, i, gdp);
+			cond_resched();
+		}
+		sbi->s_overhead_last = overhead;
+		smp_wmb();
+		sbi->s_blocks_last = ext4_blocks_count(es);
+	}
+
+	buf->f_type = EXT4_SUPER_MAGIC;
+	buf->f_bsize = sb->s_blocksize;
+	buf->f_blocks = (ext4_blocks_count(es) -
+			 EXT4_C2B(sbi, sbi->s_overhead_last));
+>>>>>>> cm/cm-11.0
 	bfree = percpu_counter_sum_positive(&sbi->s_freeclusters_counter) -
 		percpu_counter_sum_positive(&sbi->s_dirtyclusters_counter);
 	/* prevent underflow in case that few free space is available */
@@ -4887,7 +5023,12 @@ out:
 void print_bh(struct super_block *sb, struct buffer_head *bh
 		, int start, int len)
 {
+<<<<<<< HEAD
 	print_block_data(sb, bh->b_blocknr, bh->b_data, start, len);
+=======
+	if(bh)
+		print_block_data(sb, bh->b_blocknr, bh->b_data, start, len);
+>>>>>>> cm/cm-11.0
 }
 
 void print_block_data(struct super_block *sb, sector_t blocknr

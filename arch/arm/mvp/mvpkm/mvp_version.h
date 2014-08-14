@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -71,6 +75,7 @@
  *
  */
 
+<<<<<<< HEAD
 #define MVP_VERSION_CODE 16800032
 #define MVP_VERSION_CODE_FORMATSTR       "%s_%d"
 #define MVP_VERSION_CODE_FORMATARGSV(V_) MVP_STRINGIFY(1.3.1), (V_)
@@ -98,6 +103,34 @@
       }                                          \
       versionApi_;                               \
    })
+=======
+#define MVP_VERSION_CODE 16800041
+#define MVP_VERSION_CODE_FORMATSTR       "%s_%d"
+#define MVP_VERSION_CODE_FORMATARGSV(V_) MVP_STRINGIFY(1.6.0), (V_)
+#define MVP_VERSION_CODE_FORMATARGS	\
+	MVP_VERSION_CODE_FORMATARGSV(MVP_VERSION_CODE)
+
+#define MVP_VERSION_FORMATSTR				\
+	MVP_VERSION_CODE_FORMATSTR			\
+	" compiled at %s based on revision %s by user %s."
+
+#define MVP_VERSION_FORMATARGS		\
+	MVP_VERSION_CODE_FORMATARGS,	\
+	__DATE__,			\
+	MVP_STRINGIFY(b929bac713959c76f8eb1f485c86be6156df4614),	\
+	MVP_STRINGIFY()
+
+#define MvpVersion_Map(map_, version_) ({		\
+	uint32 ii_;					\
+	uint32 versionApi_ = 0;				\
+							\
+	for (ii_ = 0; ii_ < NELEM(map_); ii_++) {	\
+		if (map_[ii_] <= version_)		\
+			versionApi_ = map_[ii_];	\
+	}						\
+	versionApi_;					\
+})
+>>>>>>> cm/cm-11.0
 
 /*
  * MVP.apk must communicate to VVP and OEK on many of its APIs. To
@@ -110,7 +143,17 @@
  * determined, they must be entered here. Then the various APIs can
  * remove code that has been obsoleted before the new minimum versions.
  */
+<<<<<<< HEAD
 #define VVP_VERSION_CODE_MIN 0x0100020e
 #define OEK_VERSION_CODE_MIN 0x01000001
 
+=======
+#define VVP_VERSION_CODE_MIN 16800015
+#define OEK_VERSION_CODE_MIN 0x01000001
+
+#define BALLOON_WATCHDOG     16800010
+#define GUEST_SAME_MINFREE   16800033
+#define BALLOON_WATCHDOG_RO  16800039
+
+>>>>>>> cm/cm-11.0
 #endif /* _MVP_VERSION_H_ */

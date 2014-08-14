@@ -33,6 +33,12 @@
 
 #include "fault.h"
 
+<<<<<<< HEAD
+=======
+#define CREATE_TRACE_POINTS
+#include <trace/events/exception.h>
+
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_MMU
 
 #ifdef CONFIG_KPROBES
@@ -230,7 +236,11 @@ __do_kernel_fault(struct mm_struct *mm, unsigned long addr, unsigned int fsr,
 			"isb"
 			::"r"(0));
 		//tima_dump_log2();
+<<<<<<< HEAD
 		return; 
+=======
+		return;
+>>>>>>> cm/cm-11.0
 	}
 #endif
 
@@ -263,6 +273,11 @@ __do_user_fault(struct task_struct *tsk, unsigned long addr,
 {
 	struct siginfo si;
 
+<<<<<<< HEAD
+=======
+	trace_user_fault(tsk, addr, fsr);
+
+>>>>>>> cm/cm-11.0
 #ifdef CONFIG_DEBUG_USER
 	if (((user_debug & UDBG_SEGV) && (sig == SIGSEGV)) ||
 	    ((user_debug & UDBG_BUS)  && (sig == SIGBUS))) {

@@ -127,7 +127,13 @@ static void __etb_disable(struct etb_drvdata *drvdata)
 	ETB_UNLOCK(drvdata);
 
 	ffcr = etb_readl(drvdata, ETB_FFCR);
+<<<<<<< HEAD
 	ffcr |= (BIT(12) | BIT(6));
+=======
+	ffcr |= BIT(12);
+	etb_writel(drvdata, ffcr, ETB_FFCR);
+	ffcr |= BIT(6);
+>>>>>>> cm/cm-11.0
 	etb_writel(drvdata, ffcr, ETB_FFCR);
 	for (count = TIMEOUT_US; BVAL(etb_readl(drvdata, ETB_FFCR), 6) != 0
 				&& count > 0; count--)

@@ -53,19 +53,31 @@ static struct vsycn_ctrl {
 	int ov_koff;
 	int ov_done;
 	atomic_t suspend;
+<<<<<<< HEAD
+=======
+	atomic_t vsync_resume;
+	int wait_vsync_cnt;
+>>>>>>> cm/cm-11.0
 	int blt_change;
 	int blt_free;
 	int sysfs_created;
 	struct mutex update_lock;
 	struct completion ov_comp;
 	struct completion dmap_comp;
+<<<<<<< HEAD
+=======
+	struct completion vsync_comp;
+>>>>>>> cm/cm-11.0
 	spinlock_t spin_lock;
 	struct msm_fb_data_type *mfd;
 	struct mdp4_overlay_pipe *base_pipe;
 	struct vsync_update vlist[2];
 	int vsync_irq_enabled;
 	ktime_t vsync_time;
+<<<<<<< HEAD
 	wait_queue_head_t wait_queue;
+=======
+>>>>>>> cm/cm-11.0
 } vsync_ctrl_db[MAX_CONTROLLER];
 
 
@@ -183,11 +195,14 @@ int mdp4_lcdc_pipe_commit(int cndx, int wait)
 	undx =  vctrl->update_ndx;
 	vp = &vctrl->vlist[undx];
 	pipe = vctrl->base_pipe;
+<<<<<<< HEAD
 	if (pipe == NULL) {
 		pr_err("%s: NO base pipe\n", __func__);
 		mutex_unlock(&vctrl->update_lock);
 		return 0;
 	}
+=======
+>>>>>>> cm/cm-11.0
 	mixer = pipe->mixer_num;
 
         mdp_update_pm(vctrl->mfd, vctrl->vsync_time);
@@ -208,6 +223,12 @@ int mdp4_lcdc_pipe_commit(int cndx, int wait)
 	}
 	mutex_unlock(&vctrl->update_lock);
 
+<<<<<<< HEAD
+=======
+	/* free previous committed iommu back to pool */
+	mdp4_overlay_iommu_unmap_freelist(mixer);
+
+>>>>>>> cm/cm-11.0
 	spin_lock_irqsave(&vctrl->spin_lock, flags);
 	if (vctrl->ov_koff != vctrl->ov_done) {
 		spin_unlock_irqrestore(&vctrl->spin_lock, flags);
@@ -274,6 +295,10 @@ int mdp4_lcdc_pipe_commit(int cndx, int wait)
 		}
 	}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cm/cm-11.0
 	pipe = vctrl->base_pipe;
 	spin_lock_irqsave(&vctrl->spin_lock, flags);
 	if (pipe->ov_blt_addr) {
@@ -342,15 +367,28 @@ void mdp4_lcdc_vsync_ctrl(struct fb_info *info, int enable)
 	pr_debug("%s: vsync enable=%d\n", __func__, enable);
 
 	vctrl->vsync_irq_enabled = enable;
+<<<<<<< HEAD
 	
 	mdp4_lcdc_vsync_irq_ctrl(cndx, enable);
 
+=======
+
+	mdp4_lcdc_vsync_irq_ctrl(cndx, enable);
+
+
+	if (vctrl->vsync_irq_enabled &&  atomic_read(&vctrl->suspend) == 0)
+		atomic_set(&vctrl->vsync_resume, 1);
+>>>>>>> cm/cm-11.0
 }
 
 void mdp4_lcdc_wait4vsync(int cndx)
 {
 	struct vsycn_ctrl *vctrl;
 	struct mdp4_overlay_pipe *pipe;
+<<<<<<< HEAD
+=======
+	unsigned long flags;
+>>>>>>> cm/cm-11.0
 
 	if (cndx >= MAX_CONTROLLER) {
 		pr_err("%s: out or range: cndx=%d\n", __func__, cndx);
@@ -363,11 +401,27 @@ void mdp4_lcdc_wait4vsync(int cndx)
 	if (atomic_read(&vctrl->suspend) > 0)
 		return;
 
+<<<<<<< HEAD
 	mdp4_lcdc_vsync_irq_ctrl(cndx, 1);
 
 	wait_event_interruptible_timeout(vctrl->wait_queue, 1,
 			msecs_to_jiffies(VSYNC_PERIOD * 8));
 
+=======
+	/* start timing generator & mmu if they are not started yet */
+	mdp4_overlay_lcdc_start();
+
+	mdp4_lcdc_vsync_irq_ctrl(cndx, 1);
+
+	spin_lock_irqsave(&vctrl->spin_lock, flags);
+
+	if (vctrl->wait_vsync_cnt == 0)
+		INIT_COMPLETION(vctrl->vsync_comp);
+	vctrl->wait_vsync_cnt++;
+	spin_unlock_irqrestore(&vctrl->spin_lock, flags);
+
+	wait_for_completion(&vctrl->vsync_comp);
+>>>>>>> cm/cm-11.0
 	mdp4_lcdc_vsync_irq_ctrl(cndx, 0);
 	mdp4_stat.wait4vsync0++;
 }
@@ -412,6 +466,7 @@ ssize_t mdp4_lcdc_show_event(struct device *dev,
 	int cndx;
 	struct vsycn_ctrl *vctrl;
 	ssize_t ret = 0;
+<<<<<<< HEAD
 	u64 vsync_tick;
 	ktime_t timestamp;
 
@@ -427,6 +482,60 @@ ssize_t mdp4_lcdc_show_event(struct device *dev,
 
 	vsync_tick = ktime_to_ns(vctrl->vsync_time);
 	ret = scnprintf(buf, PAGE_SIZE, "VSYNC=%llu", vsync_tick);
+=======
+	unsigned long flags;
+	u64 vsync_tick;
+	ktime_t ctime;
+	u32 ctick, ptick;
+	int diff;
+
+	cndx = 0;
+	vctrl = &vsync_ctrl_db[0];
+
+	if (atomic_read(&vctrl->suspend) > 0 ||
+		atomic_read(&vctrl->vsync_resume) == 0)
+		return 0;
+	/*
+	 * show_event thread keep spinning on vctrl->vsync_comp
+	 * race condition on x.done if multiple thread blocked
+	 * at wait_for_completion(&vctrl->vsync_comp)
+	 *
+	 * if show_event thread waked up first then it will come back
+	 * and call INIT_COMPLETION(vctrl->vsync_comp) which set x.done = 0
+	 * then second thread wakeed up which set x.done = 0x7ffffffd
+	 * after that wait_for_completion will never wait.
+	 * To avoid this, force show_event thread to sleep 5 ms here
+	 * since it has full vsycn period (16.6 ms) to wait
+	 */
+	ctime = ktime_get();
+	ctick = (u32)ktime_to_us(ctime);
+	ptick = (u32)ktime_to_us(vctrl->vsync_time);
+	ptick += 5000;	/* 5ms */
+	diff = ptick - ctick;
+	if (diff > 0) {
+		if (diff > 1000) /* 1 ms */
+			diff = 1000;
+		usleep(diff);
+	}
+
+	spin_lock_irqsave(&vctrl->spin_lock, flags);
+	if (vctrl->wait_vsync_cnt == 0)
+		INIT_COMPLETION(vctrl->vsync_comp);
+	vctrl->wait_vsync_cnt++;
+	spin_unlock_irqrestore(&vctrl->spin_lock, flags);
+	ret = wait_for_completion_interruptible_timeout(&vctrl->vsync_comp,
+		msecs_to_jiffies(VSYNC_PERIOD * 4));
+	if (ret <= 0) {
+		vctrl->wait_vsync_cnt = 0;
+		vctrl->vsync_time = ktime_get();
+	}
+
+	spin_lock_irqsave(&vctrl->spin_lock, flags);
+	vsync_tick = ktime_to_ns(vctrl->vsync_time);
+	spin_unlock_irqrestore(&vctrl->spin_lock, flags);
+
+	ret = snprintf(buf, PAGE_SIZE, "VSYNC=%llu", vsync_tick);
+>>>>>>> cm/cm-11.0
 	buf[strlen(buf) + 1] = '\0';
 	return ret;
 }
@@ -449,6 +558,7 @@ void mdp4_lcdc_vsync_init(int cndx)
 	vctrl->inited = 1;
 	vctrl->update_ndx = 0;
 	mutex_init(&vctrl->update_lock);
+<<<<<<< HEAD
 	init_completion(&vctrl->dmap_comp);
 	init_completion(&vctrl->ov_comp);
 	atomic_set(&vctrl->suspend, 1);
@@ -456,6 +566,15 @@ void mdp4_lcdc_vsync_init(int cndx)
 	init_waitqueue_head(&vctrl->wait_queue);
 }
 
+=======
+	init_completion(&vctrl->vsync_comp);
+	init_completion(&vctrl->dmap_comp);
+	init_completion(&vctrl->ov_comp);
+	atomic_set(&vctrl->suspend, 1);
+	atomic_set(&vctrl->vsync_resume, 1);
+	spin_lock_init(&vctrl->spin_lock);
+}
+>>>>>>> cm/cm-11.0
 void mdp4_lcdc_free_base_pipe(struct msm_fb_data_type *mfd)
 {
 	struct vsycn_ctrl *vctrl;
@@ -542,11 +661,16 @@ int mdp4_lcdc_on(struct platform_device *pdev)
 	if (mfd->key != MFD_KEY)
 		return -EINVAL;
 
+<<<<<<< HEAD
 	mutex_lock(&mfd->dma->ov_mutex);
 
 	vctrl->mfd = mfd;
 	vctrl->dev = mfd->fbi->dev;
 	vctrl->vsync_irq_enabled = 0;
+=======
+	vctrl->mfd = mfd;
+	vctrl->dev = mfd->fbi->dev;
+>>>>>>> cm/cm-11.0
 
 	/* mdp clock on */
 	mdp_clk_ctrl(1);
@@ -601,8 +725,11 @@ int mdp4_lcdc_on(struct platform_device *pdev)
 	pipe->srcp0_ystride = fbi->fix.line_length;
 	pipe->bpp = bpp;
 
+<<<<<<< HEAD
 	mdp4_overlay_solidfill_init(pipe);
 
+=======
+>>>>>>> cm/cm-11.0
 	mdp4_overlay_mdp_pipe_req(pipe, mfd);
 	mdp4_calc_blt_mdp_bw(mfd, pipe);
 
@@ -615,7 +742,10 @@ int mdp4_lcdc_on(struct platform_device *pdev)
 
 	mdp4_overlay_reg_flush(pipe, 1);
 	mdp4_mixer_stage_up(pipe, 0);
+<<<<<<< HEAD
 	mdp4_mixer_stage_commit(pipe->mixer_num);
+=======
+>>>>>>> cm/cm-11.0
 
 
 	/*
@@ -710,12 +840,16 @@ int mdp4_lcdc_on(struct platform_device *pdev)
 	mdp_pipe_ctrl(MDP_CMD_BLOCK, MDP_BLOCK_POWER_OFF, FALSE);
 
 	mdp_histogram_ctrl_all(TRUE);
+<<<<<<< HEAD
 	mdp4_overlay_lcdc_start();
 	mutex_unlock(&mfd->dma->ov_mutex);
+=======
+>>>>>>> cm/cm-11.0
 
 	return ret;
 }
 
+<<<<<<< HEAD
 /* timing generator off */
 static void mdp4_lcdc_tg_off(struct vsycn_ctrl *vctrl)
 {
@@ -727,6 +861,8 @@ static void mdp4_lcdc_tg_off(struct vsycn_ctrl *vctrl)
 
 	mdp4_lcdc_wait4vsync(0);
 }
+=======
+>>>>>>> cm/cm-11.0
 int mdp4_lcdc_off(struct platform_device *pdev)
 {
 	int ret = 0;
@@ -737,6 +873,7 @@ int mdp4_lcdc_off(struct platform_device *pdev)
 	struct vsync_update *vp;
 	unsigned long flags;
 	int undx, need_wait = 0;
+<<<<<<< HEAD
 	int mixer = 0;
 
 	mfd = (struct msm_fb_data_type *)platform_get_drvdata(pdev);
@@ -749,6 +886,22 @@ int mdp4_lcdc_off(struct platform_device *pdev)
 
 	wake_up_interruptible_all(&vctrl->wait_queue);
 
+=======
+
+	mfd = (struct msm_fb_data_type *)platform_get_drvdata(pdev);
+	vctrl = &vsync_ctrl_db[cndx];
+	pipe = vctrl->base_pipe;
+
+	atomic_set(&vctrl->suspend, 1);
+	atomic_set(&vctrl->vsync_resume, 0);
+
+	msleep(20);	/* >= 17 ms */
+
+	complete_all(&vctrl->vsync_comp);
+	vctrl->wait_vsync_cnt = 0;
+	if (pipe == NULL)
+		return -EINVAL;
+>>>>>>> cm/cm-11.0
 	if (pipe->ov_blt_addr) {
 		spin_lock_irqsave(&vctrl->spin_lock, flags);
 		if (vctrl->ov_koff != vctrl->ov_done)
@@ -760,6 +913,11 @@ int mdp4_lcdc_off(struct platform_device *pdev)
 
 	mdp_histogram_ctrl_all(FALSE);
 
+<<<<<<< HEAD
+=======
+	MDP_OUTP(MDP_BASE + LCDC_BASE, 0);
+
+>>>>>>> cm/cm-11.0
 	lcdc_enabled = 0;
 
 	undx =  vctrl->update_ndx;
@@ -775,8 +933,12 @@ int mdp4_lcdc_off(struct platform_device *pdev)
 
 	if (pipe) {
 		/* sanity check, free pipes besides base layer */
+<<<<<<< HEAD
 		mixer = pipe->mixer_num;
 		mdp4_overlay_unset_mixer(mixer);
+=======
+		mdp4_overlay_unset_mixer(pipe->mixer_num);
+>>>>>>> cm/cm-11.0
 		if (mfd->ref_cnt == 0) {
 			/* adb stop */
 			if (pipe->pipe_type == OVERLAY_TYPE_BF)
@@ -795,6 +957,7 @@ int mdp4_lcdc_off(struct platform_device *pdev)
 		}
 	}
 
+<<<<<<< HEAD
 	mdp4_lcdc_tg_off(vctrl);
 
 	atomic_set(&vctrl->suspend, 1);
@@ -807,12 +970,17 @@ int mdp4_lcdc_off(struct platform_device *pdev)
 	mdp4_overlay_iommu_unmap_freelist(mixer);
 	mdp4_overlay_iommu_unmap_freelist(mixer);
 
+=======
+>>>>>>> cm/cm-11.0
 	/* MDP clock disable */
 	mdp_clk_ctrl(0);
 	mdp_pipe_ctrl(MDP_OVERLAY0_BLOCK, MDP_BLOCK_POWER_OFF, FALSE);
 
+<<<<<<< HEAD
 	mutex_unlock(&mfd->dma->ov_mutex);
 
+=======
+>>>>>>> cm/cm-11.0
 	return ret;
 }
 
@@ -877,7 +1045,13 @@ void mdp4_primary_vsync_lcdc(void)
 
 	spin_lock(&vctrl->spin_lock);
 	vctrl->vsync_time = ktime_get();
+<<<<<<< HEAD
 	wake_up_interruptible_all(&vctrl->wait_queue);
+=======
+
+	complete_all(&vctrl->vsync_comp);
+	vctrl->wait_vsync_cnt = 0;
+>>>>>>> cm/cm-11.0
 	spin_unlock(&vctrl->spin_lock);
 }
 

@@ -210,8 +210,13 @@ static int ehci_bus_suspend (struct usb_hcd *hcd)
 
 	ehci_dbg(ehci, "suspend root hub\n");
 
+<<<<<<< HEAD
 	if (time_before (jiffies, ehci->next_statechange))
 		msleep(5);
+=======
+	if (time_before_eq(jiffies, ehci->next_statechange))
+		usleep_range(10000, 10000);
+>>>>>>> cm/cm-11.0
 	del_timer_sync(&ehci->watchdog);
 	del_timer_sync(&ehci->iaa_watchdog);
 
@@ -346,8 +351,13 @@ static int ehci_bus_resume (struct usb_hcd *hcd)
 	int			i;
 	unsigned long		resume_needed = 0;
 
+<<<<<<< HEAD
 	if (time_before (jiffies, ehci->next_statechange))
 		msleep(5);
+=======
+	if (time_before_eq(jiffies, ehci->next_statechange))
+		usleep_range(10000, 10000);
+>>>>>>> cm/cm-11.0
 	spin_lock_irq (&ehci->lock);
 	if (!HCD_HW_ACCESSIBLE(hcd)) {
 		spin_unlock_irq(&ehci->lock);
@@ -840,7 +850,11 @@ static int ehci_hub_control (
 	u32 __iomem	*status_reg = &ehci->regs->port_status[
 				(wIndex & 0xff) - 1];
 	u32 __iomem	*hostpc_reg = NULL;
+<<<<<<< HEAD
 	u32		temp, temp1, status, cmd = 0;
+=======
+	u32		temp, temp1, status;
+>>>>>>> cm/cm-11.0
 	unsigned long	flags;
 	int		retval = 0;
 	unsigned	selector;
@@ -1219,6 +1233,7 @@ static int ehci_hub_control (
 				ehci->reset_done [wIndex] = jiffies
 						+ msecs_to_jiffies (50);
 			}
+<<<<<<< HEAD
 
 			if (ehci->reset_sof_bug && (temp & PORT_RESET)) {
 				cmd = ehci_readl(ehci, &ehci->regs->command);
@@ -1254,6 +1269,15 @@ static int ehci_hub_control (
 				ehci_writel(ehci, temp & ~(PORT_RWC_BITS | PORT_RESET), status_reg);
 				cmd |= CMD_RUN;
 				ehci_writel(ehci, cmd, &ehci->regs->command);
+=======
+			if (ehci->reset_sof_bug && (temp & PORT_RESET) &&
+					hcd->driver->reset_sof_bug_handler) {
+				spin_unlock_irqrestore(&ehci->lock, flags);
+				hcd->driver->reset_sof_bug_handler(hcd, temp);
+				spin_lock_irqsave(&ehci->lock, flags);
+			} else {
+				ehci_writel(ehci, temp, status_reg);
+>>>>>>> cm/cm-11.0
 			}
 			break;
 

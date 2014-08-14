@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -70,9 +74,15 @@
 /*
  * Some commonly used atomic types.
  */
+<<<<<<< HEAD
 typedef ATOMIC(int32)  AtmSInt32 __attribute__ ((aligned (4)));
 typedef ATOMIC(uint32) AtmUInt32 __attribute__ ((aligned (4)));
 typedef ATOMIC(uint64) AtmUInt64 __attribute__ ((aligned (8)));
+=======
+typedef ATOMIC(int32)  AtmSInt32 __attribute__((aligned(4)));
+typedef ATOMIC(uint32) AtmUInt32 __attribute__((aligned(4)));
+typedef ATOMIC(uint64) AtmUInt64 __attribute__((aligned(8)));
+>>>>>>> cm/cm-11.0
 
 /*
  * Architecture-dependent implementations.

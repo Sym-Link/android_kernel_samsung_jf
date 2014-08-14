@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -27,7 +31,11 @@
 #include <linux/module.h>
 #include "comm_transp_impl.h"
 
+<<<<<<< HEAD
 int (*CommTranspEvProcess)(CommTranspID* id, CommTranspIOEvent event);
+=======
+int (*CommTranspEvProcess)(CommTranspID *id, CommTranspIOEvent event);
+>>>>>>> cm/cm-11.0
 
 
 /**
@@ -39,10 +47,18 @@ int (*CommTranspEvProcess)(CommTranspID* id, CommTranspIOEvent event);
 
 void
 Mvpkm_CommEvRegisterProcessCB(int (*commProcessFunc)(CommTranspID*,
+<<<<<<< HEAD
                                                      CommTranspIOEvent))
 {
    CommTranspEvProcess = commProcessFunc;
 }
+=======
+						     CommTranspIOEvent))
+{
+	CommTranspEvProcess = commProcessFunc;
+}
+EXPORT_SYMBOL(Mvpkm_CommEvRegisterProcessCB);
+>>>>>>> cm/cm-11.0
 
 /**
  * @brief Unregister the processing callback for the host when a signal
@@ -52,11 +68,16 @@ Mvpkm_CommEvRegisterProcessCB(int (*commProcessFunc)(CommTranspID*,
 void
 Mvpkm_CommEvUnregisterProcessCB(void)
 {
+<<<<<<< HEAD
    CommTranspEvProcess = NULL;
 }
 
 
 EXPORT_SYMBOL(Mvpkm_CommEvRegisterProcessCB);
+=======
+	CommTranspEvProcess = NULL;
+}
+>>>>>>> cm/cm-11.0
 EXPORT_SYMBOL(Mvpkm_CommEvUnregisterProcessCB);
 
 

@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Guest Communications
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -31,8 +35,11 @@
 #define COMM_OS_MOD_SHORT_NAME comm
 #define COMM_OS_MOD_SHORT_NAME_STRING "comm"
 
+<<<<<<< HEAD
 #define COMM_OS_MOD_VERSION          1.0.0.0
 #define COMM_OS_MOD_VERSION_COMMAS   1,0,0,0
+=======
+>>>>>>> cm/cm-11.0
 #define COMM_OS_MOD_VERSION_STRING   "1.0.0.0"
 
 #endif /* _COM_OS_MOD_VER_H_ */

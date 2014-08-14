@@ -288,6 +288,10 @@ static int msm_ispif_config(struct ispif_device *ispif,
 		msm_ispif_enable_intf_cids(ispif, intftype,
 			ispif_params[i].cid_mask, vfe_intf);
 	}
+<<<<<<< HEAD
+=======
+	msm_camera_io_w(0x40, ispif->base + ISPIF_CTRL_ADDR);
+>>>>>>> cm/cm-11.0
 
 	msm_camera_io_w(ISPIF_IRQ_STATUS_MASK, ispif->base +
 					ISPIF_IRQ_MASK_ADDR);
@@ -430,13 +434,17 @@ static int msm_ispif_stop_intf_transfer(struct ispif_device *ispif,
 	int rc = 0;
 	uint8_t intf_cmd_mask = 0x00;
 	uint16_t intfnum = 0, mask = intfmask;
+<<<<<<< HEAD
 	int16_t timeout_counter = 4000;
+=======
+>>>>>>> cm/cm-11.0
 	mutex_lock(&ispif->mutex);
 	CDBG("%s intfmask %x intf_cmd_mask %x\n", __func__, intfmask,
 		intf_cmd_mask);
 	msm_ispif_intf_cmd(ispif, intfmask, intf_cmd_mask, vfe_intf);
 	while (mask != 0) {
 		if (intfmask & (0x1 << intfnum)) {
+<<<<<<< HEAD
 			timeout_counter = 4000;
 			switch (intfnum) {
 			case PIX0:
@@ -446,50 +454,86 @@ static int msm_ispif_stop_intf_transfer(struct ispif_device *ispif,
 					& 0xf) != 0xf)&& timeout_counter>0) {
 					timeout_counter --;
 					usleep_range(500, 600);
+=======
+			switch (intfnum) {
+			case PIX0:
+				while ((msm_camera_io_r(ispif->base +
+					ISPIF_PIX_0_STATUS_ADDR +
+					(0x200 * vfe_intf))
+					& 0xf) != 0xf) {
+>>>>>>> cm/cm-11.0
 					CDBG("Wait for pix0 Idle\n");
 				}
 				break;
 
 			case RDI0:
+<<<<<<< HEAD
 				while (((msm_camera_io_r(ispif->base +
 					ISPIF_RDI_0_STATUS_ADDR +
 					(0x200 * vfe_intf))
 					& 0xf) != 0xf)&& timeout_counter>0) {
 					timeout_counter --;
 					usleep_range(500, 600);
+=======
+				while ((msm_camera_io_r(ispif->base +
+					ISPIF_RDI_0_STATUS_ADDR +
+					(0x200 * vfe_intf))
+					& 0xf) != 0xf) {
+>>>>>>> cm/cm-11.0
 					CDBG("Wait for rdi0 Idle\n");
 				}
 				break;
 
 			case PIX1:
+<<<<<<< HEAD
 				while (((msm_camera_io_r(ispif->base +
 					ISPIF_PIX_1_STATUS_ADDR +
 					(0x200 * vfe_intf))
 					& 0xf) != 0xf)&& timeout_counter>0) {
 					timeout_counter --;
 					usleep_range(500, 600);
+=======
+				while ((msm_camera_io_r(ispif->base +
+					ISPIF_PIX_1_STATUS_ADDR +
+					(0x200 * vfe_intf))
+					& 0xf) != 0xf) {
+>>>>>>> cm/cm-11.0
 					CDBG("Wait for pix1 Idle\n");
 				}
 				break;
 
 			case RDI1:
+<<<<<<< HEAD
 				while (((msm_camera_io_r(ispif->base +
 					ISPIF_RDI_1_STATUS_ADDR +
 					(0x200 * vfe_intf))
 					& 0xf) != 0xf)&& timeout_counter>0) {
 					timeout_counter --;
 					usleep_range(500, 600);
+=======
+				while ((msm_camera_io_r(ispif->base +
+					ISPIF_RDI_1_STATUS_ADDR +
+					(0x200 * vfe_intf))
+					& 0xf) != 0xf) {
+>>>>>>> cm/cm-11.0
 					CDBG("Wait for rdi1 Idle\n");
 				}
 				break;
 
 			case RDI2:
+<<<<<<< HEAD
 				while (((msm_camera_io_r(ispif->base +
 					ISPIF_RDI_2_STATUS_ADDR +
 					(0x200 * vfe_intf))
 					& 0xf) != 0xf)&& timeout_counter>0) {
 					timeout_counter --;
 					usleep_range(500, 600);
+=======
+				while ((msm_camera_io_r(ispif->base +
+					ISPIF_RDI_2_STATUS_ADDR +
+					(0x200 * vfe_intf))
+					& 0xf) != 0xf) {
+>>>>>>> cm/cm-11.0
 					CDBG("Wait for rdi2 Idle\n");
 				}
 				break;
@@ -497,11 +541,14 @@ static int msm_ispif_stop_intf_transfer(struct ispif_device *ispif,
 			default:
 				break;
 			}
+<<<<<<< HEAD
 			if(timeout_counter <= 0) {
 				rc = -EINVAL;
 				pr_err("%s: Error: ispif wait timeout\n", __func__);
 				break;
 			}
+=======
+>>>>>>> cm/cm-11.0
 			if (intfnum != RDI2)
 				ispif->global_intf_cmd_mask |= (0xFF <<
 					(intfnum * 8));
@@ -720,9 +767,12 @@ static int msm_ispif_init(struct ispif_device *ispif,
 	int rc = 0;
 	CDBG("%s called %d\n", __func__, __LINE__);
 
+<<<<<<< HEAD
 	ispif->ispif_ref_cnt++;
 	CDBG("%s, ref count = %d\n", __func__, ispif->ispif_ref_cnt);
 
+=======
+>>>>>>> cm/cm-11.0
 	if (ispif->ispif_state == ISPIF_POWER_UP) {
 		pr_err("%s: ispif invalid state %d\n", __func__,
 			ispif->ispif_state);
@@ -765,11 +815,14 @@ static void msm_ispif_release(struct ispif_device *ispif)
 		return;
 	}
 
+<<<<<<< HEAD
 	ispif->ispif_ref_cnt--;
 	CDBG("%s, ref count = %d\n", __func__, ispif->ispif_ref_cnt);
 	if (ispif->ispif_ref_cnt > 0)
 		return;
 
+=======
+>>>>>>> cm/cm-11.0
 	CDBG("%s, free_irq\n", __func__);
 	free_irq(ispif->irq->start, ispif);
 	tasklet_kill(&ispif->ispif_tasklet);
@@ -827,6 +880,7 @@ static long msm_ispif_cmd(struct v4l2_subdev *sd, void *arg)
 static long msm_ispif_subdev_ioctl(struct v4l2_subdev *sd, unsigned int cmd,
 								void *arg)
 {
+<<<<<<< HEAD
 	switch (cmd) {
 	case VIDIOC_MSM_ISPIF_CFG:
 		return msm_ispif_cmd(sd, arg);
@@ -839,6 +893,16 @@ static long msm_ispif_subdev_ioctl(struct v4l2_subdev *sd, unsigned int cmd,
 		return 0;
 	}
 
+=======
+	struct ispif_device *ispif;
+	switch (cmd) {
+	case VIDIOC_MSM_ISPIF_CFG:
+		return msm_ispif_cmd(sd, arg);
+	case VIDIOC_MSM_ISPIF_REL:
+		ispif =	(struct ispif_device *)v4l2_get_subdevdata(sd);
+		msm_ispif_release(ispif);
+		return 0;
+>>>>>>> cm/cm-11.0
 	default:
 		return -ENOIOCTLCMD;
 	}
@@ -928,7 +992,10 @@ static int __devinit ispif_probe(struct platform_device *pdev)
 	ispif->subdev.entity.name = pdev->name;
 	ispif->subdev.entity.revision = ispif->subdev.devnode->num;
 	ispif->ispif_state = ISPIF_POWER_DOWN;
+<<<<<<< HEAD
 	ispif->ispif_ref_cnt = 0;
+=======
+>>>>>>> cm/cm-11.0
 	return 0;
 
 ispif_no_mem:

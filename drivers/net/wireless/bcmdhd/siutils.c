@@ -3,7 +3,11 @@
  * of the SiliconBackplane-based Broadcom chips.
  *
  * Copyright (C) 1999-2013, Broadcom Corporation
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> cm/cm-11.0
  *      Unless you and Broadcom execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
  * under the terms of the GNU General Public License version 2 (the "GPL"),
@@ -22,7 +26,11 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
+<<<<<<< HEAD
  * $Id: siutils.c 414368 2013-07-24 15:00:23Z $
+=======
+ * $Id: siutils.c 444038 2013-12-18 09:35:07Z $
+>>>>>>> cm/cm-11.0
  */
 
 #include <bcm_cfg.h>
@@ -340,7 +348,11 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, void *regs,
 	char *pvars = NULL;
 	uint origidx;
 #if !defined(_CFEZ_) || defined(CFG_WL)
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 	ASSERT(GOODREGS(regs));
 
 	bzero((uchar*)sii, sizeof(si_info_t));
@@ -467,7 +479,11 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, void *regs,
 	if (bustype == PCI_BUS) {
 
 	}
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 	pvars = NULL;
 	BCM_REFERENCE(pvars);
@@ -1155,7 +1171,11 @@ si_watchdog(si_t *sih, uint ticks)
 			si_core_disable(sih, 1);
 			si_setcore(sih, CC_CORE_ID, 0);
 		}
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 			nb = (sih->ccrev < 26) ? 16 : ((sih->ccrev >= 37) ? 32 : 24);
 		/* The mips compiler uses the sllv instruction,
@@ -2304,7 +2324,11 @@ si_chipcontrl_epa4331_wowl(si_t *sih, bool enter_wowl)
 	}
 	si_setcoreidx(sih, origidx);
 }
+<<<<<<< HEAD
 #endif 
+=======
+#endif
+>>>>>>> cm/cm-11.0
 
 uint
 si_pll_reset(si_t *sih)

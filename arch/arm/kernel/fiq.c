@@ -48,6 +48,14 @@
 #include <asm/irq.h>
 #include <asm/traps.h>
 
+<<<<<<< HEAD
+=======
+#define FIQ_OFFSET ({					\
+		extern void *vector_fiq_offset;		\
+		(unsigned)&vector_fiq_offset;		\
+	})
+
+>>>>>>> cm/cm-11.0
 static unsigned long no_fiq_insn;
 
 /* Default reacquire function
@@ -80,6 +88,7 @@ int show_fiq_list(struct seq_file *p, int prec)
 
 void set_fiq_handler(void *start, unsigned int length)
 {
+<<<<<<< HEAD
 #if defined(CONFIG_CPU_USE_DOMAINS)
 	memcpy((void *)0xffff001c, start, length);
 #else
@@ -88,6 +97,16 @@ void set_fiq_handler(void *start, unsigned int length)
 	flush_icache_range(0xffff001c, 0xffff001c + length);
 	if (!vectors_high())
 		flush_icache_range(0x1c, 0x1c + length);
+=======
+	void *base = vectors_page;
+	unsigned offset = FIQ_OFFSET;
+
+	memcpy(base + offset, start, length);
+	if (!cache_is_vipt_nonaliasing())
+		flush_icache_range((unsigned long)base + offset, offset +
+				   length);
+	flush_icache_range(0xffff0000 + offset, 0xffff0000 + offset + length);
+>>>>>>> cm/cm-11.0
 }
 
 int claim_fiq(struct fiq_handler *f)
@@ -123,14 +142,26 @@ void release_fiq(struct fiq_handler *f)
 	while (current_fiq->fiq_op(current_fiq->dev_id, 0));
 }
 
+<<<<<<< HEAD
 void enable_fiq(int fiq)
 {
 	enable_irq(fiq + FIQ_START);
+=======
+static int fiq_start;
+
+void enable_fiq(int fiq)
+{
+	enable_irq(fiq + fiq_start);
+>>>>>>> cm/cm-11.0
 }
 
 void disable_fiq(int fiq)
 {
+<<<<<<< HEAD
 	disable_irq(fiq + FIQ_START);
+=======
+	disable_irq(fiq + fiq_start);
+>>>>>>> cm/cm-11.0
 }
 
 void fiq_set_type(int fiq, unsigned int type)
@@ -147,7 +178,15 @@ EXPORT_SYMBOL(enable_fiq);
 EXPORT_SYMBOL(disable_fiq);
 EXPORT_SYMBOL(fiq_set_type);
 
+<<<<<<< HEAD
 void __init init_FIQ(void)
 {
 	no_fiq_insn = *(unsigned long *)0xffff001c;
+=======
+void __init init_FIQ(int start)
+{
+	unsigned offset = FIQ_OFFSET;
+	no_fiq_insn = *(unsigned long *)(0xffff0000 + offset);
+	fiq_start = start;
+>>>>>>> cm/cm-11.0
 }

@@ -52,6 +52,14 @@ void __ablkcipher_walk_complete(struct ablkcipher_walk *walk)
 {
 	struct ablkcipher_buffer *p, *tmp;
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_CRYPTO_FIPS
+	if (unlikely(in_fips_err()))
+		return;
+#endif
+
+>>>>>>> cm/cm-11.0
 	list_for_each_entry_safe(p, tmp, &walk->buffers, entry) {
 		ablkcipher_buffer_write(p);
 		list_del(&p->entry);
@@ -114,6 +122,14 @@ int ablkcipher_walk_done(struct ablkcipher_request *req,
 	struct crypto_tfm *tfm = req->base.tfm;
 	unsigned int nbytes = 0;
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_CRYPTO_FIPS
+	if (unlikely(in_fips_err()))
+		return -EACCES;
+#endif
+
+>>>>>>> cm/cm-11.0
 	if (likely(err >= 0)) {
 		unsigned int n = walk->nbytes - err;
 
@@ -659,6 +675,14 @@ int crypto_grab_skcipher(struct crypto_skcipher_spawn *spawn, const char *name,
 	struct crypto_alg *alg;
 	int err;
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_CRYPTO_FIPS
+	if (unlikely(in_fips_err()))
+		return -EACCES;
+#endif
+
+>>>>>>> cm/cm-11.0
 	type = crypto_skcipher_type(type);
 	mask = crypto_skcipher_mask(mask);
 

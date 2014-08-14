@@ -557,12 +557,22 @@ static struct i2c_driver bcm2079x_driver = {
 
 static int __init bcm2079x_dev_init(void)
 {
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_SAMSUNG_LPM_MODE
+>>>>>>> cm/cm-11.0
 	if (!poweroff_charging)
 		return i2c_add_driver(&bcm2079x_driver);
 	else {
 		pr_info("[NFC] %s - power off charging\n", __func__);
 		return -1;
 	}
+<<<<<<< HEAD
+=======
+#else
+	return i2c_add_driver(&bcm2079x_driver);
+#endif
+>>>>>>> cm/cm-11.0
 }
 module_init(bcm2079x_dev_init);
 

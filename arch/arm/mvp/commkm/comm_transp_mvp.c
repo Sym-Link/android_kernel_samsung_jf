@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Guest Communications
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -37,6 +41,7 @@
  */
 
 struct CommTranspPriv {
+<<<<<<< HEAD
    QPHandle *qp;
    CommTranspEvent event;
    unsigned int peerEvID;
@@ -45,6 +50,16 @@ struct CommTranspPriv {
    uint32 backRef;
    CommOSWork work;
    CommOSAtomic raiseInline;
+=======
+	QPHandle *qp;
+	CommTranspEvent event;
+	unsigned int peerEvID;
+	unsigned int writeSize;
+	unsigned int readSize;
+	uint32 backRef;
+	CommOSWork work;
+	CommOSAtomic raiseInline;
+>>>>>>> cm/cm-11.0
 };
 
 /*
@@ -52,9 +67,15 @@ struct CommTranspPriv {
  */
 
 typedef struct TranspTableEntry {
+<<<<<<< HEAD
    CommOSAtomic holds;
    CommTransp transp;
    CommOSWaitQueue wq;
+=======
+	CommOSAtomic holds;
+	CommTransp transp;
+	CommOSWaitQueue wq;
+>>>>>>> cm/cm-11.0
 } TranspTableEntry;
 
 TranspTableEntry transpTable[QP_MAX_QUEUE_PAIRS];
@@ -69,6 +90,7 @@ static CommOSSpinlock_Define(transpTableLock);
 static void
 DestroyTransp(CommTransp transp)
 {
+<<<<<<< HEAD
    CommTranspID transpID;
    int32 rc;
 
@@ -111,6 +133,49 @@ DestroyTransp(CommTransp transp)
    } else {
       CommOS_Log(("%s: Channel detached.\n", __FUNCTION__));
    }
+=======
+	CommTranspID transpID;
+	int32 rc;
+
+	if (!transp) {
+		CommOS_Debug(("Failed to close channel: Bad handle\n"));
+		return;
+	}
+
+	CommOS_Log(("%s: Detaching channel [%u:%u]\n",
+		    __func__,
+		    transp->qp->id.context,
+		    transp->qp->id.resource));
+
+	transpID.d32[0] = transp->qp->id.context;
+	transpID.d32[1] = transp->qp->id.resource;
+
+#if !defined(COMM_BUILDING_SERVER)
+	/*
+	 * Tell the host to detach, will block in the host
+	 * until the host has unmapped memory. Once the
+	 * host has unmapped, it is safe to free.
+	 */
+	CommTranspEvent_Raise(transp->peerEvID,
+			      &transpID,
+			      COMM_TRANSP_IO_DETACH);
+#endif
+
+	rc = QP_Detach(transp->qp);
+
+#if defined(COMM_BUILDING_SERVER)
+	/*
+	 * Wake up waiters now that unmapping is complete
+	 */
+	CommOS_WakeUp(&transpTable[transp->backRef].wq);
+#endif
+
+	CommOS_Kfree(transp);
+	if (rc != QP_SUCCESS)
+		CommOS_Log(("%s: Failed to detach. rc: %d\n", __func__, rc));
+	else
+		CommOS_Log(("%s: Channel detached.\n", __func__));
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -121,6 +186,7 @@ DestroyTransp(CommTransp transp)
 static void
 TranspTableInit(void)
 {
+<<<<<<< HEAD
    uint32 i;
    CommOS_SpinLock(&transpTableLock);
    for (i = 0; i < QP_MAX_QUEUE_PAIRS; i++) {
@@ -128,6 +194,16 @@ TranspTableInit(void)
       transpTable[i].transp = NULL;
    }
    CommOS_SpinUnlock(&transpTableLock);
+=======
+	uint32 i;
+
+	CommOS_SpinLock(&transpTableLock);
+	for (i = 0; i < QP_MAX_QUEUE_PAIRS; i++) {
+		CommOS_WriteAtomic(&transpTable[i].holds, -1);
+		transpTable[i].transp = NULL;
+	}
+	CommOS_SpinUnlock(&transpTableLock);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -141,6 +217,7 @@ TranspTableInit(void)
 static inline int32
 TranspTableAdd(CommTransp transp)
 {
+<<<<<<< HEAD
    uint32 i;
 
    if (!transp) {
@@ -160,6 +237,26 @@ TranspTableAdd(CommTransp transp)
    CommOS_SpinUnlock(&transpTableLock);
 
    return 0;
+=======
+	uint32 i;
+
+	if (!transp)
+		return -1;
+
+	CommOS_SpinLock(&transpTableLock);
+	for (i = 0; i < QP_MAX_QUEUE_PAIRS; i++) {
+		if ((transpTable[i].transp) == NULL) {
+			transpTable[i].transp = transp;
+			CommOS_WriteAtomic(&transpTable[i].holds, 1);
+			CommOS_WaitQueueInit(&transpTable[i].wq);
+			transp->backRef = i;
+			break;
+		}
+	}
+	CommOS_SpinUnlock(&transpTableLock);
+
+	return 0;
+>>>>>>> cm/cm-11.0
 }
 
 /**
@@ -172,6 +269,7 @@ TranspTableAdd(CommTransp transp)
 static inline CommTransp
 TranspTableGet(CommTranspID *id)
 {
+<<<<<<< HEAD
    CommTransp transp;
    uint32 i;
 
@@ -191,6 +289,26 @@ TranspTableGet(CommTranspID *id)
    CommOS_Debug(("%s: couldn't find transport object\n", __FUNCTION__));
 
    return NULL;
+=======
+	CommTransp transp;
+	uint32 i;
+
+	if (!id)
+		return NULL;
+
+	for (i = 0; i < QP_MAX_QUEUE_PAIRS; i++) {
+		transp = transpTable[i].transp;
+		if (transp                                  &&
+		    (transp->qp->id.context  == id->d32[0]) &&
+		    (transp->qp->id.resource == id->d32[1])) {
+			CommOS_AddReturnAtomic(&transpTable[i].holds, 1);
+			return transp;
+		}
+	}
+
+	CommOS_Debug(("%s: couldn't find transport object\n", __func__));
+	return NULL;
+>>>>>>> cm/cm-11.0
 }
 
 /**
@@ -203,6 +321,7 @@ TranspTableGet(CommTranspID *id)
 static inline void
 TranspTablePut(CommTransp transp)
 {
+<<<<<<< HEAD
    int32 holds;
    int32 backRef;
    if (!transp) {
@@ -223,6 +342,28 @@ TranspTablePut(CommTransp transp)
    transpTable[backRef].transp = NULL;
    CommOS_SpinUnlock(&transpTableLock);
    DestroyTransp(transp);
+=======
+	int32 holds;
+	int32 backRef;
+
+	if (!transp)
+		return;
+
+	backRef = transp->backRef;
+	BUG_ON(backRef >= QP_MAX_QUEUE_PAIRS);
+
+	holds = CommOS_SubReturnAtomic(&transpTable[backRef].holds, 1);
+	if (holds > 0)
+		return;
+
+	BUG_ON(holds < 0);
+
+	CommOS_SpinLock(&transpTableLock);
+	CommOS_WriteAtomic(&transpTable[backRef].holds, -1);
+	transpTable[backRef].transp = NULL;
+	CommOS_SpinUnlock(&transpTableLock);
+	DestroyTransp(transp);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -236,6 +377,7 @@ TranspTablePut(CommTransp transp)
 static inline void
 TranspTablePutNF(CommTransp transp)
 {
+<<<<<<< HEAD
    int32 holds;
    int32 backRef;
    if (!transp) {
@@ -247,6 +389,19 @@ TranspTablePutNF(CommTransp transp)
 
    holds = CommOS_SubReturnAtomic(&transpTable[backRef].holds, 1);
    BUG_ON(holds <= 0);
+=======
+	int32 holds;
+	int32 backRef;
+
+	if (!transp)
+		return;
+
+	backRef = transp->backRef;
+	BUG_ON(backRef >= QP_MAX_QUEUE_PAIRS);
+
+	holds = CommOS_SubReturnAtomic(&transpTable[backRef].holds, 1);
+	BUG_ON(holds <= 0);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -262,6 +417,7 @@ RaiseEvent(CommOSWork *arg)
 #if !defined(__linux__)
 #error "RaiseEvent() is only supported on linux. Port 'container_of'!"
 #endif
+<<<<<<< HEAD
    CommTransp transp = container_of(arg, struct CommTranspPriv, work);
    CommTranspID transpID = {{
       .d32 = {
@@ -274,6 +430,22 @@ RaiseEvent(CommOSWork *arg)
                          &transpID,
                          COMM_TRANSP_IO_INOUT);
    TranspTablePut(transp);
+=======
+	CommTransp transp = container_of(arg, struct CommTranspPriv, work);
+	CommTranspID transpID = {
+		{
+			.d32 = {
+				[0] = transp->qp->id.context,
+				[1] = transp->qp->id.resource
+			}
+		}
+	};
+
+	CommTranspEvent_Raise(transp->peerEvID,
+			      &transpID,
+			      COMM_TRANSP_IO_INOUT);
+	TranspTablePut(transp);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -287,6 +459,7 @@ RaiseEvent(CommOSWork *arg)
 unsigned int
 CommTransp_RequestInlineEvents(CommTransp transp)
 {
+<<<<<<< HEAD
    unsigned int res = CommOS_AddReturnAtomic(&transp->raiseInline, 1);
    if (res == 1) {
       /* On the first (effective) transition, make sure an event is raised. */
@@ -295,6 +468,20 @@ CommTransp_RequestInlineEvents(CommTransp transp)
       RaiseEvent(&transp->work);
    }
    return res;
+=======
+	unsigned int res = CommOS_AddReturnAtomic(&transp->raiseInline, 1);
+
+	if (res == 1) {
+		/*
+		 * On the first (effective) transition, make sure an
+		 * event is raised.
+		 */
+
+		CommOS_AddReturnAtomic(&transpTable[transp->backRef].holds, 1);
+		RaiseEvent(&transp->work);
+	}
+	return res;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -307,7 +494,11 @@ CommTransp_RequestInlineEvents(CommTransp transp)
 unsigned int
 CommTransp_ReleaseInlineEvents(CommTransp transp)
 {
+<<<<<<< HEAD
    return CommOS_SubReturnAtomic(&transp->raiseInline, 1);
+=======
+	return CommOS_SubReturnAtomic(&transp->raiseInline, 1);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -324,7 +515,11 @@ static void DetachCB(void *data);
 
 static CommOSSpinlock_Define(listenersLock);
 static CommTranspListener listeners[COMM_MAX_LISTENERS];
+<<<<<<< HEAD
 static uint32 numListeners = 0;
+=======
+static uint32 numListeners;
+>>>>>>> cm/cm-11.0
 
 
 /**
@@ -336,6 +531,7 @@ static uint32 numListeners = 0;
  */
 
 static int32
+<<<<<<< HEAD
 NotifyCB(const QPInitArgs* args)
 {
    CommTranspInitArgs transpArgs;
@@ -364,6 +560,36 @@ NotifyCB(const QPInitArgs* args)
    }
    CommOS_SpinUnlock(&listenersLock);
    return rc;
+=======
+NotifyCB(const QPInitArgs *args)
+{
+	CommTranspInitArgs transpArgs;
+	uint32 i;
+	int32 rc = -1;
+
+	if (!args)
+		return QP_ERROR_INVALID_ARGS;
+
+	transpArgs.id.d32[0] = args->id.context;
+	transpArgs.id.d32[1] = args->id.resource;
+	transpArgs.capacity = args->capacity;
+	transpArgs.type = args->type;
+
+	CommOS_SpinLock(&listenersLock);
+	for (i = 0; i < COMM_MAX_LISTENERS; i++) {
+		if (listeners[i].probe &&
+		    (listeners[i].probe(&transpArgs,
+					listeners[i].probeData) == 0)) {
+			CommOS_Debug(("%s: Delivered notify event to " \
+				      "listener %u\n",
+				      __func__, i));
+			rc = 0;
+			break;
+		}
+	}
+	CommOS_SpinUnlock(&listenersLock);
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -376,6 +602,7 @@ NotifyCB(const QPInitArgs* args)
 static void
 DetachCB(void *data)
 {
+<<<<<<< HEAD
    CommTransp transp = data;
    if (!transp || !(transp->event.ioEvent)) {
       return;
@@ -385,6 +612,19 @@ DetachCB(void *data)
                  transp->qp->id.context,
                  transp->qp->id.resource));
    transp->event.ioEvent(transp, COMM_TRANSP_IO_DETACH, transp->event.ioEventData);
+=======
+	CommTransp transp = data;
+
+	if (!transp || !(transp->event.ioEvent))
+		return;
+
+	CommOS_Debug(("%s: Guest detached from [%u:%u]\n",
+		      __func__,
+		      transp->qp->id.context,
+		      transp->qp->id.resource));
+	transp->event.ioEvent(transp, COMM_TRANSP_IO_DETACH,
+			      transp->event.ioEventData);
+>>>>>>> cm/cm-11.0
 }
 #endif
 
@@ -397,6 +637,7 @@ DetachCB(void *data)
 int
 CommTransp_Init(void)
 {
+<<<<<<< HEAD
    int32 rc;
    TranspTableInit();
 
@@ -408,6 +649,18 @@ CommTransp_Init(void)
    }
 #endif
    return rc;
+=======
+	int32 rc;
+
+	TranspTableInit();
+	rc = CommTranspEvent_Init();
+
+#if defined(COMM_BUILDING_SERVER)
+	if (!rc)
+		QP_RegisterListener(NotifyCB);
+#endif
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -418,9 +671,15 @@ CommTransp_Init(void)
 void
 CommTransp_Exit(void)
 {
+<<<<<<< HEAD
    CommTranspEvent_Exit();
 #if defined(COMM_BUILDING_SERVER)
    QP_UnregisterListener(NotifyCB);
+=======
+	CommTranspEvent_Exit();
+#if defined(COMM_BUILDING_SERVER)
+	QP_UnregisterListener(NotifyCB);
+>>>>>>> cm/cm-11.0
 #endif
 }
 
@@ -436,9 +695,15 @@ CommTransp_Exit(void)
 static int
 DetachCondition(void *arg1, void *arg2)
 {
+<<<<<<< HEAD
    uint32 backRef = (uint32)arg1;
 
    return (CommOS_ReadAtomic(&transpTable[backRef].holds) == -1);
+=======
+	uint32 backRef = (uint32)arg1;
+
+	return (CommOS_ReadAtomic(&transpTable[backRef].holds) == -1);
+>>>>>>> cm/cm-11.0
 }
 #endif
 
@@ -456,6 +721,7 @@ DetachCondition(void *arg1, void *arg2)
 
 int
 CommTranspEvent_Process(CommTranspID *id,
+<<<<<<< HEAD
                         CommTranspIOEvent event)
 {
    int rc = 0;
@@ -506,6 +772,59 @@ CommTranspEvent_Process(CommTranspID *id,
 
    rc = (delivered > 0) ? 0 : -1;
    return rc;
+=======
+			CommTranspIOEvent event)
+{
+	int rc = 0;
+	unsigned int delivered = 0;
+	unsigned int backRef;
+	int i = 0;
+
+	CommTransp transp;
+	uint32 raiseOnAllChannels = (id->d32[1] == COMM_TRANSP_ID_32_ANY);
+	uint32 channels = raiseOnAllChannels ? QP_MAX_QUEUE_PAIRS : 1;
+
+	while (channels--) {
+		if (raiseOnAllChannels)
+			id->d32[1] = i++;
+
+		transp = TranspTableGet(id);
+		if (transp) {
+			if (transp->event.ioEvent)
+				transp->event.ioEvent(transp, event,
+						     transp->event.ioEventData);
+
+			backRef = transp->backRef;
+			TranspTablePut(transp);
+
+#if defined(COMM_BUILDING_SERVER)
+			/*
+			 * Wait for unmap on IO_DETACH, return to monitor.
+			 */
+			if (event == COMM_TRANSP_IO_DETACH) {
+				unsigned long long timeout = 30000;
+
+				rc = CommOS_Wait(&transpTable[backRef].wq,
+						 DetachCondition,
+						 (void *)backRef,
+						 NULL,
+						 &timeout);
+				switch (rc) {
+				case 1:     /* Memory successfully unmapped */
+					rc = 0;
+					break;
+				default:    /* Timed out or other error. */
+					return -1;
+				}
+			}
+#endif
+			delivered++;
+		}
+	}
+
+	rc = (delivered > 0) ? 0 : -1;
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -519,6 +838,7 @@ CommTranspEvent_Process(CommTranspID *id,
 int
 CommTransp_Register(const CommTranspListener *listener)
 {
+<<<<<<< HEAD
    int32 rc = -1;
 #if defined(COMM_BUILDING_SERVER)
    uint32 i;
@@ -541,6 +861,30 @@ CommTransp_Register(const CommTranspListener *listener)
    CommOS_SpinUnlock(&listenersLock);
 #endif
    return rc;
+=======
+	int32 rc = -1;
+#if defined(COMM_BUILDING_SERVER)
+	uint32 i;
+
+	if (!listener)
+		return -1;
+
+	CommOS_SpinLock(&listenersLock);
+	for (i = 0; i < COMM_MAX_LISTENERS; i++) {
+		if ((listeners[i].probe == NULL) &&
+		    (listeners[i].probeData == NULL)) {
+			listeners[i] = *listener;
+			numListeners++;
+			rc = 0;
+			CommOS_Debug(("%s: Registered listener %u\n",
+				      __func__, i));
+			break;
+		}
+	}
+	CommOS_SpinUnlock(&listenersLock);
+#endif
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -554,6 +898,7 @@ void
 CommTransp_Unregister(const CommTranspListener *listener)
 {
 #if defined(COMM_BUILDING_SERVER)
+<<<<<<< HEAD
    uint32 i;
 
    if (!listener || !listener->probe) {
@@ -572,6 +917,25 @@ CommTransp_Unregister(const CommTranspListener *listener)
       }
    }
    CommOS_SpinUnlock(&listenersLock);
+=======
+	uint32 i;
+
+	if (!listener || !listener->probe)
+		return;
+
+	CommOS_SpinLock(&listenersLock);
+	for (i = 0; i <  COMM_MAX_LISTENERS; i++) {
+		if ((listeners[i].probe == listener->probe) &&
+		    (listeners[i].probeData == listener->probeData)) {
+			listeners[i].probe = NULL;
+			listeners[i].probeData = NULL;
+			numListeners--;
+			CommOS_Debug(("%s: Unregistered listener %u\n",
+				      __func__, i));
+		}
+	}
+	CommOS_SpinUnlock(&listenersLock);
+>>>>>>> cm/cm-11.0
 #endif
 }
 
@@ -588,6 +952,7 @@ CommTransp_Unregister(const CommTranspListener *listener)
 
 int
 CommTransp_Open(CommTransp *transp,
+<<<<<<< HEAD
                 CommTranspInitArgs *transpArgs,
                 CommTranspEvent *transpEvent)
 {
@@ -672,6 +1037,90 @@ out:
    }
 
    return rc;
+=======
+		CommTranspInitArgs *transpArgs,
+		CommTranspEvent *transpEvent)
+{
+	int32 rc = -1;
+	QPHandle *qp = NULL;
+	CommTransp transpOut = NULL;
+	QPInitArgs qpInitArgs;
+
+	if (!transp || !transpArgs)
+		return -1;
+
+	CommOS_Log(("%s: Attaching to [%u:%u]. Capacity: %u\n",
+		    __func__, transpArgs->id.d32[1], transpArgs->id.d32[0],
+		    transpArgs->capacity));
+
+	qpInitArgs.id.context  = transpArgs->id.d32[0];
+	qpInitArgs.id.resource = transpArgs->id.d32[1];
+	qpInitArgs.capacity    = transpArgs->capacity;
+	qpInitArgs.type        = transpArgs->type;
+
+	transpOut = CommOS_Kmalloc(sizeof(*transpOut));
+	if (!transpOut) {
+		rc = -1;
+		goto out;
+	}
+
+	/*
+	 * Attach to the queue pair.
+	 */
+	rc = QP_Attach(&qpInitArgs, &qp);
+	if (rc < 0) {
+		rc = -1;
+		goto out;
+	}
+
+	transpOut->qp = qp;
+
+	/*
+	 * Reassign ID so Comm knows what ID was actually given
+	 */
+	transpArgs->id.d32[0] = qp->id.context;
+	transpArgs->id.d32[1] = qp->id.resource;
+
+	if (transpEvent) {
+		transpOut->event = *transpEvent;
+	} else {
+		transpOut->event.ioEvent = NULL;
+		transpOut->event.ioEventData = NULL;
+	}
+
+#if defined(COMM_BUILDING_SERVER)
+	CommOS_Debug(("%s: Registering detach CB on id %u...\n",
+		      __func__, transpArgs->id.d32[1]));
+	QP_RegisterDetachCB(transpOut->qp, DetachCB, transpOut);
+#endif
+
+	transpOut->peerEvID = COMM_TRANSP_ID_32_ANY;
+	transpOut->writeSize = 0;
+	transpOut->readSize = 0;
+	CommOS_InitWork(&transpOut->work, RaiseEvent);
+	CommOS_WriteAtomic(&transpOut->raiseInline, 0);
+
+	if (TranspTableAdd(transpOut)) {
+		CommOS_Log(("%s: Exceeded max limit of transport objects!\n",
+			    __func__));
+		DestroyTransp(transpOut);
+		rc = -1;
+		goto out;
+	}
+
+	*transp = transpOut;
+	rc = 0;
+
+	CommOS_Log(("%s: Channel attached.\n", __func__));
+
+out:
+	if (rc && transpOut) {
+		CommOS_Log(("%s: Failed to attach: %d\n", __func__, rc));
+		CommOS_Kfree(transpOut);
+	}
+
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -683,12 +1132,22 @@ out:
  */
 
 void
+<<<<<<< HEAD
 CommTransp_Close(CommTransp transp) {
    if (!transp) {
       return;
    }
    CommOS_FlushAIOWork(&transp->work);
    TranspTablePut(transp);
+=======
+CommTransp_Close(CommTransp transp)
+{
+	if (!transp)
+		return;
+
+	CommOS_FlushAIOWork(&transp->work);
+	TranspTablePut(transp);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -702,10 +1161,17 @@ CommTransp_Close(CommTransp transp) {
 int
 CommTransp_EnqueueSpace(CommTransp transp)
 {
+<<<<<<< HEAD
    if (!transp) {
       return -1;
    }
    return QP_EnqueueSpace(transp->qp);
+=======
+	if (!transp)
+		return -1;
+
+	return QP_EnqueueSpace(transp->qp);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -718,11 +1184,19 @@ CommTransp_EnqueueSpace(CommTransp transp)
 int
 CommTransp_EnqueueReset(CommTransp transp)
 {
+<<<<<<< HEAD
    if (!transp) {
       return -1;
    }
    transp->writeSize = 0;
    return QP_EnqueueReset(transp->qp);
+=======
+	if (!transp)
+		return -1;
+
+	transp->writeSize = 0;
+	return QP_EnqueueReset(transp->qp);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -738,6 +1212,7 @@ CommTransp_EnqueueReset(CommTransp transp)
 
 int
 CommTransp_EnqueueSegment(CommTransp transp,
+<<<<<<< HEAD
                           const void *buf,
                           unsigned int bufLen,
                           int kern)
@@ -754,6 +1229,24 @@ CommTransp_EnqueueSegment(CommTransp transp,
       transp->writeSize = 0;
    }
    return rc;
+=======
+			  const void *buf,
+			  unsigned int bufLen,
+			  int kern)
+{
+	int rc;
+
+	if (!transp)
+		return -1;
+
+	rc = QP_EnqueueSegment(transp->qp, (void *)buf, bufLen, kern);
+	if (rc >= 0)
+		transp->writeSize += (unsigned int)rc;
+	else
+		transp->writeSize = 0;
+
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -767,6 +1260,7 @@ CommTransp_EnqueueSegment(CommTransp transp,
 int
 CommTransp_EnqueueCommit(CommTransp transp)
 {
+<<<<<<< HEAD
    int rc;
 
    if (!transp) {
@@ -807,6 +1301,50 @@ CommTransp_EnqueueCommit(CommTransp transp)
    }
    transp->writeSize = 0;
    return rc;
+=======
+	int rc;
+
+	if (!transp)
+		return -1;
+
+	rc = QP_EnqueueCommit(transp->qp);
+	if (rc >= 0) {
+		const unsigned int fudge = 4;
+		int writable = CommTransp_EnqueueSpace(transp);
+
+		if ((writable >= 0) &&
+		    ((transp->writeSize + (unsigned int)writable + fudge) >=
+		    transp->qp->queueSize)) {
+			/*
+			 * If bytes written since last commit + writable space
+			 * 'almost' equal write queue size, then signal.
+			 * The 'almost' fudge factor accounts for a possibly
+			 * inaccurate CommTransp_EnqueueSpace() return value.
+			 * Most of the time, this is inconsequential. In rare,
+			 * borderline occasions, it results in a few extra
+			 * signals.
+			 * The scheme essentially means this: if this is the
+			 * first packet to be write-committed, we signal.
+			 * Otherwise, the remote end is supposed to keep
+			 * going for as long as it can read.
+			 */
+
+			BUG_ON(transp->backRef >= QP_MAX_QUEUE_PAIRS);
+			CommOS_AddReturnAtomic(
+				&transpTable[transp->backRef].holds, 1);
+			if (CommOS_ReadAtomic(&transp->raiseInline))
+				RaiseEvent(&transp->work);
+			else if (CommOS_ScheduleAIOWork(&transp->work))
+				TranspTablePutNF(transp);
+		}
+		rc = 0;
+	} else {
+		rc = -1;
+	}
+
+	transp->writeSize = 0;
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -819,10 +1357,17 @@ CommTransp_EnqueueCommit(CommTransp transp)
 int
 CommTransp_DequeueSpace(CommTransp transp)
 {
+<<<<<<< HEAD
    if (!transp) {
       return -1;
    }
    return QP_DequeueSpace(transp->qp);
+=======
+	if (!transp)
+		return -1;
+
+	return QP_DequeueSpace(transp->qp);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -835,11 +1380,19 @@ CommTransp_DequeueSpace(CommTransp transp)
 int
 CommTransp_DequeueReset(CommTransp transp)
 {
+<<<<<<< HEAD
    if (!transp) {
       return -1;
    }
    transp->readSize = 0;
    return QP_DequeueReset(transp->qp);
+=======
+	if (!transp)
+		return -1;
+
+	transp->readSize = 0;
+	return QP_DequeueReset(transp->qp);
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -856,6 +1409,7 @@ CommTransp_DequeueReset(CommTransp transp)
 
 int
 CommTransp_DequeueSegment(CommTransp transp,
+<<<<<<< HEAD
                           void *buf,
                           unsigned bufLen,
                           int kern)
@@ -872,6 +1426,24 @@ CommTransp_DequeueSegment(CommTransp transp,
       transp->readSize = 0;
    }
    return rc;
+=======
+			  void *buf,
+			  unsigned bufLen,
+			  int kern)
+{
+	int rc;
+
+	if (!transp)
+		return -1;
+
+	rc = QP_DequeueSegment(transp->qp, buf, bufLen, kern);
+	if (rc >= 0)
+		transp->readSize += (unsigned int)rc;
+	else
+		transp->readSize = 0;
+
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -885,6 +1457,7 @@ CommTransp_DequeueSegment(CommTransp transp,
 int
 CommTransp_DequeueCommit(CommTransp transp)
 {
+<<<<<<< HEAD
    int rc;
 
    if (!transp) {
@@ -920,6 +1493,43 @@ CommTransp_DequeueCommit(CommTransp transp)
    /* coverity[deref_after_free] */
    transp->readSize = 0;
    return rc;
+=======
+	int rc;
+
+	if (!transp)
+		return -1;
+
+	rc = QP_DequeueCommit(transp->qp);
+	if (rc >= 0) {
+		int readable = CommTransp_DequeueSpace(transp);
+		const unsigned int limit = transp->qp->queueSize / 2;
+
+		if ((readable >= 0) &&
+		    (transp->readSize + (unsigned int)readable >= limit) &&
+		    ((unsigned int)readable < limit)) {
+			/*
+			 * Minimize the number of likely 'peer write OK'
+			 * signalling: only do it, if reading crossed
+			 * half-way down.
+			 */
+
+			BUG_ON(transp->backRef >= QP_MAX_QUEUE_PAIRS);
+			CommOS_AddReturnAtomic(
+				&transpTable[transp->backRef].holds, 1);
+			if (CommOS_ReadAtomic(&transp->raiseInline))
+				RaiseEvent(&transp->work);
+			else if (CommOS_ScheduleAIOWork(&transp->work))
+				TranspTablePut(transp);
+		}
+		rc = 0;
+	} else {
+		rc = -1;
+	}
+
+	/* coverity[deref_after_free] */
+	transp->readSize = 0;
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 
@@ -933,6 +1543,7 @@ CommTransp_DequeueCommit(CommTransp transp)
 
 int
 CommTransp_Notify(const CommTranspID *notificationCenterID,
+<<<<<<< HEAD
                   CommTranspInitArgs *transpArgs)
 {
    QPInitArgs args;
@@ -948,5 +1559,22 @@ CommTransp_Notify(const CommTranspID *notificationCenterID,
                  transpArgs->id.d32[1]));
    QP_Notify(&args);
    return 0;
+=======
+		  CommTranspInitArgs *transpArgs)
+{
+	QPInitArgs args;
+
+	args.id.context = transpArgs->id.d32[0];
+	args.id.resource = transpArgs->id.d32[1];
+	args.capacity = transpArgs->capacity;
+	args.type  = transpArgs->type;
+
+	CommOS_Debug(("%s: d32[0]: %u d32[1]: %u\n",
+		      __func__,
+		      transpArgs->id.d32[0],
+		      transpArgs->id.d32[1]));
+	QP_Notify(&args);
+	return 0;
+>>>>>>> cm/cm-11.0
 }
 

@@ -144,8 +144,12 @@ void ext4_evict_inode(struct inode *inode)
 		 * don't use page cache.
 		 */
 		if (ext4_should_journal_data(inode) &&
+<<<<<<< HEAD
 		    (S_ISLNK(inode->i_mode) || S_ISREG(inode->i_mode)) &&
 		    inode->i_ino != EXT4_JOURNAL_INO) {
+=======
+		    (S_ISLNK(inode->i_mode) || S_ISREG(inode->i_mode))) {
+>>>>>>> cm/cm-11.0
 			journal_t *journal = EXT4_SB(inode->i_sb)->s_journal;
 			tid_t commit_tid = EXT4_I(inode)->i_datasync_tid;
 
@@ -280,6 +284,7 @@ void ext4_da_update_reserve_space(struct inode *inode,
 		used = ei->i_reserved_data_blocks;
 	}
 
+<<<<<<< HEAD
 	if (unlikely(ei->i_allocated_meta_blocks > ei->i_reserved_meta_blocks)) {
 		ext4_msg(inode->i_sb, KERN_NOTICE, "%s: ino %lu, allocated %d "
 			 "with only %d reserved metadata blocks\n", __func__,
@@ -289,6 +294,8 @@ void ext4_da_update_reserve_space(struct inode *inode,
 		ei->i_allocated_meta_blocks = ei->i_reserved_meta_blocks;
 	}
 
+=======
+>>>>>>> cm/cm-11.0
 	/* Update per-inode reservations */
 	ei->i_reserved_data_blocks -= used;
 	ei->i_reserved_meta_blocks -= ei->i_allocated_meta_blocks;
@@ -1118,6 +1125,7 @@ static int ext4_da_reserve_space(struct inode *inode, ext4_lblk_t lblock)
 	struct ext4_inode_info *ei = EXT4_I(inode);
 	unsigned int md_needed;
 	int ret;
+<<<<<<< HEAD
 	ext4_lblk_t save_last_lblock;
 	int save_len;
 
@@ -1129,6 +1137,8 @@ static int ext4_da_reserve_space(struct inode *inode, ext4_lblk_t lblock)
 	ret = dquot_reserve_block(inode, EXT4_C2B(sbi, 1));
 	if (ret)
 		return ret;
+=======
+>>>>>>> cm/cm-11.0
 
 	/*
 	 * recalculate the amount of metadata blocks to reserve
@@ -1137,6 +1147,7 @@ static int ext4_da_reserve_space(struct inode *inode, ext4_lblk_t lblock)
 	 */
 repeat:
 	spin_lock(&ei->i_block_reservation_lock);
+<<<<<<< HEAD
 	/*
 	 * ext4_calc_metadata_amount() has side effects, which we have
 	 * to be prepared undo if we fail to claim space.
@@ -1148,20 +1159,46 @@ repeat:
 	trace_ext4_da_reserve_space(inode, md_needed);
 
 	/*
+=======
+	md_needed = EXT4_NUM_B2C(sbi,
+				 ext4_calc_metadata_amount(inode, lblock));
+	trace_ext4_da_reserve_space(inode, md_needed);
+	spin_unlock(&ei->i_block_reservation_lock);
+
+	/*
+	 * We will charge metadata quota at writeout time; this saves
+	 * us from metadata over-estimation, though we may go over by
+	 * a small amount in the end.  Here we just reserve for data.
+	 */
+	ret = dquot_reserve_block(inode, EXT4_C2B(sbi, 1));
+	if (ret)
+		return ret;
+	/*
+>>>>>>> cm/cm-11.0
 	 * We do still charge estimated metadata to the sb though;
 	 * we cannot afford to run out of free blocks.
 	 */
 	if (ext4_claim_free_clusters(sbi, md_needed + 1, 0)) {
+<<<<<<< HEAD
 		ei->i_da_metadata_calc_len = save_len;
 		ei->i_da_metadata_calc_last_lblock = save_last_lblock;
 		spin_unlock(&ei->i_block_reservation_lock);
+=======
+		dquot_release_reservation_block(inode, EXT4_C2B(sbi, 1));
+>>>>>>> cm/cm-11.0
 		if (ext4_should_retry_alloc(inode->i_sb, &retries)) {
 			yield();
 			goto repeat;
 		}
+<<<<<<< HEAD
 		dquot_release_reservation_block(inode, EXT4_C2B(sbi, 1));
 		return -ENOSPC;
 	}
+=======
+		return -ENOSPC;
+	}
+	spin_lock(&ei->i_block_reservation_lock);
+>>>>>>> cm/cm-11.0
 	ei->i_reserved_data_blocks++;
 	ei->i_reserved_meta_blocks += md_needed;
 	spin_unlock(&ei->i_block_reservation_lock);
@@ -1429,8 +1466,11 @@ static void ext4_da_block_invalidatepages(struct mpage_da_data *mpd)
 
 	index = mpd->first_page;
 	end   = mpd->next_page - 1;
+<<<<<<< HEAD
 
 	pagevec_init(&pvec, 0);
+=======
+>>>>>>> cm/cm-11.0
 	while (index <= end) {
 		nr_pages = pagevec_lookup(&pvec, mapping, index, PAGEVEC_SIZE);
 		if (nr_pages == 0)
@@ -2393,6 +2433,7 @@ static int ext4_nonda_switch(struct super_block *sb)
 	free_blocks  = EXT4_C2B(sbi,
 		percpu_counter_read_positive(&sbi->s_freeclusters_counter));
 	dirty_blocks = percpu_counter_read_positive(&sbi->s_dirtyclusters_counter);
+<<<<<<< HEAD
 	/*
 	 * Start pushing delalloc when 1/2 of free blocks are dirty.
 	 */
@@ -2403,6 +2444,8 @@ static int ext4_nonda_switch(struct super_block *sb)
 		up_read(&sb->s_umount);
 	}
 
+=======
+>>>>>>> cm/cm-11.0
 	if (2 * free_blocks < 3 * dirty_blocks ||
 		free_blocks < (dirty_blocks + EXT4_FREECLUSTERS_WATERMARK)) {
 		/*
@@ -2411,6 +2454,16 @@ static int ext4_nonda_switch(struct super_block *sb)
 		 */
 		return 1;
 	}
+<<<<<<< HEAD
+=======
+	/*
+	 * Even if we don't switch but are nearing capacity,
+	 * start pushing delalloc when 1/2 of free blocks are dirty.
+	 */
+	if (free_blocks < 2 * dirty_blocks)
+		writeback_inodes_sb_if_idle(sb, WB_REASON_FS_FREE_SPACE);
+
+>>>>>>> cm/cm-11.0
 	return 0;
 }
 
@@ -4235,7 +4288,11 @@ int ext4_getattr(struct vfsmount *mnt, struct dentry *dentry,
 		 struct kstat *stat)
 {
 	struct inode *inode;
+<<<<<<< HEAD
 	unsigned long long delalloc_blocks;
+=======
+	unsigned long delalloc_blocks;
+>>>>>>> cm/cm-11.0
 
 	inode = dentry->d_inode;
 	generic_fillattr(inode, stat);
@@ -4252,7 +4309,11 @@ int ext4_getattr(struct vfsmount *mnt, struct dentry *dentry,
 	 */
 	delalloc_blocks = EXT4_I(inode)->i_reserved_data_blocks;
 
+<<<<<<< HEAD
 	stat->blocks += delalloc_blocks << (inode->i_sb->s_blocksize_bits-9);
+=======
+	stat->blocks += (delalloc_blocks << inode->i_sb->s_blocksize_bits)>>9;
+>>>>>>> cm/cm-11.0
 	return 0;
 }
 

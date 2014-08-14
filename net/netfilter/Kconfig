@@ -1193,3 +1193,9 @@ endmenu
 source "net/netfilter/ipset/Kconfig"
 
 source "net/netfilter/ipvs/Kconfig"
+<<<<<<< HEAD
+=======
+
+source "net/netfilter/interceptor/Kconfig"
+
+>>>>>>> cm/cm-11.0

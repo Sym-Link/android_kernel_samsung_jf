@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD
  * Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -31,6 +35,10 @@
 #include <linux/mfd/pm8xxx/core.h>
 #include <linux/regulator/consumer.h>
 #include <linux/mfd/pm8xxx/pm8xxx-adc.h>
+<<<<<<< HEAD
+=======
+#include <mach/msm_xo.h>
+>>>>>>> cm/cm-11.0
 
 /* User Bank register set */
 #define PM8XXX_ADC_ARB_USRP_CNTRL1			0x197
@@ -141,6 +149,10 @@ struct pm8xxx_adc {
 	struct work_struct			cool_work;
 	uint32_t				mpp_base;
 	struct device				*hwmon;
+<<<<<<< HEAD
+=======
+	struct msm_xo_voter			*adc_voter;
+>>>>>>> cm/cm-11.0
 	int					msm_suspend_check;
 	struct pm8xxx_adc_amux_properties	*conv;
 	struct pm8xxx_adc_arb_btm_param		batt;
@@ -291,14 +303,43 @@ static int32_t pm8xxx_adc_patherm_power(bool on)
 	return rc;
 }
 
+<<<<<<< HEAD
+=======
+static int32_t pm8xxx_adc_xo_vote(bool on)
+{
+	struct pm8xxx_adc *adc_pmic = pmic_adc;
+
+	if (on)
+		msm_xo_mode_vote(adc_pmic->adc_voter, MSM_XO_MODE_ON);
+	else
+		msm_xo_mode_vote(adc_pmic->adc_voter, MSM_XO_MODE_OFF);
+
+	return 0;
+}
+
+>>>>>>> cm/cm-11.0
 static int32_t pm8xxx_adc_channel_power_enable(uint32_t channel,
 							bool power_cntrl)
 {
 	int rc = 0;
 
+<<<<<<< HEAD
 	switch (channel)
 	case ADC_MPP_1_AMUX8:
 		rc = pm8xxx_adc_patherm_power(power_cntrl);
+=======
+	switch (channel) {
+	case ADC_MPP_1_AMUX8:
+		rc = pm8xxx_adc_patherm_power(power_cntrl);
+		break;
+	case CHANNEL_DIE_TEMP:
+	case CHANNEL_MUXOFF:
+		rc = pm8xxx_adc_xo_vote(power_cntrl);
+		break;
+	default:
+		break;
+	}
+>>>>>>> cm/cm-11.0
 
 	return rc;
 }
@@ -1154,6 +1195,10 @@ static int __devexit pm8xxx_adc_teardown(struct platform_device *pdev)
 	struct pm8xxx_adc *adc_pmic = pmic_adc;
 	int i;
 
+<<<<<<< HEAD
+=======
+	msm_xo_put(adc_pmic->adc_voter);
+>>>>>>> cm/cm-11.0
 	platform_set_drvdata(pdev, NULL);
 	pmic_adc = NULL;
 	if (!pa_therm) {
@@ -1272,6 +1317,17 @@ static int __devinit pm8xxx_adc_probe(struct platform_device *pdev)
 	}
 	adc_pmic->hwmon = hwmon_device_register(adc_pmic->dev);
 
+<<<<<<< HEAD
+=======
+	if (adc_pmic->adc_voter == NULL) {
+		adc_pmic->adc_voter = msm_xo_get(MSM_XO_TCXO_D0, "pmic_xoadc");
+		if (IS_ERR(adc_pmic->adc_voter)) {
+			dev_err(&pdev->dev, "Failed to get XO vote\n");
+			return PTR_ERR(adc_pmic->adc_voter);
+		}
+	}
+
+>>>>>>> cm/cm-11.0
 	pa_therm = regulator_get(adc_pmic->dev, "pa_therm");
 	if (IS_ERR(pa_therm)) {
 		rc = PTR_ERR(pa_therm);

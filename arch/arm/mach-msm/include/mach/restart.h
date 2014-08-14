@@ -35,7 +35,10 @@ void fsm_restart(char mode, const char *cmd);
 #endif
 
 extern int pmic_reset_irq;
+<<<<<<< HEAD
 int resout_irq_control (int enable);
+=======
+>>>>>>> cm/cm-11.0
 
 #endif
 

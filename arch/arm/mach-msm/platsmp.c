@@ -49,10 +49,17 @@ volatile int pen_release = -1;
  */
 static void __cpuinit write_pen_release(int val)
 {
+<<<<<<< HEAD
        pen_release = val;
        smp_wmb();
        __cpuc_flush_dcache_area((void *)&pen_release, sizeof(pen_release));
        outer_clean_range(__pa(&pen_release), __pa(&pen_release + 1));
+=======
+	pen_release = val;
+	smp_wmb();
+	__cpuc_flush_dcache_area((void *)&pen_release, sizeof(pen_release));
+	outer_clean_range(__pa(&pen_release), __pa(&pen_release + 1));
+>>>>>>> cm/cm-11.0
 }
 
 static DEFINE_SPINLOCK(boot_lock);
@@ -68,9 +75,16 @@ void __cpuinit platform_secondary_init(unsigned int cpu)
 	 */
 	gic_secondary_init(0);
 
+<<<<<<< HEAD
 	/* let the primary processor know we're out of the
          * pen, then head off into the C entry point
          */
+=======
+	/*
+	 * let the primary processor know we're out of the
+	 * pen, then head off into the C entry point
+	 */
+>>>>>>> cm/cm-11.0
 	write_pen_release(-1);
 
 	/*

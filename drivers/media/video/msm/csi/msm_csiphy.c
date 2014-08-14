@@ -105,7 +105,11 @@ static irqreturn_t msm_csiphy_irq(int irq_num, void *data)
 	uint32_t irq;
 	int i;
 	struct csiphy_device *csiphy_dev = data;
+<<<<<<< HEAD
 	if (!csiphy_dev || !csiphy_dev->base)
+=======
+	if(!csiphy_dev || !csiphy_dev->base)
+>>>>>>> cm/cm-11.0
 		return IRQ_HANDLED;
 	for (i = 0; i < 8; i++) {
 		irq = msm_camera_io_r(

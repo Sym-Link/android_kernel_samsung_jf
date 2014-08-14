@@ -31,7 +31,11 @@
  */
 
 #ifdef STATIC
+<<<<<<< HEAD
 #include "lzo/lzo1x_decompress.c"
+=======
+#include "lzo/lzo1x_decompress_safe.c"
+>>>>>>> cm/cm-11.0
 #else
 #include <linux/decompress/unlzo.h>
 #endif

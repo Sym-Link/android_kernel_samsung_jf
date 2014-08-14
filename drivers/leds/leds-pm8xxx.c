@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -52,6 +56,10 @@
 #define WLED_SYNC_REG			SSBI_REG_ADDR_WLED_CTRL(11)
 #define WLED_OVP_CFG_REG		SSBI_REG_ADDR_WLED_CTRL(13)
 #define WLED_BOOST_CFG_REG		SSBI_REG_ADDR_WLED_CTRL(14)
+<<<<<<< HEAD
+=======
+#define WLED_RESISTOR_COMPENSATION_CFG_REG	SSBI_REG_ADDR_WLED_CTRL(15)
+>>>>>>> cm/cm-11.0
 #define WLED_HIGH_POLE_CAP_REG		SSBI_REG_ADDR_WLED_CTRL(16)
 
 #define WLED_STRINGS			0x03
@@ -76,9 +84,20 @@
 
 #define WLED_MAX_LEVEL			255
 #define WLED_8_BIT_MASK			0xFF
+<<<<<<< HEAD
 #define WLED_8_BIT_SHFT			0x08
 #define WLED_MAX_DUTY_CYCLE		0xFFF
 
+=======
+#define WLED_4_BIT_MASK			0x0F
+#define WLED_8_BIT_SHFT			0x08
+#define WLED_4_BIT_SHFT			0x04
+#define WLED_MAX_DUTY_CYCLE		0xFFF
+
+#define WLED_RESISTOR_COMPENSATION_DEFAULT	20
+#define WLED_RESISTOR_COMPENSATION_MAX	320
+
+>>>>>>> cm/cm-11.0
 #define WLED_SYNC_VAL			0x07
 #define WLED_SYNC_RESET_VAL		0x00
 #define WLED_SYNC_MASK			0xF8
@@ -138,6 +157,13 @@
 			_rgb_led_blue << PM8XXX_ID_RGB_LED_BLUE, \
 	}
 
+<<<<<<< HEAD
+=======
+#define PM8XXX_PWM_CURRENT_4MA		4
+#define PM8XXX_PWM_CURRENT_8MA		8
+#define PM8XXX_PWM_CURRENT_12MA		12
+
+>>>>>>> cm/cm-11.0
 /**
  * supported_leds - leds supported for each PMIC version
  * @version - version of PMIC
@@ -439,6 +465,10 @@ static int pm8xxx_led_pwm_pattern_update(struct pm8xxx_led_data * led)
 	int temp = 0;
 	int pwm_max = 0;
 	int total_ms, on_ms;
+<<<<<<< HEAD
+=======
+	int flags;
+>>>>>>> cm/cm-11.0
 
 	if (!led->pwm_duty_cycles || !led->pwm_duty_cycles->duty_pcts) {
 		dev_err(led->cdev.dev, "duty_cycles and duty_pcts is not exist\n");
@@ -492,11 +522,34 @@ static int pm8xxx_led_pwm_pattern_update(struct pm8xxx_led_data * led)
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
+=======
+	flags = PM8XXX_LED_PWM_FLAGS;
+	switch (led->max_current) {
+	case PM8XXX_PWM_CURRENT_4MA:
+		flags |= PM_PWM_BANK_LO;
+		break;
+	case PM8XXX_PWM_CURRENT_8MA:
+		flags |= PM_PWM_BANK_HI;
+		break;
+	case PM8XXX_PWM_CURRENT_12MA:
+		flags |= (PM_PWM_BANK_LO | PM_PWM_BANK_HI);
+		break;
+	default:
+		flags |= (PM_PWM_BANK_LO | PM_PWM_BANK_HI);
+		break;
+	}
+
+>>>>>>> cm/cm-11.0
 	rc = pm8xxx_pwm_lut_config(led->pwm_dev, led->pwm_period_us,
 			led->pwm_duty_cycles->duty_pcts,
 			led->pwm_duty_cycles->duty_ms,
 			start_idx, idx_len, led->pwm_pause_lo, led->pwm_pause_hi,
+<<<<<<< HEAD
 			PM8XXX_LED_PWM_FLAGS);
+=======
+			flags);
+>>>>>>> cm/cm-11.0
 
 	return rc;
 }
@@ -682,12 +735,21 @@ static enum led_brightness pm8xxx_led_get(struct led_classdev *led_cdev)
 static int __devinit init_wled(struct pm8xxx_led_data *led)
 {
 	int rc, i;
+<<<<<<< HEAD
 	u8 val, num_wled_strings;
+=======
+	u8 val, num_wled_strings, comp;
+	u16 temp;
+>>>>>>> cm/cm-11.0
 
 	num_wled_strings = led->wled_cfg->num_strings;
 
 	/* program over voltage protection threshold */
+<<<<<<< HEAD
 	if (led->wled_cfg->ovp_val > WLED_OVP_37V) {
+=======
+	if (led->wled_cfg->ovp_val > WLED_OVP_27V) {
+>>>>>>> cm/cm-11.0
 		dev_err(led->dev->parent, "Invalid ovp value");
 		return -EINVAL;
 	}
@@ -735,6 +797,49 @@ static int __devinit init_wled(struct pm8xxx_led_data *led)
 		return rc;
 	}
 
+<<<<<<< HEAD
+=======
+	if (led->wled_cfg->comp_res_val) {
+		/* Add Validation for compensation resistor value */
+		if (!(led->wled_cfg->comp_res_val >=
+			WLED_RESISTOR_COMPENSATION_DEFAULT &&
+			led->wled_cfg->comp_res_val <=
+				WLED_RESISTOR_COMPENSATION_MAX &&
+			led->wled_cfg->comp_res_val %
+				WLED_RESISTOR_COMPENSATION_DEFAULT == 0)) {
+			dev_err(led->dev->parent, "Invalid Value " \
+			"for compensation register.\n");
+			return -EINVAL;
+		}
+
+		/* Compute the compensation resistor register value */
+		temp = led->wled_cfg->comp_res_val;
+		temp = (temp - WLED_RESISTOR_COMPENSATION_DEFAULT) /
+					WLED_RESISTOR_COMPENSATION_DEFAULT;
+		comp = (temp << WLED_4_BIT_SHFT);
+
+		rc = pm8xxx_readb(led->dev->parent,
+				WLED_RESISTOR_COMPENSATION_CFG_REG, &val);
+		if (rc) {
+			dev_err(led->dev->parent, "can't read wled " \
+			"resistor compensation config register rc=%d\n", rc);
+			return rc;
+		}
+
+		val = val && WLED_4_BIT_MASK;
+		val = val | comp;
+
+		/* program compenstation resistor register */
+		rc = pm8xxx_writeb(led->dev->parent,
+				WLED_RESISTOR_COMPENSATION_CFG_REG, val);
+		if (rc) {
+			dev_err(led->dev->parent, "can't write wled " \
+			"resistor compensation config register rc=%d\n", rc);
+			return rc;
+		}
+	}
+
+>>>>>>> cm/cm-11.0
 	/* program high pole capacitance */
 	if (led->wled_cfg->cp_select > WLED_CP_SELECT_MAX) {
 		dev_err(led->dev->parent, "Invalid pole capacitance");

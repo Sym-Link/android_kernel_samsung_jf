@@ -403,7 +403,11 @@ static void ecm_qc_notify(struct f_ecm_qc *ecm)
 static void ecm_qc_notify_complete(struct usb_ep *ep, struct usb_request *req)
 {
 	struct f_ecm_qc			*ecm = req->context;
+<<<<<<< HEAD
 
+=======
+	struct usb_composite_dev *cdev = f->config->cdev;
+>>>>>>> cm/cm-11.0
 	switch (req->status) {
 	case 0:
 		/* no fault */

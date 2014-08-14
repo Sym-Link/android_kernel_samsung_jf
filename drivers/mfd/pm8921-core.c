@@ -622,6 +622,7 @@ pm8921_add_subdevices(const struct pm8921_platform_data *pdata,
 		}
 	}
 
+<<<<<<< HEAD
 	if (pdata->pwrkey_pdata) {
 		pwrkey_cell.platform_data = pdata->pwrkey_pdata;
 		pwrkey_cell.pdata_size =
@@ -634,6 +635,8 @@ pm8921_add_subdevices(const struct pm8921_platform_data *pdata,
 		}
 	}
 
+=======
+>>>>>>> cm/cm-11.0
 	if (pdata->mpp_pdata) {
 		if (version == PM8XXX_VERSION_8917) {
 			mpp_cell_resources[0].end = mpp_cell_resources[0].end
@@ -665,6 +668,21 @@ pm8921_add_subdevices(const struct pm8921_platform_data *pdata,
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	if (pdata->pwrkey_pdata) {
+		pwrkey_cell.platform_data = pdata->pwrkey_pdata;
+		pwrkey_cell.pdata_size =
+			sizeof(struct pm8xxx_pwrkey_platform_data);
+		ret = mfd_add_devices(pmic->dev, 0, &pwrkey_cell, 1, NULL,
+					irq_base);
+		if (ret) {
+			pr_err("Failed to add pwrkey subdevice ret=%d\n", ret);
+			goto bail;
+		}
+	}
+
+>>>>>>> cm/cm-11.0
 	if (pdata->keypad_pdata) {
 		keypad_cell.platform_data = pdata->keypad_pdata;
 		keypad_cell.pdata_size =
@@ -804,6 +822,11 @@ pm8921_add_subdevices(const struct pm8921_platform_data *pdata,
 	}
 
 	if (pdata->ccadc_pdata) {
+<<<<<<< HEAD
+=======
+		pdata->ccadc_pdata->ccadc_cdata.batt_temp_channel
+						= CHANNEL_BATT_THERM;
+>>>>>>> cm/cm-11.0
 		ccadc_cell.platform_data = pdata->ccadc_pdata;
 		ccadc_cell.pdata_size =
 				sizeof(struct pm8xxx_ccadc_platform_data);

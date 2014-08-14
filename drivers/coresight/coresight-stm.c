@@ -24,6 +24,10 @@
 #include <linux/slab.h>
 #include <linux/delay.h>
 #include <linux/clk.h>
+<<<<<<< HEAD
+=======
+#include <linux/bitmap.h>
+>>>>>>> cm/cm-11.0
 #include <linux/of_coresight.h>
 #include <linux/coresight.h>
 #include <linux/coresight-stm.h>
@@ -45,6 +49,7 @@ do {									\
 	mb();								\
 } while (0)
 
+<<<<<<< HEAD
 #define STMDMASTARTR		(0xC04)
 #define STMDMASTOPR		(0xC08)
 #define STMDMASTATR		(0xC0C)
@@ -83,6 +88,49 @@ do {									\
 
 #define OST_START_TOKEN		(0x30)
 #define OST_VERSION		(0x1)
+=======
+#define STMDMASTARTR			(0xC04)
+#define STMDMASTOPR			(0xC08)
+#define STMDMASTATR			(0xC0C)
+#define STMDMACTLR			(0xC10)
+#define STMDMAIDR			(0xCFC)
+#define STMHEER				(0xD00)
+#define STMHETER			(0xD20)
+#define STMHEMCR			(0xD64)
+#define STMHEMASTR			(0xDF4)
+#define STMHEFEAT1R			(0xDF8)
+#define STMHEIDR			(0xDFC)
+#define STMSPER				(0xE00)
+#define STMSPTER			(0xE20)
+#define STMSPSCR			(0xE60)
+#define STMSPMSCR			(0xE64)
+#define STMSPOVERRIDER			(0xE68)
+#define STMSPMOVERRIDER			(0xE6C)
+#define STMSPTRIGCSR			(0xE70)
+#define STMTCSR				(0xE80)
+#define STMTSSTIMR			(0xE84)
+#define STMTSFREQR			(0xE8C)
+#define STMSYNCR			(0xE90)
+#define STMAUXCR			(0xE94)
+#define STMSPFEAT1R			(0xEA0)
+#define STMSPFEAT2R			(0xEA4)
+#define STMSPFEAT3R			(0xEA8)
+#define STMITTRIGGER			(0xEE8)
+#define STMITATBDATA0			(0xEEC)
+#define STMITATBCTR2			(0xEF0)
+#define STMITATBID			(0xEF4)
+#define STMITATBCTR0			(0xEF8)
+
+#define NR_STM_CHANNEL			(32)
+#define BYTES_PER_CHANNEL		(256)
+#define STM_TRACE_BUF_SIZE		(4096)
+#define STM_USERSPACE_HEADER_SIZE	(8)
+#define STM_USERSPACE_MAGIC1_VAL	(0xf0)
+#define STM_USERSPACE_MAGIC2_VAL	(0xf1)
+
+#define OST_START_TOKEN			(0x30)
+#define OST_VERSION			(0x1)
+>>>>>>> cm/cm-11.0
 
 enum stm_pkt_type {
 	STM_PKT_TYPE_DATA	= 0x98,
@@ -98,7 +146,11 @@ enum {
 					(ch * BYTES_PER_CHANNEL))
 #define stm_channel_off(type, opts)	(type & ~opts)
 
+<<<<<<< HEAD
 #ifdef CONFIG_MSM_QDSS_STM_DEFAULT_ENABLE
+=======
+#ifdef CONFIG_CORESIGHT_STM_DEFAULT_ENABLE
+>>>>>>> cm/cm-11.0
 static int boot_enable = 1;
 #else
 static int boot_enable;
@@ -128,7 +180,11 @@ struct stm_drvdata {
 	spinlock_t		spinlock;
 	struct channel_space	chs;
 	bool			enable;
+<<<<<<< HEAD
 	uint32_t		entity;
+=======
+	DECLARE_BITMAP(entities, OST_ENTITY_MAX);
+>>>>>>> cm/cm-11.0
 };
 
 static struct stm_drvdata *stmdrvdata;
@@ -150,7 +206,14 @@ static void __stm_hwevent_enable(struct stm_drvdata *drvdata)
 {
 	STM_UNLOCK(drvdata);
 
+<<<<<<< HEAD
 	stm_writel(drvdata, 0x0, STMHETER);
+=======
+	/* Program STMHETER to ensure TRIGOUTHETE (fed to CTI) is asserted
+	   for HW events.
+	*/
+	stm_writel(drvdata, 0xFFFFFFFF, STMHETER);
+>>>>>>> cm/cm-11.0
 	stm_writel(drvdata, 0xFFFFFFFF, STMHEER);
 	stm_writel(drvdata, 0x5, STMHEMCR);
 
@@ -187,7 +250,11 @@ static void __stm_port_enable(struct stm_drvdata *drvdata)
 {
 	STM_UNLOCK(drvdata);
 
+<<<<<<< HEAD
 	stm_writel(drvdata, 0xFFFFFFFF, STMSPTER);
+=======
+	stm_writel(drvdata, 0x10, STMSPTRIGCSR);
+>>>>>>> cm/cm-11.0
 	stm_writel(drvdata, 0xFFFFFFFF, STMSPER);
 
 	STM_LOCK(drvdata);
@@ -214,9 +281,15 @@ static void __stm_enable(struct stm_drvdata *drvdata)
 
 	STM_UNLOCK(drvdata);
 
+<<<<<<< HEAD
 	stm_writel(drvdata, 0x80, STMSYNCR);
 	/* SYNCEN is read-only and HWTEN is not implemented */
 	stm_writel(drvdata, 0x30003, STMTCSR);
+=======
+	stm_writel(drvdata, 0xFFF, STMSYNCR);
+	/* SYNCEN is read-only and HWTEN is not implemented */
+	stm_writel(drvdata, 0x100003, STMTCSR);
+>>>>>>> cm/cm-11.0
 
 	STM_LOCK(drvdata);
 }
@@ -243,9 +316,15 @@ static void __stm_hwevent_disable(struct stm_drvdata *drvdata)
 {
 	STM_UNLOCK(drvdata);
 
+<<<<<<< HEAD
 	stm_writel(drvdata, 0x0, STMHETER);
 	stm_writel(drvdata, 0x0, STMHEER);
 	stm_writel(drvdata, 0x0, STMHEMCR);
+=======
+	stm_writel(drvdata, 0x0, STMHEMCR);
+	stm_writel(drvdata, 0x0, STMHEER);
+	stm_writel(drvdata, 0x0, STMHETER);
+>>>>>>> cm/cm-11.0
 
 	STM_LOCK(drvdata);
 }
@@ -263,7 +342,11 @@ static void __stm_port_disable(struct stm_drvdata *drvdata)
 	STM_UNLOCK(drvdata);
 
 	stm_writel(drvdata, 0x0, STMSPER);
+<<<<<<< HEAD
 	stm_writel(drvdata, 0x0, STMSPTER);
+=======
+	stm_writel(drvdata, 0x0, STMSPTRIGCSR);
+>>>>>>> cm/cm-11.0
 
 	STM_LOCK(drvdata);
 }
@@ -280,7 +363,11 @@ static void __stm_disable(struct stm_drvdata *drvdata)
 {
 	STM_UNLOCK(drvdata);
 
+<<<<<<< HEAD
 	stm_writel(drvdata, 0x30000, STMTCSR);
+=======
+	stm_writel(drvdata, 0x100000, STMTCSR);
+>>>>>>> cm/cm-11.0
 
 	STM_LOCK(drvdata);
 
@@ -479,7 +566,12 @@ int stm_trace(uint32_t options, uint8_t entity_id, uint8_t proto_id,
 	struct stm_drvdata *drvdata = stmdrvdata;
 
 	/* we don't support sizes more than 24bits (0 to 23) */
+<<<<<<< HEAD
 	if (!(drvdata && drvdata->enable && (drvdata->entity & entity_id) &&
+=======
+	if (!(drvdata && drvdata->enable &&
+	      test_bit(entity_id, drvdata->entities) && size &&
+>>>>>>> cm/cm-11.0
 	      (size < 0x1000000)))
 		return 0;
 
@@ -493,6 +585,7 @@ static ssize_t stm_write(struct file *file, const char __user *data,
 	struct stm_drvdata *drvdata = container_of(file->private_data,
 						   struct stm_drvdata, miscdev);
 	char *buf;
+<<<<<<< HEAD
 
 	if (!drvdata->enable)
 		return -EINVAL;
@@ -500,6 +593,14 @@ static ssize_t stm_write(struct file *file, const char __user *data,
 	if (!(drvdata->entity & OST_ENTITY_DEV_NODE))
 		return size;
 
+=======
+	uint8_t entity_id, proto_id;
+	uint32_t options;
+
+	if (!drvdata->enable || !size)
+		return -EINVAL;
+
+>>>>>>> cm/cm-11.0
 	if (size > STM_TRACE_BUF_SIZE)
 		size = STM_TRACE_BUF_SIZE;
 
@@ -513,7 +614,36 @@ static ssize_t stm_write(struct file *file, const char __user *data,
 		return -EFAULT;
 	}
 
+<<<<<<< HEAD
 	__stm_trace(STM_OPTION_TIMESTAMPED, OST_ENTITY_DEV_NODE, 0, buf, size);
+=======
+	if (size >= STM_USERSPACE_HEADER_SIZE &&
+	    buf[0] == STM_USERSPACE_MAGIC1_VAL &&
+	    buf[1] == STM_USERSPACE_MAGIC2_VAL) {
+
+		entity_id = buf[2];
+		proto_id = buf[3];
+		options = *(uint32_t *)(buf + 4);
+
+		if (!test_bit(entity_id, drvdata->entities) ||
+		    !(size - STM_USERSPACE_HEADER_SIZE)) {
+			kfree(buf);
+			return size;
+		}
+
+		__stm_trace(options, entity_id, proto_id,
+			    buf + STM_USERSPACE_HEADER_SIZE,
+			    size - STM_USERSPACE_HEADER_SIZE);
+	} else {
+		if (!test_bit(OST_ENTITY_DEV_NODE, drvdata->entities)) {
+			kfree(buf);
+			return size;
+		}
+
+		__stm_trace(STM_OPTION_TIMESTAMPED, OST_ENTITY_DEV_NODE, 0,
+			    buf, size);
+	}
+>>>>>>> cm/cm-11.0
 
 	kfree(buf);
 
@@ -591,6 +721,7 @@ static ssize_t stm_store_port_enable(struct device *dev,
 static DEVICE_ATTR(port_enable, S_IRUGO | S_IWUSR, stm_show_port_enable,
 		   stm_store_port_enable);
 
+<<<<<<< HEAD
 static ssize_t stm_show_entity(struct device *dev,
 			       struct device_attribute *attr, char *buf)
 {
@@ -601,10 +732,31 @@ static ssize_t stm_show_entity(struct device *dev,
 }
 
 static ssize_t stm_store_entity(struct device *dev,
+=======
+static ssize_t stm_show_entities(struct device *dev,
+			       struct device_attribute *attr, char *buf)
+{
+	struct stm_drvdata *drvdata = dev_get_drvdata(dev->parent);
+	ssize_t len;
+
+	len = bitmap_scnprintf(buf, PAGE_SIZE, drvdata->entities,
+			       OST_ENTITY_MAX);
+
+	if (PAGE_SIZE - len < 2)
+		len = -EINVAL;
+	else
+		len += scnprintf(buf + len, 2, "\n");
+
+	return len;
+}
+
+static ssize_t stm_store_entities(struct device *dev,
+>>>>>>> cm/cm-11.0
 				struct device_attribute *attr,
 				const char *buf, size_t size)
 {
 	struct stm_drvdata *drvdata = dev_get_drvdata(dev->parent);
+<<<<<<< HEAD
 	unsigned long val;
 
 	if (sscanf(buf, "%lx", &val) != 1)
@@ -615,11 +767,34 @@ static ssize_t stm_store_entity(struct device *dev,
 }
 static DEVICE_ATTR(entity, S_IRUGO | S_IWUSR, stm_show_entity,
 		   stm_store_entity);
+=======
+	unsigned long val1, val2;
+
+	if (sscanf(buf, "%lx %lx", &val1, &val2) != 2)
+		return -EINVAL;
+
+	if (val1 >= OST_ENTITY_MAX)
+		return -EINVAL;
+
+	if (val2)
+		__set_bit(val1, drvdata->entities);
+	else
+		__clear_bit(val1, drvdata->entities);
+
+	return size;
+}
+static DEVICE_ATTR(entities, S_IRUGO | S_IWUSR, stm_show_entities,
+		   stm_store_entities);
+>>>>>>> cm/cm-11.0
 
 static struct attribute *stm_attrs[] = {
 	&dev_attr_hwevent_enable.attr,
 	&dev_attr_port_enable.attr,
+<<<<<<< HEAD
 	&dev_attr_entity.attr,
+=======
+	&dev_attr_entities.attr,
+>>>>>>> cm/cm-11.0
 	NULL,
 };
 
@@ -695,7 +870,11 @@ static int __devinit stm_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
 	drvdata->entity = OST_ENTITY_ALL;
+=======
+	bitmap_fill(drvdata->entities, OST_ENTITY_MAX);
+>>>>>>> cm/cm-11.0
 
 	desc = devm_kzalloc(dev, sizeof(*desc), GFP_KERNEL);
 	if (!desc)

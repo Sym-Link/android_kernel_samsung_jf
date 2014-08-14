@@ -51,7 +51,11 @@
 #if defined(CONFIG_MACH_GC1) || defined(CONFIG_MACH_U1_NA_SPR) || \
 	defined(CONFIG_MACH_VIENNAEUR) || defined(CONFIG_MACH_LT03EUR) || \
 	defined(CONFIG_MACH_LT03SKT) || defined(CONFIG_MACH_LT03KTT) || \
+<<<<<<< HEAD
 	defined(CONFIG_MACH_LT03LGT)
+=======
+	defined(CONFIG_MACH_LT03LGT) || defined(CONFIG_MACH_PICASSO)
+>>>>>>> cm/cm-11.0
 #undef USE_CID_CHECK
 #define READ_MACADDR
 #endif	/* CONFIG_MACH_GC1 || CONFIG_MACH_U1_NA_SPR || CONFIG_MACH_VIENNAEUR ||
@@ -68,6 +72,13 @@
 #define WIFI_TURNOFF_DELAY	200
 #endif /* CONFIG_ARCH_MSM8960 */
 
+<<<<<<< HEAD
+=======
+#if defined(CONFIG_BCM4335) || defined (CONFIG_BCM4335_MODULE)
+#define POWERUP_MAX_RETRY 5 /* Due to late start-up of FPGA in JF project */
+#endif /* CONFIG_BCM4335 || CONFIG_BCM4335_MODULE */
+
+>>>>>>> cm/cm-11.0
 /* REGION CODE */
 #ifndef CONFIG_WLAN_REGION_CODE
 #define CONFIG_WLAN_REGION_CODE 100
@@ -136,10 +147,23 @@
 #define BCMWAPI_WAI
 #endif /* CONFIG_WLAN_REGION_CODE >= 300 && CONFIG_WLAN_REGION_CODE < 400 */
 
+<<<<<<< HEAD
+=======
+#if (CONFIG_WLAN_REGION_CODE == 402) /* TMO */
+#undef CUSTOM_SUSPEND_BCN_LI_DTIM
+#define CUSTOM_SUSPEND_BCN_LI_DTIM 3
+#endif /* CONFIG_WLAN_REGION_CODE == 402 */
+
+>>>>>>> cm/cm-11.0
 #if !defined(READ_MACADDR) && !defined(WRITE_MACADDR) && !defined(RDWR_KORICS_MACADDR) \
 	&& !defined(RDWR_MACADDR)
 #define GET_MAC_FROM_OTP
 #define SHOW_NVRAM_TYPE
 #endif /* !READ_MACADDR && !WRITE_MACADDR && !RDWR_KORICS_MACADDR && !RDWR_MACADDR */
 
+<<<<<<< HEAD
+=======
+#define WRITE_WLANINFO
+
+>>>>>>> cm/cm-11.0
 #endif /* _dhd_sec_feature_h_ */

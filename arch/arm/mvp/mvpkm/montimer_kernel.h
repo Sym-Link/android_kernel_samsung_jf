@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -36,6 +40,7 @@
 /**
  * @brief Monitor Timer structure
  */
+<<<<<<< HEAD
 typedef struct {
    struct MvpkmVM *vm;         ///< Associated vm
    struct hrtimer  timer;      ///< Linux timer
@@ -43,6 +48,15 @@ typedef struct {
 
 void MonitorTimer_Setup(struct MvpkmVM *vm);
 void MonitorTimer_Request(MonTimer *monTimer, uint64 when64);
+=======
+struct MonTimer {
+	struct MvpkmVM *vm;         /**< Associated vm */
+	struct hrtimer  timer;      /**< Linux timer */
+};
+
+void MonitorTimer_Setup(struct MvpkmVM *vm);
+void MonitorTimer_Request(struct MonTimer *monTimer, uint64 when64);
+>>>>>>> cm/cm-11.0
 
 #endif
 

@@ -1,7 +1,11 @@
 /*
  * Linux 2.6.32 and later Kernel module for VMware MVP Hypervisor Support
  *
+<<<<<<< HEAD
  * Copyright (C) 2010-2012 VMware, Inc. All rights reserved.
+=======
+ * Copyright (C) 2010-2013 VMware, Inc. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -71,6 +75,7 @@
 #include "comm_transp_impl.h"
 
 typedef struct WSParams {
+<<<<<<< HEAD
    uint32 callno;
    union {
       /**
@@ -146,6 +151,99 @@ typedef struct WSParams {
       } wait;
 
    };                              ///< anonymous union
+=======
+	uint32 callno;
+	union {
+	/**
+	 * @brief Used for both WSCALL_ACQUIRE_PAGE and WSCALL_RELEASE_PAGE.
+	 */
+	struct {
+		/** IN Number of pages */
+		uint16 pages;
+
+		/**
+		 *  IN Size of each page - 2^(12+order) sized and
+		 *  aligned in machine space. (WSCALL_ACQUIRE_PAGE only)
+		 */
+		uint16 order;
+
+		/** IN Region identifier for pages (WSCALL_ACQUIRE_PAGE only) */
+		PhysMem_RegionType forRegion;
+
+		/**
+		 * OUT (on WSCALL_ACQUIRE_PAGE)
+		 * IN (on WSCALL_RELEASE_PAGE)
+		 * Vector of page base MPNs
+		 */
+		MPN mpns[WSCALL_MAX_MPNS];
+	} pages;
+
+	union {
+		MPN mpn;          /**< IN MPN to query refcount. */
+		_Bool referenced; /**< OUT Host page tables contain the MPN? */
+	} refCount;
+
+	struct {
+		ExitStatus   status; /**< IN the final status of the monitor */
+	} abort;
+
+	struct {
+		int level;
+		char messg[WSCALL_LOG_MAX];
+	} log;
+
+	struct {
+		HKVA mtxHKVA;           /**< IN mutex's host kernel virt addr */
+		MutexMode mode;         /**< IN shared or exclusive */
+		uint32 cvi;             /**< IN condition variable index */
+		_Bool all;              /**< IN wake all waiting threads? */
+		_Bool ok;               /**< OUT Mutex_Lock completed */
+	} mutex;
+
+	struct {
+		Mksck_VmId  vmId;       /**< IN translate and lock this vmID */
+
+		/**
+		 * OUT true if the lookup was successful, page is found,
+		 * and refc incremented
+		 */
+		_Bool found;
+
+		/** OUT array of MPNs of the requested vmId */
+		MPN mpn[MKSCKPAGE_TOTAL];
+	} pageMgmnt;
+
+	struct {
+		/** OUT current time-of-day seconds */
+		unsigned int now;
+		/** OUT current time-of-day microseconds */
+		unsigned int nowusec;
+	} tod;
+
+	struct {
+		QPId id;             /**< IN/OUT shared memory id */
+		uint32 capacity;     /**< IN size of shared region requested */
+		uint32 type;         /**< IN type of queue pair */
+		uint32 base;         /**< IN base MPN of PA vector page */
+		uint32 nrPages;      /**< IN number of pages to map */
+		int32 rc;            /**< OUT return code */
+	} qp;
+
+	struct {
+		CommTranspID transpID;
+		CommTranspIOEvent event;
+	} commEvent;
+
+	struct {
+		uint64 when64;       /**< IN timer request */
+	} timer;
+
+	struct {
+		_Bool suspendMode;   /**< Is the guest in suspend mode? */
+	} wait;
+
+	};                           /**< anonymous union */
+>>>>>>> cm/cm-11.0
 } WSParams;
 
 
@@ -154,6 +252,7 @@ typedef struct WSParams {
  * @param wsp_ the world switch page structure pointer
  * @return the cast pointer
  */
+<<<<<<< HEAD
 static inline WSParams* UNUSED
 WSP_Params(WorldSwitchPage *wsp_) {
    return (WSParams*)(wsp_->params_);
@@ -161,5 +260,14 @@ WSP_Params(WorldSwitchPage *wsp_) {
 
 MY_ASSERTS(WSParFn,
    ASSERT_ON_COMPILE(sizeof(WSParams) <= WSP_PARAMS_SIZE);
+=======
+static inline WSParams *UNUSED
+WSP_Params(WorldSwitchPage *wsp_) {
+	return (WSParams *)(wsp_->params_);
+}
+
+MY_ASSERTS(WSParFn,
+	   ASSERT_ON_COMPILE(sizeof(WSParams) <= WSP_PARAMS_SIZE);
+>>>>>>> cm/cm-11.0
 )
 #endif

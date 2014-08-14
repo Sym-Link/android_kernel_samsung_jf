@@ -219,7 +219,11 @@ int msm_jpeg_evt_get(struct msm_jpeg_device *pgmn_dev,
 		JPEG_DBG("%s:%d] no buffer\n", __func__, __LINE__);
 		return -EAGAIN;
 	}
+<<<<<<< HEAD
 	memset(&ctrl_cmd, 0, sizeof(ctrl_cmd));
+=======
+
+>>>>>>> cm/cm-11.0
 	ctrl_cmd.type = buf_p->vbuf.type;
 	kfree(buf_p);
 

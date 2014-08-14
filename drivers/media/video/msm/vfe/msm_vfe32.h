@@ -205,6 +205,12 @@
 
 #define VFE_RELOAD_ALL_WRITE_MASTERS 0x00003FFF
 
+<<<<<<< HEAD
+=======
+#define VFE_IOMMU_FAULT_HANDLER 1
+#define BUS_OVERFLOW_THRESHOLD  5
+
+>>>>>>> cm/cm-11.0
 enum VFE32_DMI_RAM_SEL {
 	NO_MEM_SELECTED          = 0,
 	BLACK_LUT_RAM_BANK0      = 0x1,
@@ -553,6 +559,15 @@ enum VFE_YUV_INPUT_COSITING_MODE {
 
 #define VFE32_GAMMA_NUM_ENTRIES  64
 
+<<<<<<< HEAD
+=======
+#define VFE32_GAMMA_CH0_G_POS    0
+
+#define VFE32_GAMMA_CH1_B_POS    32
+
+#define VFE32_GAMMA_CH2_R_POS    64
+
+>>>>>>> cm/cm-11.0
 #define VFE32_LA_TABLE_LENGTH    64
 
 #define VFE32_LINEARIZATON_TABLE_LENGTH    36
@@ -927,6 +942,10 @@ struct vfe32_frame_extra {
 #define VFE_DMI_ADDR                    0x0000059C
 #define VFE_DMI_DATA_HI                 0x000005A0
 #define VFE_DMI_DATA_LO                 0x000005A4
+<<<<<<< HEAD
+=======
+#define VFE_AXI_CFG                     0x00000600
+>>>>>>> cm/cm-11.0
 #define VFE_BUS_IO_FORMAT_CFG           0x000006F8
 #define VFE_PIXEL_IF_CFG                0x000006FC
 #define VFE_RDI0_CFG                    0x00000734
@@ -936,6 +955,10 @@ struct vfe32_frame_extra {
 
 #define VFE33_DMI_DATA_HI               0x000005A0
 #define VFE33_DMI_DATA_LO               0x000005A4
+<<<<<<< HEAD
+=======
+#define VFE_AXI_CFG_MASK                0x80000000
+>>>>>>> cm/cm-11.0
 
 #define VFE32_OUTPUT_MODE_PT			BIT(0)
 #define VFE32_OUTPUT_MODE_S			BIT(1)
@@ -1011,7 +1034,13 @@ struct vfe_share_ctrl_t {
 	atomic_t rdi2_update_ack_pending;
 
 	uint8_t stream_error;
+<<<<<<< HEAD
 
+=======
+	uint32_t rdi_comp;
+	uint32_t overflow_count;
+	uint8_t stop_issued;
+>>>>>>> cm/cm-11.0
 };
 
 struct axi_ctrl_t {

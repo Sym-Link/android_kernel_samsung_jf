@@ -45,7 +45,11 @@ static struct kgsl_iommu_register_list kgsl_iommuv1_reg[KGSL_IOMMU_REG_MAX] = {
 	{ 0x03C, 0, 0 },			/* TLBLKCR */
 	{ 0x818, 0, 0 },			/* V2PUR */
 	{ 0x2C, 0, 0 },                         /* FSYNR0 */
+<<<<<<< HEAD
 	{ 0x2C, 0, 0 },                         /* FSYNR0 */
+=======
+	{ 0x30, 0, 0 },                         /* FSYNR1 */
+>>>>>>> cm/cm-11.0
 };
 
 static struct kgsl_iommu_register_list kgsl_iommuv2_reg[KGSL_IOMMU_REG_MAX] = {
@@ -295,8 +299,12 @@ static int kgsl_iommu_fault_handler(struct iommu_domain *domain,
 	unsigned int no_page_fault_log = 0;
 	unsigned int curr_context_id = 0;
 	unsigned int curr_global_ts = 0;
+<<<<<<< HEAD
 	static struct adreno_context *curr_context;
 	static struct kgsl_context *context;
+=======
+	struct kgsl_context *context;
+>>>>>>> cm/cm-11.0
 	unsigned int pid;
 	unsigned int fsynr0, fsynr1;
 	int write;
@@ -368,6 +376,7 @@ static int kgsl_iommu_fault_handler(struct iommu_domain *domain,
 
 	kgsl_sharedmem_readl(&device->memstore, &curr_context_id,
 		KGSL_MEMSTORE_OFFSET(KGSL_MEMSTORE_GLOBAL, current_context));
+<<<<<<< HEAD
 	context = idr_find(&device->context_idr, curr_context_id);
 	if (context != NULL)
 			curr_context = context->devctxt;
@@ -381,6 +390,35 @@ static int kgsl_iommu_fault_handler(struct iommu_domain *domain,
 	 */
 	curr_context->pagefault = 1;
 	curr_context->pagefault_ts = curr_global_ts;
+=======
+	context = kgsl_context_get(device, curr_context_id);
+
+	if (context != NULL && (context->devctxt != NULL)) {
+		struct adreno_context *drawctxt = context->devctxt;
+
+		ret = kgsl_sharedmem_readl(&device->memstore, &curr_global_ts,
+				KGSL_MEMSTORE_OFFSET(KGSL_MEMSTORE_GLOBAL, eoptimestamp));
+
+		if (ret < 0) {
+			KGSL_CORE_ERR("Invalid curr_global_ts = %d\n", curr_global_ts);
+			kgsl_context_put(context);
+			goto done;
+		}
+
+		/*
+		 * Store pagefault's timestamp in adreno context,
+		 * this information will be used in GFT
+		 */
+
+		if (drawctxt != NULL) {
+			drawctxt->pagefault = 1;
+			drawctxt->pagefault_ts = curr_global_ts;
+		}
+
+		kgsl_context_put(context);
+	}
+
+>>>>>>> cm/cm-11.0
 
 	trace_kgsl_mmu_pagefault(iommu_dev->kgsldev, addr,
 			kgsl_mmu_get_ptname_from_ptbase(mmu, ptbase),
@@ -609,10 +647,15 @@ static void kgsl_iommu_destroy_pagetable(void *mmu_specific_pt)
 {
 	struct kgsl_iommu_pt *iommu_pt = mmu_specific_pt;
 	if (iommu_pt->domain)
+<<<<<<< HEAD
 		msm_unregister_domain(iommu_pt->domain);
 
 	kfree(iommu_pt);
 	iommu_pt = NULL;
+=======
+		iommu_domain_free(iommu_pt->domain);
+	kfree(iommu_pt);
+>>>>>>> cm/cm-11.0
 }
 
 /*
@@ -1420,7 +1463,11 @@ static void kgsl_iommu_lock_rb_in_tlb(struct kgsl_mmu *mmu)
 				KGSL_IOMMU_SET_CTX_REG(iommu, iommu_unit,
 						iommu_unit->dev[j].ctx_id,
 						V2PUR, v2pxx);
+<<<<<<< HEAD
                 mb();
+=======
+				mb();
+>>>>>>> cm/cm-11.0
 				vaddr += PAGE_SIZE;
 				for (l = 0; l < iommu_unit->dev_count; l++) {
 					tlblkcr = KGSL_IOMMU_GET_CTX_REG(iommu,

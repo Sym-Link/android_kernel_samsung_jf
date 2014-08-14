@@ -67,6 +67,12 @@
 #define MTP_RESPONSE_OK             0x2001
 #define MTP_RESPONSE_DEVICE_BUSY    0x2019
 
+<<<<<<< HEAD
+=======
+unsigned int mtp_rx_req_len = MTP_BULK_BUFFER_SIZE;
+module_param(mtp_rx_req_len, uint, S_IRUGO | S_IWUSR);
+
+>>>>>>> cm/cm-11.0
 static const char mtp_shortname[] = "mtp_usb";
 
 struct mtp_dev {
@@ -427,10 +433,24 @@ static int mtp_create_bulk_endpoints(struct mtp_dev *dev,
 		req->complete = mtp_complete_in;
 		mtp_req_put(dev, &dev->tx_idle, req);
 	}
+<<<<<<< HEAD
 	for (i = 0; i < RX_REQ_MAX; i++) {
 		req = mtp_request_new(dev->ep_out, MTP_BULK_BUFFER_SIZE);
 		if (!req)
 			goto fail;
+=======
+retry_rx_alloc:
+	for (i = 0; i < RX_REQ_MAX; i++) {
+		req = mtp_request_new(dev->ep_out, mtp_rx_req_len);
+		if (!req) {
+			if (mtp_rx_req_len <= MTP_BULK_BUFFER_SIZE)
+				goto fail;
+			for (; i > 0; i--)
+				mtp_request_free(dev->rx_req[i], dev->ep_out);
+			mtp_rx_req_len = MTP_BULK_BUFFER_SIZE;
+			goto retry_rx_alloc;
+		}
+>>>>>>> cm/cm-11.0
 		req->complete = mtp_complete_out;
 		dev->rx_req[i] = req;
 	}
@@ -460,7 +480,11 @@ static ssize_t mtp_read(struct file *fp, char __user *buf,
 
 	DBG(cdev, "mtp_read(%d)\n", count);
 
+<<<<<<< HEAD
 	if (count > MTP_BULK_BUFFER_SIZE)
+=======
+	if (count > mtp_rx_req_len)
+>>>>>>> cm/cm-11.0
 		return -EINVAL;
 
 	/* we will block until we're online */
@@ -758,8 +782,13 @@ static void receive_file_work(struct work_struct *data)
 			read_req = dev->rx_req[cur_buf];
 			cur_buf = (cur_buf + 1) % RX_REQ_MAX;
 
+<<<<<<< HEAD
 			read_req->length = (count > MTP_BULK_BUFFER_SIZE
 					? MTP_BULK_BUFFER_SIZE : count);
+=======
+			read_req->length = (count > mtp_rx_req_len
+					? mtp_rx_req_len : count);
+>>>>>>> cm/cm-11.0
 			dev->rx_done = 0;
 			ret = usb_ep_queue(dev->ep_out, read_req, GFP_KERNEL);
 			if (ret < 0) {

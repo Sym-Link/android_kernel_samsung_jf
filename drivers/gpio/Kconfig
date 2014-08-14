@@ -575,4 +575,10 @@ config GPIO_QPNP_PIN_DEBUG
 	help
 	  Say 'y' here to include debug support for the Qualcomm
 	  QPNP gpio driver.
+<<<<<<< HEAD
+=======
+
+config SEC_GPIO_DVS
+	tristate "setting Samsung GPIO debugging and verification system"
+>>>>>>> cm/cm-11.0
 endif

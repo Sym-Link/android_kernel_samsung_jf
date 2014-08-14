@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -197,6 +201,10 @@ int wfd_stats_update(struct wfd_stats *stats, enum wfd_stats_event event)
 	}
 	mutex_unlock(&stats->mutex);
 
+<<<<<<< HEAD
+=======
+	mutex_unlock(&stats->mutex);
+>>>>>>> cm/cm-11.0
 	return rc;
 }
 

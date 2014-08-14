@@ -74,12 +74,15 @@ static int mmc_queue_thread(void *d)
 		if (req && IS_RT_CLASS_REQ(req))
 			    mmc_set_nopacked_period(mq, HZ);
 		mq->mqrq_cur->req = req;
+<<<<<<< HEAD
 		if (!req && mq->mqrq_prev->req &&
 			!(mq->mqrq_prev->req->cmd_flags & REQ_SANITIZE) &&
 			!(mq->mqrq_prev->req->cmd_flags & REQ_FLUSH) &&
 			!(mq->mqrq_prev->req->cmd_flags & REQ_DISCARD))
 			card->host->context_info.is_waiting_last_req = true;
 
+=======
+>>>>>>> cm/cm-11.0
 		spin_unlock_irq(q->queue_lock);
 
 		if (req || mq->mqrq_prev->req) {
@@ -88,6 +91,7 @@ static int mmc_queue_thread(void *d)
 			if (mq->flags & MMC_QUEUE_NEW_REQUEST) {
 				mq->flags &= ~MMC_QUEUE_NEW_REQUEST;
 				continue; /* fetch again */
+<<<<<<< HEAD
 			} else if ((mq->flags & MMC_QUEUE_URGENT_REQUEST) &&
 				   (mq->mqrq_cur->req &&
 				!(mq->mqrq_cur->req->cmd_flags & REQ_URGENT))) {
@@ -100,17 +104,34 @@ static int mmc_queue_thread(void *d)
 				mq->mqrq_cur->brq.mrq.data = NULL;
 				mq->mqrq_cur->req = NULL;
 			}
+=======
+			}
+
+			/*
+			 * Current request becomes previous request
+			 * and vice versa.
+			 */
+			mq->mqrq_prev->brq.mrq.data = NULL;
+			mq->mqrq_prev->req = NULL;
+			tmp = mq->mqrq_prev;
+			mq->mqrq_prev = mq->mqrq_cur;
+			mq->mqrq_cur = tmp;
+>>>>>>> cm/cm-11.0
 		} else {
 			if (kthread_should_stop()) {
 				set_current_state(TASK_RUNNING);
 				break;
 			}
 			mmc_start_delayed_bkops(card);
+<<<<<<< HEAD
 			mq->card->host->context_info.is_urgent = false;
+=======
+>>>>>>> cm/cm-11.0
 			up(&mq->thread_sem);
 			schedule();
 			down(&mq->thread_sem);
 		}
+<<<<<<< HEAD
 
 		/*
 		 * Current request becomes previous request
@@ -122,6 +143,8 @@ static int mmc_queue_thread(void *d)
 		mq->mqrq_prev = mq->mqrq_cur;
 		mq->mqrq_cur = tmp;
 
+=======
+>>>>>>> cm/cm-11.0
 	} while (1);
 	up(&mq->thread_sem);
 
@@ -150,6 +173,7 @@ static void mmc_request(struct request_queue *q)
 		return;
 	}
 
+<<<<<<< HEAD
 	if (unlikely(!irqs_disabled())) {
 		ioc = get_task_io_context(current, GFP_NOWAIT, 0);
 		if (ioc) {
@@ -158,6 +182,14 @@ static void mmc_request(struct request_queue *q)
 		        mmc_set_nopacked_period(mq, HZ);
 		    put_io_context(ioc);
 		}
+=======
+	ioc = get_task_io_context(current, GFP_NOWAIT, 0);
+	if (ioc) {
+	    /* Set nopacked period if requesting process is RT class */
+	    if (IOPRIO_PRIO_CLASS(ioc->ioprio) == IOPRIO_CLASS_RT)
+	        mmc_set_nopacked_period(mq, HZ);
+	    put_io_context(ioc);
+>>>>>>> cm/cm-11.0
 	}
 
 	cntx = &mq->card->host->context_info;
@@ -177,6 +209,7 @@ static void mmc_request(struct request_queue *q)
 		wake_up_process(mq->thread);
 }
 
+<<<<<<< HEAD
 /*
  * mmc_urgent_request() - Urgent MMC request handler.
  * @q: request queue.
@@ -218,6 +251,8 @@ static void mmc_urgent_request(struct request_queue *q)
 	}
 }
 
+=======
+>>>>>>> cm/cm-11.0
 static struct scatterlist *mmc_alloc_sg(int sg_len, int *err)
 {
 	struct scatterlist *sg;
@@ -285,11 +320,14 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
 	if (!mq->queue)
 		return -ENOMEM;
 
+<<<<<<< HEAD
 	if ((host->caps2 & MMC_CAP2_STOP_REQUEST) &&
 			host->ops->stop_request &&
 			mq->card->ext_csd.hpi)
 		blk_urgent_request(mq->queue, mmc_urgent_request);
 
+=======
+>>>>>>> cm/cm-11.0
 	memset(&mq->mqrq_cur, 0, sizeof(mq->mqrq_cur));
 	memset(&mq->mqrq_prev, 0, sizeof(mq->mqrq_prev));
 
@@ -465,10 +503,18 @@ EXPORT_SYMBOL(mmc_cleanup_queue);
  * complete any outstanding requests.  This ensures that we
  * won't suspend while a request is being processed.
  */
+<<<<<<< HEAD
 void mmc_queue_suspend(struct mmc_queue *mq)
 {
 	struct request_queue *q = mq->queue;
 	unsigned long flags;
+=======
+int mmc_queue_suspend(struct mmc_queue *mq)
+{
+	struct request_queue *q = mq->queue;
+	unsigned long flags;
+	int rc = 0;
+>>>>>>> cm/cm-11.0
 
 	if (!(mq->flags & MMC_QUEUE_SUSPENDED)) {
 		mq->flags |= MMC_QUEUE_SUSPENDED;
@@ -477,8 +523,25 @@ void mmc_queue_suspend(struct mmc_queue *mq)
 		blk_stop_queue(q);
 		spin_unlock_irqrestore(q->queue_lock, flags);
 
+<<<<<<< HEAD
 		down(&mq->thread_sem);
 	}
+=======
+		rc = down_trylock(&mq->thread_sem);
+		if (rc) {
+			/*
+			 * Failed to take the lock so better to abort the
+			 * suspend because mmcqd thread is processing requests.
+			 */
+			mq->flags &= ~MMC_QUEUE_SUSPENDED;
+			spin_lock_irqsave(q->queue_lock, flags);
+			blk_start_queue(q);
+			spin_unlock_irqrestore(q->queue_lock, flags);
+			rc = -EBUSY;
+		}
+	}
+	return rc;
+>>>>>>> cm/cm-11.0
 }
 
 /**

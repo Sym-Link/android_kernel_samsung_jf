@@ -541,7 +541,11 @@ static int __devinit msm_mpm_dev_probe(struct platform_device *pdev)
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ipc");
 	if (!res) {
 		pr_err("%s(): Missing GCC memory resource\n", __func__);
+<<<<<<< HEAD
 		goto failed_irq_get;
+=======
+		goto fail;
+>>>>>>> cm/cm-11.0
 	}
 
 	dev->mpm_apps_ipc_reg = devm_ioremap(&pdev->dev, res->start,
@@ -550,7 +554,11 @@ static int __devinit msm_mpm_dev_probe(struct platform_device *pdev)
 	if (of_property_read_u32(pdev->dev.of_node,
 				"qcom,ipc-bit-offset", &offset)) {
 		pr_info("%s(): Cannot read ipc bit offset\n", __func__);
+<<<<<<< HEAD
 		goto failed_free_irq;
+=======
+		goto failed_irq_get;
+>>>>>>> cm/cm-11.0
 	}
 
 	dev->mpm_apps_ipc_val = (1 << offset);
@@ -576,7 +584,11 @@ static int __devinit msm_mpm_dev_probe(struct platform_device *pdev)
 	if (ret) {
 		pr_err("%s: failed to set wakeup irq %u: %d\n",
 			__func__, dev->mpm_ipc_irq, ret);
+<<<<<<< HEAD
 		goto failed_irq_get;
+=======
+		goto failed_free_irq;
+>>>>>>> cm/cm-11.0
 
 	}
 	msm_mpm_initialized |= MSM_MPM_DEVICE_PROBED;

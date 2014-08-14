@@ -104,6 +104,7 @@ static int msm_v4l2_overlay_mapformat(uint32_t pixelformat)
 		mdp_format = MDP_RGB_888;
 		break;
 	case V4L2_PIX_FMT_NV12:
+<<<<<<< HEAD
 		mdp_format = MDP_Y_CBCR_H2V2;
 		break;
 	case V4L2_PIX_FMT_NV21:
@@ -120,6 +121,15 @@ static int msm_v4l2_overlay_mapformat(uint32_t pixelformat)
 		break;
 	case V4L2_PIX_FMT_YVU420:
 		mdp_format = MDP_Y_CR_CB_GH2V2;
+=======
+		mdp_format = MDP_Y_CRCB_H2V2;
+		break;
+	case V4L2_PIX_FMT_NV21:
+		mdp_format = MDP_Y_CBCR_H2V2;
+		break;
+	case V4L2_PIX_FMT_YUV420:
+		mdp_format = MDP_Y_CR_CB_H2V2;
+>>>>>>> cm/cm-11.0
 		break;
 	default:
 		pr_err("%s:Unrecognized format %u\n", __func__, pixelformat);

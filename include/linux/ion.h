@@ -43,7 +43,11 @@ enum ion_heap_type {
 	ION_HEAP_TYPE_DMA,
 	ION_HEAP_TYPE_CUSTOM, /* must be last so device specific heaps always
 				 are at the end of this enum */
+<<<<<<< HEAD
 	ION_NUM_HEAPS,
+=======
+	ION_NUM_HEAPS=16,
+>>>>>>> cm/cm-11.0
 };
 
 #define ION_HEAP_SYSTEM_MASK		(1 << ION_HEAP_TYPE_SYSTEM)

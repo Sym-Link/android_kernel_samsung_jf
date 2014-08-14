@@ -1,6 +1,10 @@
 /* drivers/tty/n_smux.c
  *
+<<<<<<< HEAD
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -28,6 +32,10 @@
 #include <mach/subsystem_notif.h>
 #include <mach/subsystem_restart.h>
 #include <mach/msm_serial_hs.h>
+<<<<<<< HEAD
+=======
+#include <mach/msm_ipc_logging.h>
+>>>>>>> cm/cm-11.0
 #include "smux_private.h"
 #include "smux_loopback.h"
 
@@ -59,10 +67,19 @@ enum {
 	MSM_SMUX_PKT = 1U << 3,
 };
 
+<<<<<<< HEAD
 static int smux_debug_mask;
 module_param_named(debug_mask, smux_debug_mask,
 		   int, S_IRUGO | S_IWUSR | S_IWGRP);
 
+=======
+static int smux_debug_mask = MSM_SMUX_DEBUG | MSM_SMUX_POWER_INFO;
+module_param_named(debug_mask, smux_debug_mask,
+		   int, S_IRUGO | S_IWUSR | S_IWGRP);
+
+static int disable_ipc_logging;
+
+>>>>>>> cm/cm-11.0
 /* Simulated wakeup used for testing */
 int smux_byte_loopback;
 module_param_named(byte_loopback, smux_byte_loopback,
@@ -71,14 +88,34 @@ int smux_simulate_wakeup_delay = 1;
 module_param_named(simulate_wakeup_delay, smux_simulate_wakeup_delay,
 		   int, S_IRUGO | S_IWUSR | S_IWGRP);
 
+<<<<<<< HEAD
 #define SMUX_DBG(x...) do {                              \
 	if (smux_debug_mask & MSM_SMUX_DEBUG) \
 			pr_info(x);  \
+=======
+#define IPC_LOG_STR(x...) do { \
+	if (!disable_ipc_logging && log_ctx) \
+		ipc_log_string(log_ctx, x); \
+} while (0)
+
+#define SMUX_DBG(x...) do {                              \
+	if (smux_debug_mask & MSM_SMUX_DEBUG) \
+			IPC_LOG_STR(x);  \
+} while (0)
+
+#define SMUX_ERR(x...) do {                              \
+	pr_err(x); \
+	IPC_LOG_STR(x);  \
+>>>>>>> cm/cm-11.0
 } while (0)
 
 #define SMUX_PWR(x...) do {                              \
 	if (smux_debug_mask & MSM_SMUX_POWER_INFO) \
+<<<<<<< HEAD
 			pr_info(x);  \
+=======
+			IPC_LOG_STR(x);  \
+>>>>>>> cm/cm-11.0
 } while (0)
 
 #define SMUX_PWR_PKT_RX(pkt) do { \
@@ -90,10 +127,17 @@ module_param_named(simulate_wakeup_delay, smux_simulate_wakeup_delay,
 	if (smux_debug_mask & MSM_SMUX_POWER_INFO) { \
 			if (pkt->hdr.cmd == SMUX_CMD_BYTE && \
 					pkt->hdr.flags == SMUX_WAKEUP_ACK) \
+<<<<<<< HEAD
 				pr_info("smux: TX Wakeup ACK\n"); \
 			else if (pkt->hdr.cmd == SMUX_CMD_BYTE && \
 					pkt->hdr.flags == SMUX_WAKEUP_REQ) \
 				pr_info("smux: TX Wakeup REQ\n"); \
+=======
+				IPC_LOG_STR("smux: TX Wakeup ACK\n"); \
+			else if (pkt->hdr.cmd == SMUX_CMD_BYTE && \
+					pkt->hdr.flags == SMUX_WAKEUP_REQ) \
+				IPC_LOG_STR("smux: TX Wakeup REQ\n"); \
+>>>>>>> cm/cm-11.0
 			else \
 				smux_log_pkt(pkt, 0); \
 	} \
@@ -170,6 +214,7 @@ enum {
 	SMUX_PWR_OFF_FLUSH,
 };
 
+<<<<<<< HEAD
 /**
  * Logical Channel Structure.  One instance per channel.
  *
@@ -223,6 +268,8 @@ struct smux_lch_t {
 	unsigned notify_lwm;
 };
 
+=======
+>>>>>>> cm/cm-11.0
 union notifier_metadata {
 	struct smux_meta_disconnected disconnected;
 	struct smux_meta_read read;
@@ -276,6 +323,10 @@ struct smux_ldisc_t {
 	int is_initialized;
 	int platform_devs_registered;
 	int in_reset;
+<<<<<<< HEAD
+=======
+	int remote_is_alive;
+>>>>>>> cm/cm-11.0
 	int ld_open_count;
 	struct tty_struct *tty;
 
@@ -298,11 +349,20 @@ struct smux_ldisc_t {
 	unsigned powerdown_enabled;
 	unsigned power_ctl_remote_req_received;
 	struct list_head power_queue;
+<<<<<<< HEAD
+=======
+	unsigned remote_initiated_wakeup_count;
+	unsigned local_initiated_wakeup_count;
+>>>>>>> cm/cm-11.0
 };
 
 
 /* data structures */
+<<<<<<< HEAD
 static struct smux_lch_t smux_lch[SMUX_NUM_LOGICAL_CHANNELS];
+=======
+struct smux_lch_t smux_lch[SMUX_NUM_LOGICAL_CHANNELS];
+>>>>>>> cm/cm-11.0
 static struct smux_ldisc_t smux;
 static const char *tty_error_type[] = {
 	[TTY_NORMAL] = "normal",
@@ -312,15 +372,66 @@ static const char *tty_error_type[] = {
 	[TTY_FRAME] = "framing",
 };
 
+<<<<<<< HEAD
 static const char *smux_cmds[] = {
+=======
+static const char * const smux_cmds[] = {
+>>>>>>> cm/cm-11.0
 	[SMUX_CMD_DATA] = "DATA",
 	[SMUX_CMD_OPEN_LCH] = "OPEN",
 	[SMUX_CMD_CLOSE_LCH] = "CLOSE",
 	[SMUX_CMD_STATUS] = "STATUS",
 	[SMUX_CMD_PWR_CTL] = "PWR",
+<<<<<<< HEAD
 	[SMUX_CMD_BYTE] = "Raw Byte",
 };
 
+=======
+	[SMUX_CMD_DELAY] = "DELAY",
+	[SMUX_CMD_BYTE] = "Raw Byte",
+};
+
+static const char * const smux_events[] = {
+	[SMUX_CONNECTED] = "CONNECTED" ,
+	[SMUX_DISCONNECTED] = "DISCONNECTED",
+	[SMUX_READ_DONE] = "READ_DONE",
+	[SMUX_READ_FAIL] = "READ_FAIL",
+	[SMUX_WRITE_DONE] = "WRITE_DONE",
+	[SMUX_WRITE_FAIL] = "WRITE_FAIL",
+	[SMUX_TIOCM_UPDATE] = "TIOCM_UPDATE",
+	[SMUX_LOW_WM_HIT] = "LOW_WM_HIT",
+	[SMUX_HIGH_WM_HIT] = "HIGH_WM_HIT",
+	[SMUX_RX_RETRY_HIGH_WM_HIT] = "RX_RETRY_HIGH_WM_HIT",
+	[SMUX_RX_RETRY_LOW_WM_HIT] = "RX_RETRY_LOW_WM_HIT",
+	[SMUX_LOCAL_CLOSED] = "LOCAL_CLOSED",
+	[SMUX_REMOTE_CLOSED] = "REMOTE_CLOSED",
+};
+
+static const char * const smux_local_state[] = {
+	[SMUX_LCH_LOCAL_CLOSED] = "CLOSED",
+	[SMUX_LCH_LOCAL_OPENING] = "OPENING",
+	[SMUX_LCH_LOCAL_OPENED] = "OPENED",
+	[SMUX_LCH_LOCAL_CLOSING] = "CLOSING",
+};
+
+static const char * const smux_remote_state[] = {
+	[SMUX_LCH_REMOTE_CLOSED] = "CLOSED",
+	[SMUX_LCH_REMOTE_OPENED] = "OPENED",
+};
+
+static const char * const smux_mode[] = {
+	[SMUX_LCH_MODE_NORMAL] = "N",
+	[SMUX_LCH_MODE_LOCAL_LOOPBACK] = "L",
+	[SMUX_LCH_MODE_REMOTE_LOOPBACK] = "R",
+};
+
+static const char * const smux_undef[] = {
+	[SMUX_UNDEF_LONG] = "UNDEF",
+	[SMUX_UNDEF_SHORT] = "U",
+};
+
+static void *log_ctx;
+>>>>>>> cm/cm-11.0
 static void smux_notify_local_fn(struct work_struct *work);
 static DECLARE_WORK(smux_notify_local, smux_notify_local_fn);
 
@@ -346,7 +457,10 @@ static DECLARE_WORK(smux_inactivity_work, smux_inactivity_worker);
 static DECLARE_DELAYED_WORK(smux_delayed_inactivity_work,
 		smux_inactivity_worker);
 
+<<<<<<< HEAD
 static long msm_smux_tiocm_get_atomic(struct smux_lch_t *ch);
+=======
+>>>>>>> cm/cm-11.0
 static void list_channel(struct smux_lch_t *ch);
 static int smux_send_status_cmd(struct smux_lch_t *ch);
 static int smux_dispatch_rx_pkt(struct smux_pkt_t *pkt);
@@ -363,6 +477,48 @@ static void smux_flush_workqueues(void);
 static void smux_pdev_release(struct device *dev);
 
 /**
+<<<<<<< HEAD
+=======
+ * local_lch_state() - Return human readable form of local logical state.
+ * @state:  Local logical channel state enum.
+ *
+ */
+const char *local_lch_state(unsigned state)
+{
+	if (state < ARRAY_SIZE(smux_local_state))
+		return smux_local_state[state];
+	else
+		return smux_undef[SMUX_UNDEF_LONG];
+}
+
+/**
+ * remote_lch_state() - Return human readable for of remote logical state.
+ * @state:  Remote logical channel state enum.
+ *
+ */
+const char *remote_lch_state(unsigned state)
+{
+	if (state < ARRAY_SIZE(smux_remote_state))
+		return smux_remote_state[state];
+	else
+		return smux_undef[SMUX_UNDEF_LONG];
+}
+
+/**
+ * lch_mode() - Return human readable form of mode.
+ * @mode:  Mode of the logical channel.
+ *
+ */
+const char *lch_mode(unsigned mode)
+{
+	if (mode < ARRAY_SIZE(smux_mode))
+		return smux_mode[mode];
+	else
+		return smux_undef[SMUX_UNDEF_SHORT];
+}
+
+/**
+>>>>>>> cm/cm-11.0
  * Convert TTY Error Flags to string for logging purposes.
  *
  * @flag    TTY_* flag
@@ -389,14 +545,41 @@ static const char *cmd_to_str(unsigned cmd)
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Convert SMUX event to string for logging purposes.
+ *
+ * @event    SMUX event
+ * @returns String description or NULL if unknown
+ */
+static const char *event_to_str(unsigned cmd)
+{
+	if (cmd < ARRAY_SIZE(smux_events))
+		return smux_events[cmd];
+	return NULL;
+}
+
+/**
+>>>>>>> cm/cm-11.0
  * Set the reset state due to an unrecoverable failure.
  */
 static void smux_enter_reset(void)
 {
+<<<<<<< HEAD
 	pr_err("%s: unrecoverable failure, waiting for ssr\n", __func__);
 	smux.in_reset = 1;
 }
 
+=======
+	SMUX_ERR("%s: unrecoverable failure, waiting for ssr\n", __func__);
+	smux.in_reset = 1;
+	smux.remote_is_alive = 0;
+}
+
+/**
+ * Initialize the lch_structs.
+ */
+>>>>>>> cm/cm-11.0
 static int lch_init(void)
 {
 	unsigned int id;
@@ -410,7 +593,11 @@ static int lch_init(void)
 	smux_rx_wq = create_singlethread_workqueue("smux_rx_wq");
 
 	if (IS_ERR(smux_notify_wq) || IS_ERR(smux_tx_wq)) {
+<<<<<<< HEAD
 		SMUX_DBG("%s: create_singlethread_workqueue ENOMEM\n",
+=======
+		SMUX_DBG("smux: %s: create_singlethread_workqueue ENOMEM\n",
+>>>>>>> cm/cm-11.0
 							__func__);
 		return -ENOMEM;
 	}
@@ -421,7 +608,11 @@ static int lch_init(void)
 	i |= smux_loopback_init();
 
 	if (i) {
+<<<<<<< HEAD
 		pr_err("%s: out of memory error\n", __func__);
+=======
+		SMUX_ERR("%s: out of memory error\n", __func__);
+>>>>>>> cm/cm-11.0
 		return -ENOMEM;
 	}
 
@@ -471,7 +662,11 @@ static void smux_lch_purge(void)
 	/* Empty TX ready list */
 	spin_lock_irqsave(&smux.tx_lock_lha2, flags);
 	while (!list_empty(&smux.lch_tx_ready_list)) {
+<<<<<<< HEAD
 		SMUX_DBG("%s: emptying ready list %p\n",
+=======
+		SMUX_DBG("smux: %s: emptying ready list %p\n",
+>>>>>>> cm/cm-11.0
 				__func__, smux.lch_tx_ready_list.next);
 		ch = list_first_entry(&smux.lch_tx_ready_list,
 						struct smux_lch_t,
@@ -488,7 +683,11 @@ static void smux_lch_purge(void)
 						struct smux_pkt_t,
 						list);
 		list_del(&pkt->list);
+<<<<<<< HEAD
 		SMUX_DBG("%s: emptying power queue pkt=%p\n",
+=======
+		SMUX_DBG("smux: %s: emptying power queue pkt=%p\n",
+>>>>>>> cm/cm-11.0
 				__func__, pkt);
 		smux_free_pkt(pkt);
 	}
@@ -496,8 +695,15 @@ static void smux_lch_purge(void)
 
 	/* Close all ports */
 	for (i = 0 ; i < SMUX_NUM_LOGICAL_CHANNELS; i++) {
+<<<<<<< HEAD
 		ch = &smux_lch[i];
 		SMUX_DBG("%s: cleaning up lcid %d\n", __func__, i);
+=======
+		union notifier_metadata meta;
+		int send_disconnect = 0;
+		ch = &smux_lch[i];
+		SMUX_DBG("smux: %s: cleaning up lcid %d\n", __func__, i);
+>>>>>>> cm/cm-11.0
 
 		spin_lock_irqsave(&ch->state_lock_lhb1, flags);
 
@@ -506,6 +712,7 @@ static void smux_lch_purge(void)
 		smux_purge_ch_tx_queue(ch, 1);
 		spin_unlock(&ch->tx_lock_lhb2);
 
+<<<<<<< HEAD
 		/* Notify user of disconnect and reset channel state */
 		if (ch->local_state == SMUX_LCH_LOCAL_OPENED ||
 			ch->local_state == SMUX_LCH_LOCAL_CLOSING) {
@@ -514,6 +721,21 @@ static void smux_lch_purge(void)
 			meta.disconnected.is_ssr = smux.in_reset;
 			schedule_notify(ch->lcid, SMUX_DISCONNECTED, &meta);
 		}
+=======
+		meta.disconnected.is_ssr = smux.in_reset;
+		/* Notify user of disconnect and reset channel state */
+		if (ch->local_state == SMUX_LCH_LOCAL_OPENED ||
+			ch->local_state == SMUX_LCH_LOCAL_CLOSING) {
+			schedule_notify(ch->lcid, SMUX_LOCAL_CLOSED, &meta);
+			send_disconnect = 1;
+		}
+		if (ch->remote_state != SMUX_LCH_REMOTE_CLOSED) {
+			schedule_notify(ch->lcid, SMUX_REMOTE_CLOSED, &meta);
+			send_disconnect = 1;
+		}
+		if (send_disconnect)
+			schedule_notify(ch->lcid, SMUX_DISCONNECTED, &meta);
+>>>>>>> cm/cm-11.0
 
 		ch->local_state = SMUX_LCH_LOCAL_CLOSED;
 		ch->remote_state = SMUX_LCH_REMOTE_CLOSED;
@@ -670,7 +892,11 @@ static void smux_log_pkt(struct smux_pkt_t *pkt, int is_recv)
 		i += snprintf(logbuf + i, SMUX_PKT_LOG_SIZE - i,
 				"%02x ", (unsigned)data[count]);
 
+<<<<<<< HEAD
 	pr_info("%s\n", logbuf);
+=======
+	IPC_LOG_STR(logbuf);
+>>>>>>> cm/cm-11.0
 }
 
 static void smux_notify_local_fn(struct work_struct *work)
@@ -688,8 +914,14 @@ static void smux_notify_local_fn(struct work_struct *work)
 				&notify_handle,
 				handle_size);
 		if (i != handle_size) {
+<<<<<<< HEAD
 			pr_err("%s: unable to retrieve handle %d expected %d\n",
 					__func__, i, handle_size);
+=======
+			SMUX_ERR(
+				"%s: unable to retrieve handle %d expected %d\n",
+				__func__, i, handle_size);
+>>>>>>> cm/cm-11.0
 			spin_unlock_irqrestore(&notify_lock_lhc1, flags);
 			break;
 			}
@@ -735,7 +967,11 @@ struct smux_pkt_t *smux_alloc_pkt(void)
 	/* Consider a free list implementation instead of kmalloc */
 	pkt = kmalloc(sizeof(struct smux_pkt_t), GFP_ATOMIC);
 	if (!pkt) {
+<<<<<<< HEAD
 		pr_err("%s: out of memory\n", __func__);
+=======
+		SMUX_ERR("%s: out of memory\n", __func__);
+>>>>>>> cm/cm-11.0
 		return NULL;
 	}
 	smux_init_pkt(pkt);
@@ -779,7 +1015,11 @@ int smux_alloc_pkt_payload(struct smux_pkt_t *pkt)
 	pkt->payload = kmalloc(pkt->hdr.payload_len, GFP_ATOMIC);
 	pkt->free_payload = 1;
 	if (!pkt->payload) {
+<<<<<<< HEAD
 		pr_err("%s: unable to malloc %d bytes for payload\n",
+=======
+		SMUX_ERR("%s: unable to malloc %d bytes for payload\n",
+>>>>>>> cm/cm-11.0
 				__func__, pkt->hdr.payload_len);
 		return -ENOMEM;
 	}
@@ -797,11 +1037,24 @@ static int schedule_notify(uint8_t lcid, int event,
 	unsigned long flags;
 	int ret = 0;
 
+<<<<<<< HEAD
 	ch = &smux_lch[lcid];
 	notify_handle = kzalloc(sizeof(struct smux_notify_handle),
 						GFP_ATOMIC);
 	if (!notify_handle) {
 		pr_err("%s: out of memory\n", __func__);
+=======
+	IPC_LOG_STR("smux: %s ch:%d\n", event_to_str(event), lcid);
+	ch = &smux_lch[lcid];
+	if (!ch->notify) {
+		SMUX_DBG("%s: [%d]lcid notify fn is NULL\n", __func__, lcid);
+		return ret;
+	}
+	notify_handle = kzalloc(sizeof(struct smux_notify_handle),
+						GFP_ATOMIC);
+	if (!notify_handle) {
+		SMUX_ERR("%s: out of memory\n", __func__);
+>>>>>>> cm/cm-11.0
 		ret = -ENOMEM;
 		goto free_out;
 	}
@@ -813,7 +1066,11 @@ static int schedule_notify(uint8_t lcid, int event,
 		meta_copy = kzalloc(sizeof(union notifier_metadata),
 							GFP_ATOMIC);
 		if (!meta_copy) {
+<<<<<<< HEAD
 			pr_err("%s: out of memory\n", __func__);
+=======
+			SMUX_ERR("%s: out of memory\n", __func__);
+>>>>>>> cm/cm-11.0
 			ret = -ENOMEM;
 			goto free_out;
 		}
@@ -826,7 +1083,11 @@ static int schedule_notify(uint8_t lcid, int event,
 	spin_lock_irqsave(&notify_lock_lhc1, flags);
 	i = kfifo_avail(&smux_notify_fifo);
 	if (i < handle_size) {
+<<<<<<< HEAD
 		pr_err("%s: fifo full error %d expected %d\n",
+=======
+		SMUX_ERR("%s: fifo full error %d expected %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, i, handle_size);
 		ret = -ENOMEM;
 		goto unlock_out;
@@ -834,7 +1095,11 @@ static int schedule_notify(uint8_t lcid, int event,
 
 	i = kfifo_in(&smux_notify_fifo, &notify_handle, handle_size);
 	if (i < 0 || i != handle_size) {
+<<<<<<< HEAD
 		pr_err("%s: fifo not available error %d (expected %d)\n",
+=======
+		SMUX_ERR("%s: fifo not available error %d (expected %d)\n",
+>>>>>>> cm/cm-11.0
 				__func__, i, handle_size);
 		ret = -ENOSPC;
 		goto unlock_out;
@@ -886,7 +1151,11 @@ int smux_serialize(struct smux_pkt_t *pkt, char *out,
 	char *data_start = out;
 
 	if (smux_serialize_size(pkt) > SMUX_MAX_PKT_SIZE) {
+<<<<<<< HEAD
 		pr_err("%s: packet size %d too big\n",
+=======
+		SMUX_ERR("%s: packet size %d too big\n",
+>>>>>>> cm/cm-11.0
 				__func__, smux_serialize_size(pkt));
 		return -E2BIG;
 	}
@@ -971,7 +1240,11 @@ static int write_to_tty(char *data, unsigned len)
 			len -= data_written;
 			data += data_written;
 		} else {
+<<<<<<< HEAD
 			pr_err("%s: TTY write returned error %d\n",
+=======
+			SMUX_ERR("%s: TTY write returned error %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, data_written);
 			return data_written;
 		}
@@ -997,12 +1270,20 @@ static int smux_tx_tty(struct smux_pkt_t *pkt)
 	int ret;
 
 	if (!smux.tty) {
+<<<<<<< HEAD
 		pr_err("%s: TTY not initialized", __func__);
+=======
+		SMUX_ERR("%s: TTY not initialized", __func__);
+>>>>>>> cm/cm-11.0
 		return -ENOTTY;
 	}
 
 	if (pkt->hdr.cmd == SMUX_CMD_BYTE) {
+<<<<<<< HEAD
 		SMUX_DBG("%s: tty send single byte\n", __func__);
+=======
+		SMUX_DBG("smux: %s: tty send single byte\n", __func__);
+>>>>>>> cm/cm-11.0
 		ret = write_to_tty(&pkt->hdr.flags, 1);
 		return ret;
 	}
@@ -1010,7 +1291,11 @@ static int smux_tx_tty(struct smux_pkt_t *pkt)
 	smux_serialize_hdr(pkt, &data, &len);
 	ret = write_to_tty(data, len);
 	if (ret) {
+<<<<<<< HEAD
 		pr_err("%s: failed %d to write header %d\n",
+=======
+		SMUX_ERR("%s: failed %d to write header %d\n",
+>>>>>>> cm/cm-11.0
 				__func__, ret, len);
 		return ret;
 	}
@@ -1018,7 +1303,11 @@ static int smux_tx_tty(struct smux_pkt_t *pkt)
 	smux_serialize_payload(pkt, &data, &len);
 	ret = write_to_tty(data, len);
 	if (ret) {
+<<<<<<< HEAD
 		pr_err("%s: failed %d to write payload %d\n",
+=======
+		SMUX_ERR("%s: failed %d to write payload %d\n",
+>>>>>>> cm/cm-11.0
 				__func__, ret, len);
 		return ret;
 	}
@@ -1028,7 +1317,11 @@ static int smux_tx_tty(struct smux_pkt_t *pkt)
 		char zero = 0x0;
 		ret = write_to_tty(&zero, 1);
 		if (ret) {
+<<<<<<< HEAD
 			pr_err("%s: failed %d to write padding %d\n",
+=======
+			SMUX_ERR("%s: failed %d to write padding %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, ret, len);
 			return ret;
 		}
@@ -1048,7 +1341,11 @@ static void smux_send_byte(char ch)
 
 	pkt = smux_alloc_pkt();
 	if (!pkt) {
+<<<<<<< HEAD
 		pr_err("%s: alloc failure for byte %x\n", __func__, ch);
+=======
+		SMUX_ERR("%s: alloc failure for byte %x\n", __func__, ch);
+>>>>>>> cm/cm-11.0
 		return;
 	}
 	pkt->hdr.cmd = SMUX_CMD_BYTE;
@@ -1091,7 +1388,11 @@ static void smux_tx_queue(struct smux_pkt_t *pkt_ptr, struct smux_lch_t *ch,
 {
 	unsigned long flags;
 
+<<<<<<< HEAD
 	SMUX_DBG("%s: queuing pkt %p\n", __func__, pkt_ptr);
+=======
+	SMUX_DBG("smux: %s: queuing pkt %p\n", __func__, pkt_ptr);
+>>>>>>> cm/cm-11.0
 
 	spin_lock_irqsave(&ch->tx_lock_lhb2, flags);
 	list_add_tail(&pkt_ptr->list, &ch->tx_queue);
@@ -1114,13 +1415,21 @@ static int smux_handle_rx_open_ack(struct smux_pkt_t *pkt)
 	int ret;
 	struct smux_lch_t *ch;
 	int enable_powerdown = 0;
+<<<<<<< HEAD
+=======
+	int tx_ready = 0;
+>>>>>>> cm/cm-11.0
 
 	lcid = pkt->hdr.lcid;
 	ch = &smux_lch[lcid];
 
 	spin_lock(&ch->state_lock_lhb1);
 	if (ch->local_state == SMUX_LCH_LOCAL_OPENING) {
+<<<<<<< HEAD
 		SMUX_DBG("lcid %d local state 0x%x -> 0x%x\n", lcid,
+=======
+		SMUX_DBG("smux: lcid %d local state 0x%x -> 0x%x\n", lcid,
+>>>>>>> cm/cm-11.0
 				ch->local_state,
 				SMUX_LCH_LOCAL_OPENED);
 
@@ -1128,6 +1437,7 @@ static int smux_handle_rx_open_ack(struct smux_pkt_t *pkt)
 			enable_powerdown = 1;
 
 		ch->local_state = SMUX_LCH_LOCAL_OPENED;
+<<<<<<< HEAD
 		if (ch->remote_state == SMUX_LCH_REMOTE_OPENED)
 			schedule_notify(lcid, SMUX_CONNECTED, NULL);
 		ret = 0;
@@ -1136,6 +1446,19 @@ static int smux_handle_rx_open_ack(struct smux_pkt_t *pkt)
 		ret = 0;
 	} else {
 		pr_err("%s: lcid %d state 0x%x open ack invalid\n",
+=======
+		if (ch->remote_state == SMUX_LCH_REMOTE_OPENED) {
+			schedule_notify(lcid, SMUX_CONNECTED, NULL);
+			if (!(list_empty(&ch->tx_queue)))
+				tx_ready = 1;
+		}
+		ret = 0;
+	} else if (ch->remote_mode == SMUX_LCH_MODE_REMOTE_LOOPBACK) {
+		SMUX_DBG("smux: Remote loopback OPEN ACK received\n");
+		ret = 0;
+	} else {
+		SMUX_ERR("%s: lcid %d state 0x%x open ack invalid\n",
+>>>>>>> cm/cm-11.0
 				__func__, lcid, ch->local_state);
 		ret = -EINVAL;
 	}
@@ -1145,12 +1468,22 @@ static int smux_handle_rx_open_ack(struct smux_pkt_t *pkt)
 		spin_lock(&smux.tx_lock_lha2);
 		if (!smux.powerdown_enabled) {
 			smux.powerdown_enabled = 1;
+<<<<<<< HEAD
 			SMUX_DBG("%s: enabling power-collapse support\n",
+=======
+			SMUX_DBG("smux: %s: enabling power-collapse support\n",
+>>>>>>> cm/cm-11.0
 					__func__);
 		}
 		spin_unlock(&smux.tx_lock_lha2);
 	}
 
+<<<<<<< HEAD
+=======
+	if (tx_ready)
+		list_channel(ch);
+
+>>>>>>> cm/cm-11.0
 	return ret;
 }
 
@@ -1169,19 +1502,34 @@ static int smux_handle_close_ack(struct smux_pkt_t *pkt)
 	spin_lock_irqsave(&ch->state_lock_lhb1, flags);
 
 	if (ch->local_state == SMUX_LCH_LOCAL_CLOSING) {
+<<<<<<< HEAD
 		SMUX_DBG("lcid %d local state 0x%x -> 0x%x\n", lcid,
 				SMUX_LCH_LOCAL_CLOSING,
 				SMUX_LCH_LOCAL_CLOSED);
 		ch->local_state = SMUX_LCH_LOCAL_CLOSED;
+=======
+		SMUX_DBG("smux: lcid %d local state 0x%x -> 0x%x\n", lcid,
+				SMUX_LCH_LOCAL_CLOSING,
+				SMUX_LCH_LOCAL_CLOSED);
+		ch->local_state = SMUX_LCH_LOCAL_CLOSED;
+		schedule_notify(lcid, SMUX_LOCAL_CLOSED, &meta_disconnected);
+>>>>>>> cm/cm-11.0
 		if (ch->remote_state == SMUX_LCH_REMOTE_CLOSED)
 			schedule_notify(lcid, SMUX_DISCONNECTED,
 				&meta_disconnected);
 		ret = 0;
 	} else if (ch->remote_mode == SMUX_LCH_MODE_REMOTE_LOOPBACK) {
+<<<<<<< HEAD
 		SMUX_DBG("Remote loopback CLOSE ACK received\n");
 		ret = 0;
 	} else {
 		pr_err("%s: lcid %d state 0x%x close ack invalid\n",
+=======
+		SMUX_DBG("smux: Remote loopback CLOSE ACK received\n");
+		ret = 0;
+	} else {
+		SMUX_ERR("%s: lcid %d state 0x%x close ack invalid\n",
+>>>>>>> cm/cm-11.0
 				__func__, lcid,	ch->local_state);
 		ret = -EINVAL;
 	}
@@ -1215,7 +1563,11 @@ static int smux_handle_rx_open_cmd(struct smux_pkt_t *pkt)
 	spin_lock_irqsave(&ch->state_lock_lhb1, flags);
 
 	if (ch->remote_state == SMUX_LCH_REMOTE_CLOSED) {
+<<<<<<< HEAD
 		SMUX_DBG("lcid %d remote state 0x%x -> 0x%x\n", lcid,
+=======
+		SMUX_DBG("smux: lcid %d remote state 0x%x -> 0x%x\n", lcid,
+>>>>>>> cm/cm-11.0
 				SMUX_LCH_REMOTE_CLOSED,
 				SMUX_LCH_REMOTE_OPENED);
 
@@ -1231,8 +1583,14 @@ static int smux_handle_rx_open_cmd(struct smux_pkt_t *pkt)
 			goto out;
 		}
 		ack_pkt->hdr.cmd = SMUX_CMD_OPEN_LCH;
+<<<<<<< HEAD
 		ack_pkt->hdr.flags = SMUX_CMD_OPEN_ACK
 			| SMUX_CMD_OPEN_POWER_COLLAPSE;
+=======
+		ack_pkt->hdr.flags = SMUX_CMD_OPEN_ACK;
+		if (enable_powerdown)
+			ack_pkt->hdr.flags |= SMUX_CMD_OPEN_POWER_COLLAPSE;
+>>>>>>> cm/cm-11.0
 		ack_pkt->hdr.lcid = lcid;
 		ack_pkt->hdr.payload_len = 0;
 		ack_pkt->hdr.pad_len = 0;
@@ -1252,22 +1610,38 @@ static int smux_handle_rx_open_cmd(struct smux_pkt_t *pkt)
 			if (ack_pkt) {
 				ack_pkt->hdr.lcid = lcid;
 				ack_pkt->hdr.cmd = SMUX_CMD_OPEN_LCH;
+<<<<<<< HEAD
 				ack_pkt->hdr.flags =
 					SMUX_CMD_OPEN_POWER_COLLAPSE;
+=======
+				if (enable_powerdown)
+					ack_pkt->hdr.flags |=
+						SMUX_CMD_OPEN_POWER_COLLAPSE;
+>>>>>>> cm/cm-11.0
 				ack_pkt->hdr.payload_len = 0;
 				ack_pkt->hdr.pad_len = 0;
 				smux_tx_queue(ack_pkt, ch, 0);
 				tx_ready = 1;
 			} else {
+<<<<<<< HEAD
 				pr_err("%s: Remote loopack allocation failure\n",
 						__func__);
+=======
+				SMUX_ERR(
+					"%s: Remote loopack allocation failure\n",
+					__func__);
+>>>>>>> cm/cm-11.0
 			}
 		} else if (ch->local_state == SMUX_LCH_LOCAL_OPENED) {
 			schedule_notify(lcid, SMUX_CONNECTED, NULL);
 		}
 		ret = 0;
 	} else {
+<<<<<<< HEAD
 		pr_err("%s: lcid %d remote state 0x%x open invalid\n",
+=======
+		SMUX_ERR("%s: lcid %d remote state 0x%x open invalid\n",
+>>>>>>> cm/cm-11.0
 			   __func__, lcid, ch->remote_state);
 		ret = -EINVAL;
 	}
@@ -1279,7 +1653,11 @@ out:
 		spin_lock_irqsave(&smux.tx_lock_lha2, flags);
 		if (!smux.powerdown_enabled) {
 			smux.powerdown_enabled = 1;
+<<<<<<< HEAD
 			SMUX_DBG("%s: enabling power-collapse support\n",
+=======
+			SMUX_DBG("smux: %s: enabling power-collapse support\n",
+>>>>>>> cm/cm-11.0
 					__func__);
 		}
 		spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
@@ -1317,7 +1695,11 @@ static int smux_handle_rx_close_cmd(struct smux_pkt_t *pkt)
 
 	spin_lock_irqsave(&ch->state_lock_lhb1, flags);
 	if (ch->remote_state == SMUX_LCH_REMOTE_OPENED) {
+<<<<<<< HEAD
 		SMUX_DBG("lcid %d remote state 0x%x -> 0x%x\n", lcid,
+=======
+		SMUX_DBG("smux: lcid %d remote state 0x%x -> 0x%x\n", lcid,
+>>>>>>> cm/cm-11.0
 				SMUX_LCH_REMOTE_OPENED,
 				SMUX_LCH_REMOTE_CLOSED);
 
@@ -1351,17 +1733,31 @@ static int smux_handle_rx_close_cmd(struct smux_pkt_t *pkt)
 				smux_tx_queue(ack_pkt, ch, 0);
 				tx_ready = 1;
 			} else {
+<<<<<<< HEAD
 				pr_err("%s: Remote loopack allocation failure\n",
 						__func__);
 			}
 		}
 
+=======
+				SMUX_ERR(
+					"%s: Remote loopack allocation failure\n",
+					__func__);
+			}
+		}
+
+		schedule_notify(lcid, SMUX_REMOTE_CLOSED, &meta_disconnected);
+>>>>>>> cm/cm-11.0
 		if (ch->local_state == SMUX_LCH_LOCAL_CLOSED)
 			schedule_notify(lcid, SMUX_DISCONNECTED,
 				&meta_disconnected);
 		ret = 0;
 	} else {
+<<<<<<< HEAD
 		pr_err("%s: lcid %d remote state 0x%x close invalid\n",
+=======
+		SMUX_ERR("%s: lcid %d remote state 0x%x close invalid\n",
+>>>>>>> cm/cm-11.0
 				__func__, lcid, ch->remote_state);
 		ret = -EINVAL;
 	}
@@ -1412,7 +1808,11 @@ static int smux_handle_rx_data_cmd(struct smux_pkt_t *pkt)
 
 	if (ch->local_state != SMUX_LCH_LOCAL_OPENED
 		&& !remote_loopback) {
+<<<<<<< HEAD
 		pr_err("smux: ch %d error data on local state 0x%x",
+=======
+		SMUX_ERR("smux: ch %d error data on local state 0x%x",
+>>>>>>> cm/cm-11.0
 					lcid, ch->local_state);
 		ret = -EIO;
 		spin_unlock_irqrestore(&ch->state_lock_lhb1, flags);
@@ -1420,7 +1820,11 @@ static int smux_handle_rx_data_cmd(struct smux_pkt_t *pkt)
 	}
 
 	if (ch->remote_state != SMUX_LCH_REMOTE_OPENED) {
+<<<<<<< HEAD
 		pr_err("smux: ch %d error data on remote state 0x%x",
+=======
+		SMUX_ERR("smux: ch %d error data on remote state 0x%x",
+>>>>>>> cm/cm-11.0
 					lcid, ch->remote_state);
 		ret = -EIO;
 		spin_unlock_irqrestore(&ch->state_lock_lhb1, flags);
@@ -1441,8 +1845,14 @@ static int smux_handle_rx_data_cmd(struct smux_pkt_t *pkt)
 		}
 		if ((ch->rx_retry_queue_cnt + 1) > SMUX_RX_RETRY_MAX_PKTS) {
 			/* retry queue full */
+<<<<<<< HEAD
 			pr_err("%s: ch %d RX retry queue full\n",
 					__func__, lcid);
+=======
+			SMUX_ERR(
+				"%s: ch %d RX retry queue full; rx flow=%d\n",
+				__func__, lcid, ch->rx_flow_control_auto);
+>>>>>>> cm/cm-11.0
 			schedule_notify(lcid, SMUX_READ_FAIL, NULL);
 			ret = -ENOMEM;
 			spin_unlock_irqrestore(&ch->state_lock_lhb1, flags);
@@ -1468,7 +1878,11 @@ static int smux_handle_rx_data_cmd(struct smux_pkt_t *pkt)
 			smux_tx_queue(ack_pkt, ch, 0);
 			tx_ready = 1;
 		} else {
+<<<<<<< HEAD
 			pr_err("%s: Remote loopack allocation failure\n",
+=======
+			SMUX_ERR("%s: Remote loopack allocation failure\n",
+>>>>>>> cm/cm-11.0
 					__func__);
 		}
 	} else if (!do_retry) {
@@ -1492,7 +1906,11 @@ static int smux_handle_rx_data_cmd(struct smux_pkt_t *pkt)
 			/* buffer allocation failed - add to retry queue */
 			do_retry = 1;
 		} else if (tmp < 0) {
+<<<<<<< HEAD
 			pr_err("%s: ch %d Client RX buffer alloc failed %d\n",
+=======
+			SMUX_ERR("%s: ch %d Client RX buffer alloc failed %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, lcid, tmp);
 			schedule_notify(lcid, SMUX_READ_FAIL, NULL);
 			ret = -ENOMEM;
@@ -1504,7 +1922,11 @@ static int smux_handle_rx_data_cmd(struct smux_pkt_t *pkt)
 
 		retry = kmalloc(sizeof(struct smux_rx_pkt_retry), GFP_KERNEL);
 		if (!retry) {
+<<<<<<< HEAD
 			pr_err("%s: retry alloc failure\n", __func__);
+=======
+			SMUX_ERR("%s: retry alloc failure\n", __func__);
+>>>>>>> cm/cm-11.0
 			ret = -ENOMEM;
 			schedule_notify(lcid, SMUX_READ_FAIL, NULL);
 			goto out;
@@ -1516,7 +1938,11 @@ static int smux_handle_rx_data_cmd(struct smux_pkt_t *pkt)
 		retry->pkt = smux_alloc_pkt();
 		if (!retry->pkt) {
 			kfree(retry);
+<<<<<<< HEAD
 			pr_err("%s: pkt alloc failure\n", __func__);
+=======
+			SMUX_ERR("%s: pkt alloc failure\n", __func__);
+>>>>>>> cm/cm-11.0
 			ret = -ENOMEM;
 			schedule_notify(lcid, SMUX_READ_FAIL, NULL);
 			goto out;
@@ -1562,7 +1988,11 @@ static int smux_handle_rx_byte_cmd(struct smux_pkt_t *pkt)
 	unsigned long flags;
 
 	if (!pkt || smux_assert_lch_id(pkt->hdr.lcid)) {
+<<<<<<< HEAD
 		pr_err("%s: invalid packet or channel id\n", __func__);
+=======
+		SMUX_ERR("%s: invalid packet or channel id\n", __func__);
+>>>>>>> cm/cm-11.0
 		return -ENXIO;
 	}
 
@@ -1571,14 +2001,22 @@ static int smux_handle_rx_byte_cmd(struct smux_pkt_t *pkt)
 	spin_lock_irqsave(&ch->state_lock_lhb1, flags);
 
 	if (ch->local_state != SMUX_LCH_LOCAL_OPENED) {
+<<<<<<< HEAD
 		pr_err("smux: ch %d error data on local state 0x%x",
+=======
+		SMUX_ERR("smux: ch %d error data on local state 0x%x",
+>>>>>>> cm/cm-11.0
 					lcid, ch->local_state);
 		ret = -EIO;
 		goto out;
 	}
 
 	if (ch->remote_state != SMUX_LCH_REMOTE_OPENED) {
+<<<<<<< HEAD
 		pr_err("smux: ch %d error data on remote state 0x%x",
+=======
+		SMUX_ERR("smux: ch %d error data on remote state 0x%x",
+>>>>>>> cm/cm-11.0
 					lcid, ch->remote_state);
 		ret = -EIO;
 		goto out;
@@ -1623,11 +2061,19 @@ static int smux_handle_rx_status_cmd(struct smux_pkt_t *pkt)
 		/* logical channel flow control changed */
 		if (pkt->hdr.flags & SMUX_CMD_STATUS_FLOW_CNTL) {
 			/* disabled TX */
+<<<<<<< HEAD
 			SMUX_DBG("TX Flow control enabled\n");
 			ch->tx_flow_control = 1;
 		} else {
 			/* re-enable channel */
 			SMUX_DBG("TX Flow control disabled\n");
+=======
+			SMUX_DBG("smux: TX Flow control enabled\n");
+			ch->tx_flow_control = 1;
+		} else {
+			/* re-enable channel */
+			SMUX_DBG("smux: TX Flow control disabled\n");
+>>>>>>> cm/cm-11.0
 			ch->tx_flow_control = 0;
 			tx_ready = 1;
 		}
@@ -1671,7 +2117,11 @@ static int smux_handle_rx_power_cmd(struct smux_pkt_t *pkt)
 			/* Power-down complete, turn off UART */
 			power_down = 1;
 		else
+<<<<<<< HEAD
 			pr_err("%s: sleep request ack invalid in state %d\n",
+=======
+			SMUX_ERR("%s: sleep request ack invalid in state %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, smux.power_state);
 	} else {
 		/*
@@ -1690,7 +2140,11 @@ static int smux_handle_rx_power_cmd(struct smux_pkt_t *pkt)
 		if (smux.power_state == SMUX_PWR_ON) {
 			ack_pkt = smux_alloc_pkt();
 			if (ack_pkt) {
+<<<<<<< HEAD
 				SMUX_PWR("%s: Power %d->%d\n", __func__,
+=======
+				SMUX_PWR("smux: %s: Power %d->%d\n", __func__,
+>>>>>>> cm/cm-11.0
 						smux.power_state,
 						SMUX_PWR_TURNING_OFF_FLUSH);
 
@@ -1706,7 +2160,11 @@ static int smux_handle_rx_power_cmd(struct smux_pkt_t *pkt)
 			}
 		} else if (smux.power_state == SMUX_PWR_TURNING_OFF_FLUSH) {
 			/* Local power-down request still in TX queue */
+<<<<<<< HEAD
 			SMUX_PWR("%s: Power-down shortcut - no ack\n",
+=======
+			SMUX_PWR("smux: %s: Power-down shortcut - no ack\n",
+>>>>>>> cm/cm-11.0
 					__func__);
 			smux.power_ctl_remote_req_received = 1;
 		} else if (smux.power_state == SMUX_PWR_TURNING_OFF) {
@@ -1714,17 +2172,29 @@ static int smux_handle_rx_power_cmd(struct smux_pkt_t *pkt)
 			 * Local power-down request already sent to remote
 			 * side, so this request gets treated as an ACK.
 			 */
+<<<<<<< HEAD
 			SMUX_PWR("%s: Power-down shortcut - no ack\n",
 					__func__);
 			power_down = 1;
 		} else {
 			pr_err("%s: sleep request invalid in state %d\n",
+=======
+			SMUX_PWR("smux: %s: Power-down shortcut - no ack\n",
+					__func__);
+			power_down = 1;
+		} else {
+			SMUX_ERR("%s: sleep request invalid in state %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, smux.power_state);
 		}
 	}
 
 	if (power_down) {
+<<<<<<< HEAD
 		SMUX_PWR("%s: Power %d->%d\n", __func__,
+=======
+		SMUX_PWR("smux: %s: Power %d->%d\n", __func__,
+>>>>>>> cm/cm-11.0
 				smux.power_state, SMUX_PWR_OFF_FLUSH);
 		smux.power_state = SMUX_PWR_OFF_FLUSH;
 		queue_work(smux_tx_wq, &smux_inactivity_work);
@@ -1749,7 +2219,11 @@ static int smux_dispatch_rx_pkt(struct smux_pkt_t *pkt)
 	case SMUX_CMD_OPEN_LCH:
 		SMUX_LOG_PKT_RX(pkt);
 		if (smux_assert_lch_id(pkt->hdr.lcid)) {
+<<<<<<< HEAD
 			pr_err("%s: invalid channel id %d\n",
+=======
+			SMUX_ERR("%s: invalid channel id %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, pkt->hdr.lcid);
 			break;
 		}
@@ -1759,7 +2233,11 @@ static int smux_dispatch_rx_pkt(struct smux_pkt_t *pkt)
 	case SMUX_CMD_DATA:
 		SMUX_LOG_PKT_RX(pkt);
 		if (smux_assert_lch_id(pkt->hdr.lcid)) {
+<<<<<<< HEAD
 			pr_err("%s: invalid channel id %d\n",
+=======
+			SMUX_ERR("%s: invalid channel id %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, pkt->hdr.lcid);
 			break;
 		}
@@ -1769,7 +2247,11 @@ static int smux_dispatch_rx_pkt(struct smux_pkt_t *pkt)
 	case SMUX_CMD_CLOSE_LCH:
 		SMUX_LOG_PKT_RX(pkt);
 		if (smux_assert_lch_id(pkt->hdr.lcid)) {
+<<<<<<< HEAD
 			pr_err("%s: invalid channel id %d\n",
+=======
+			SMUX_ERR("%s: invalid channel id %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, pkt->hdr.lcid);
 			break;
 		}
@@ -1779,7 +2261,11 @@ static int smux_dispatch_rx_pkt(struct smux_pkt_t *pkt)
 	case SMUX_CMD_STATUS:
 		SMUX_LOG_PKT_RX(pkt);
 		if (smux_assert_lch_id(pkt->hdr.lcid)) {
+<<<<<<< HEAD
 			pr_err("%s: invalid channel id %d\n",
+=======
+			SMUX_ERR("%s: invalid channel id %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, pkt->hdr.lcid);
 			break;
 		}
@@ -1797,7 +2283,11 @@ static int smux_dispatch_rx_pkt(struct smux_pkt_t *pkt)
 
 	default:
 		SMUX_LOG_PKT_RX(pkt);
+<<<<<<< HEAD
 		pr_err("%s: command %d unknown\n", __func__, pkt->hdr.cmd);
+=======
+		SMUX_ERR("%s: command %d unknown\n", __func__, pkt->hdr.cmd);
+>>>>>>> cm/cm-11.0
 		ret = -EINVAL;
 	}
 	return ret;
@@ -1824,7 +2314,11 @@ static int smux_deserialize(unsigned char *data, int len)
 	memcpy(&recv.hdr, data, sizeof(struct smux_hdr_t));
 
 	if (recv.hdr.magic != SMUX_MAGIC) {
+<<<<<<< HEAD
 		pr_err("%s: invalid header magic\n", __func__);
+=======
+		SMUX_ERR("%s: invalid header magic\n", __func__);
+>>>>>>> cm/cm-11.0
 		return -EINVAL;
 	}
 
@@ -1845,8 +2339,14 @@ static void smux_handle_wakeup_req(void)
 	if (smux.power_state == SMUX_PWR_OFF
 		|| smux.power_state == SMUX_PWR_TURNING_ON) {
 		/* wakeup system */
+<<<<<<< HEAD
 		SMUX_PWR("%s: Power %d->%d\n", __func__,
 				smux.power_state, SMUX_PWR_ON);
+=======
+		SMUX_PWR("smux: %s: Power %d->%d\n", __func__,
+				smux.power_state, SMUX_PWR_ON);
+		smux.remote_initiated_wakeup_count++;
+>>>>>>> cm/cm-11.0
 		smux.power_state = SMUX_PWR_ON;
 		queue_work(smux_tx_wq, &smux_wakeup_work);
 		queue_work(smux_tx_wq, &smux_tx_work);
@@ -1857,7 +2357,11 @@ static void smux_handle_wakeup_req(void)
 		smux_send_byte(SMUX_WAKEUP_ACK);
 	} else {
 		/* stale wakeup request from previous wakeup */
+<<<<<<< HEAD
 		SMUX_PWR("%s: stale Wakeup REQ in state %d\n",
+=======
+		SMUX_PWR("smux: %s: stale Wakeup REQ in state %d\n",
+>>>>>>> cm/cm-11.0
 				__func__, smux.power_state);
 	}
 	spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
@@ -1873,7 +2377,11 @@ static void smux_handle_wakeup_ack(void)
 	spin_lock_irqsave(&smux.tx_lock_lha2, flags);
 	if (smux.power_state == SMUX_PWR_TURNING_ON) {
 		/* received response to wakeup request */
+<<<<<<< HEAD
 		SMUX_PWR("%s: Power %d->%d\n", __func__,
+=======
+		SMUX_PWR("smux: %s: Power %d->%d\n", __func__,
+>>>>>>> cm/cm-11.0
 				smux.power_state, SMUX_PWR_ON);
 		smux.power_state = SMUX_PWR_ON;
 		queue_work(smux_tx_wq, &smux_tx_work);
@@ -1882,7 +2390,11 @@ static void smux_handle_wakeup_ack(void)
 
 	} else if (smux.power_state != SMUX_PWR_ON) {
 		/* invalid message */
+<<<<<<< HEAD
 		SMUX_PWR("%s: stale Wakeup REQ ACK in state %d\n",
+=======
+		SMUX_PWR("smux: %s: stale Wakeup REQ ACK in state %d\n",
+>>>>>>> cm/cm-11.0
 				__func__, smux.power_state);
 	}
 	spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
@@ -1905,7 +2417,11 @@ static void smux_rx_handle_idle(const unsigned char *data,
 		if (smux_byte_loopback)
 			smux_receive_byte(SMUX_UT_ECHO_ACK_FAIL,
 					smux_byte_loopback);
+<<<<<<< HEAD
 		pr_err("%s: TTY error 0x%x - ignoring\n", __func__, flag);
+=======
+		SMUX_ERR("%s: TTY error 0x%x - ignoring\n", __func__, flag);
+>>>>>>> cm/cm-11.0
 		++*used;
 		return;
 	}
@@ -1916,11 +2432,29 @@ static void smux_rx_handle_idle(const unsigned char *data,
 			smux.rx_state = SMUX_RX_MAGIC;
 			break;
 		case SMUX_WAKEUP_REQ:
+<<<<<<< HEAD
 			SMUX_PWR("smux: RX Wakeup REQ\n");
 			smux_handle_wakeup_req();
 			break;
 		case SMUX_WAKEUP_ACK:
 			SMUX_PWR("smux: RX Wakeup ACK\n");
+=======
+			SMUX_PWR("smux: smux: RX Wakeup REQ\n");
+			if (unlikely(!smux.remote_is_alive)) {
+				mutex_lock(&smux.mutex_lha0);
+				smux.remote_is_alive = 1;
+				mutex_unlock(&smux.mutex_lha0);
+			}
+			smux_handle_wakeup_req();
+			break;
+		case SMUX_WAKEUP_ACK:
+			SMUX_PWR("smux: smux: RX Wakeup ACK\n");
+			if (unlikely(!smux.remote_is_alive)) {
+				mutex_lock(&smux.mutex_lha0);
+				smux.remote_is_alive = 1;
+				mutex_unlock(&smux.mutex_lha0);
+			}
+>>>>>>> cm/cm-11.0
 			smux_handle_wakeup_ack();
 			break;
 		default:
@@ -1928,8 +2462,13 @@ static void smux_rx_handle_idle(const unsigned char *data,
 			if (smux_byte_loopback && data[i] == SMUX_UT_ECHO_REQ)
 				smux_receive_byte(SMUX_UT_ECHO_ACK_OK,
 						smux_byte_loopback);
+<<<<<<< HEAD
 			pr_err("%s: parse error 0x%02x - ignoring\n", __func__,
 					(unsigned)data[i]);
+=======
+			SMUX_ERR("%s: parse error 0x%02x - ignoring\n",
+				__func__, (unsigned)data[i]);
+>>>>>>> cm/cm-11.0
 			break;
 		}
 	}
@@ -1951,7 +2490,11 @@ static void smux_rx_handle_magic(const unsigned char *data,
 	int i;
 
 	if (flag) {
+<<<<<<< HEAD
 		pr_err("%s: TTY RX error %d\n", __func__, flag);
+=======
+		SMUX_ERR("%s: TTY RX error %d\n", __func__, flag);
+>>>>>>> cm/cm-11.0
 		smux_enter_reset();
 		smux.rx_state = SMUX_RX_FAILURE;
 		++*used;
@@ -1967,8 +2510,14 @@ static void smux_rx_handle_magic(const unsigned char *data,
 			smux.rx_state = SMUX_RX_HDR;
 		} else {
 			/* unexpected / trash character */
+<<<<<<< HEAD
 			pr_err("%s: rx parse error for char %c; *used=%d, len=%d\n",
 					__func__, data[i], *used, len);
+=======
+			SMUX_ERR(
+				"%s: rx parse error for char %c; *used=%d, len=%d\n",
+				__func__, data[i], *used, len);
+>>>>>>> cm/cm-11.0
 			smux.rx_state = SMUX_RX_IDLE;
 		}
 	}
@@ -1991,7 +2540,11 @@ static void smux_rx_handle_hdr(const unsigned char *data,
 	struct smux_hdr_t *hdr;
 
 	if (flag) {
+<<<<<<< HEAD
 		pr_err("%s: TTY RX error %d\n", __func__, flag);
+=======
+		SMUX_ERR("%s: TTY RX error %d\n", __func__, flag);
+>>>>>>> cm/cm-11.0
 		smux_enter_reset();
 		smux.rx_state = SMUX_RX_FAILURE;
 		++*used;
@@ -2025,7 +2578,11 @@ static void smux_rx_handle_pkt_payload(const unsigned char *data,
 	int remaining;
 
 	if (flag) {
+<<<<<<< HEAD
 		pr_err("%s: TTY RX error %d\n", __func__, flag);
+=======
+		SMUX_ERR("%s: TTY RX error %d\n", __func__, flag);
+>>>>>>> cm/cm-11.0
 		smux_enter_reset();
 		smux.rx_state = SMUX_RX_FAILURE;
 		++*used;
@@ -2073,6 +2630,83 @@ void smux_rx_state_machine(const unsigned char *data,
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Returns true if the remote side has acknowledged a wakeup
+ * request previously, so we know that the link is alive and active.
+ *
+ * @returns true for is alive, false for not alive
+ */
+bool smux_remote_is_active(void)
+{
+	bool is_active = false;
+
+	mutex_lock(&smux.mutex_lha0);
+	if (smux.remote_is_alive)
+		is_active = true;
+	mutex_unlock(&smux.mutex_lha0);
+
+	return is_active;
+}
+
+/**
+ * Sends a delay command to the remote side.
+ *
+ * @ms: Time in milliseconds for the remote side to delay
+ *
+ * This command defines the delay that the remote side will use
+ * to slow the response time for DATA commands.
+ */
+void smux_set_loopback_data_reply_delay(uint32_t ms)
+{
+	struct smux_lch_t *ch = &smux_lch[SMUX_TEST_LCID];
+	struct smux_pkt_t *pkt;
+
+	pkt = smux_alloc_pkt();
+	if (!pkt) {
+		pr_err("%s: unable to allocate packet\n", __func__);
+		return;
+	}
+
+	pkt->hdr.lcid = ch->lcid;
+	pkt->hdr.cmd = SMUX_CMD_DELAY;
+	pkt->hdr.flags = 0;
+	pkt->hdr.payload_len = sizeof(uint32_t);
+	pkt->hdr.pad_len = 0;
+
+	if (smux_alloc_pkt_payload(pkt)) {
+		pr_err("%s: unable to allocate payload\n", __func__);
+		smux_free_pkt(pkt);
+		return;
+	}
+	memcpy(pkt->payload, &ms, sizeof(uint32_t));
+
+	smux_tx_queue(pkt, ch, 1);
+}
+
+/**
+ * Retrieve wakeup counts.
+ *
+ * @local_cnt: Pointer to local wakeup count
+ * @remote_cnt: Pointer to remote wakeup count
+ */
+void smux_get_wakeup_counts(int *local_cnt, int *remote_cnt)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&smux.tx_lock_lha2, flags);
+
+	if (local_cnt)
+		*local_cnt = smux.local_initiated_wakeup_count;
+
+	if (remote_cnt)
+		*remote_cnt = smux.remote_initiated_wakeup_count;
+
+	spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
+}
+
+/**
+>>>>>>> cm/cm-11.0
  * Add channel to transmit-ready list and trigger transmit worker.
  *
  * @ch Channel to add
@@ -2081,7 +2715,11 @@ static void list_channel(struct smux_lch_t *ch)
 {
 	unsigned long flags;
 
+<<<<<<< HEAD
 	SMUX_DBG("%s: listing channel %d\n",
+=======
+	SMUX_DBG("smux: %s: listing channel %d\n",
+>>>>>>> cm/cm-11.0
 			__func__, ch->lcid);
 
 	spin_lock_irqsave(&smux.tx_lock_lha2, flags);
@@ -2120,11 +2758,19 @@ static void smux_tx_pkt(struct smux_lch_t *ch, struct smux_pkt_t *pkt)
 			meta_write.write.buffer = pkt->payload;
 			meta_write.write.len = pkt->hdr.payload_len;
 			if (ret >= 0) {
+<<<<<<< HEAD
 				SMUX_DBG("%s: PKT write done", __func__);
 				schedule_notify(ch->lcid, SMUX_WRITE_DONE,
 						&meta_write);
 			} else {
 				pr_err("%s: failed to write pkt %d\n",
+=======
+				SMUX_DBG("smux: %s: PKT write done", __func__);
+				schedule_notify(ch->lcid, SMUX_WRITE_DONE,
+						&meta_write);
+			} else {
+				SMUX_ERR("%s: failed to write pkt %d\n",
+>>>>>>> cm/cm-11.0
 						__func__, ret);
 				schedule_notify(ch->lcid, SMUX_WRITE_FAIL,
 						&meta_write);
@@ -2140,7 +2786,11 @@ static void smux_flush_tty(void)
 {
 	mutex_lock(&smux.mutex_lha0);
 	if (!smux.tty) {
+<<<<<<< HEAD
 		pr_err("%s: ldisc not loaded\n", __func__);
+=======
+		SMUX_ERR("%s: ldisc not loaded\n", __func__);
+>>>>>>> cm/cm-11.0
 		mutex_unlock(&smux.mutex_lha0);
 		return;
 	}
@@ -2149,7 +2799,11 @@ static void smux_flush_tty(void)
 			msecs_to_jiffies(TTY_BUFFER_FULL_WAIT_MS));
 
 	if (tty_chars_in_buffer(smux.tty) > 0)
+<<<<<<< HEAD
 		pr_err("%s: unable to flush UART queue\n", __func__);
+=======
+		SMUX_ERR("%s: unable to flush UART queue\n", __func__);
+>>>>>>> cm/cm-11.0
 
 	mutex_unlock(&smux.mutex_lha0);
 }
@@ -2207,8 +2861,16 @@ static void smux_purge_ch_tx_queue(struct smux_lch_t *ch, int is_ssr)
 		union notifier_metadata meta_disconnected;
 
 		meta_disconnected.disconnected.is_ssr = smux.in_reset;
+<<<<<<< HEAD
 		schedule_notify(ch->lcid, SMUX_DISCONNECTED,
 			&meta_disconnected);
+=======
+		schedule_notify(ch->lcid, SMUX_LOCAL_CLOSED,
+			&meta_disconnected);
+		if (ch->remote_state == SMUX_LCH_REMOTE_CLOSED)
+			schedule_notify(ch->lcid, SMUX_DISCONNECTED,
+				&meta_disconnected);
+>>>>>>> cm/cm-11.0
 	}
 }
 
@@ -2222,7 +2884,11 @@ static void smux_uart_power_on_atomic(void)
 	struct uart_state *state;
 
 	if (!smux.tty || !smux.tty->driver_data) {
+<<<<<<< HEAD
 		pr_err("%s: unable to find UART port for tty %p\n",
+=======
+		SMUX_ERR("%s: unable to find UART port for tty %p\n",
+>>>>>>> cm/cm-11.0
 				__func__, smux.tty);
 		return;
 	}
@@ -2250,7 +2916,11 @@ static void smux_uart_power_off_atomic(void)
 	struct uart_state *state;
 
 	if (!smux.tty || !smux.tty->driver_data) {
+<<<<<<< HEAD
 		pr_err("%s: unable to find UART port for tty %p\n",
+=======
+		SMUX_ERR("%s: unable to find UART port for tty %p\n",
+>>>>>>> cm/cm-11.0
 				__func__, smux.tty);
 		mutex_unlock(&smux.mutex_lha0);
 		return;
@@ -2290,7 +2960,11 @@ static void smux_wakeup_worker(struct work_struct *work)
 		/* wakeup complete */
 		smux.pwr_wakeup_delay_us = 1;
 		spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
+<<<<<<< HEAD
 		SMUX_DBG("%s: wakeup complete\n", __func__);
+=======
+		SMUX_DBG("smux: %s: wakeup complete\n", __func__);
+>>>>>>> cm/cm-11.0
 
 		/*
 		 * Cancel any pending retry.  This avoids a race condition with
@@ -2310,17 +2984,30 @@ static void smux_wakeup_worker(struct work_struct *work)
 				SMUX_WAKEUP_DELAY_MAX;
 
 		spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
+<<<<<<< HEAD
 		SMUX_PWR("%s: triggering wakeup\n", __func__);
 		smux_send_byte(SMUX_WAKEUP_REQ);
 
 		if (wakeup_delay < SMUX_WAKEUP_DELAY_MIN) {
 			SMUX_DBG("%s: sleeping for %u us\n", __func__,
+=======
+		SMUX_PWR("smux: %s: triggering wakeup\n", __func__);
+		smux_send_byte(SMUX_WAKEUP_REQ);
+
+		if (wakeup_delay < SMUX_WAKEUP_DELAY_MIN) {
+			SMUX_DBG("smux: %s: sleeping for %u us\n", __func__,
+>>>>>>> cm/cm-11.0
 					wakeup_delay);
 			usleep_range(wakeup_delay, 2*wakeup_delay);
 			queue_work(smux_tx_wq, &smux_wakeup_work);
 		} else {
 			/* schedule delayed work */
+<<<<<<< HEAD
 			SMUX_DBG("%s: scheduling delayed wakeup in %u ms\n",
+=======
+			SMUX_DBG(
+			"smux: %s: scheduling delayed wakeup in %u ms\n",
+>>>>>>> cm/cm-11.0
 					__func__, wakeup_delay / 1000);
 			queue_delayed_work(smux_tx_wq,
 					&smux_wakeup_delayed_work,
@@ -2330,7 +3017,11 @@ static void smux_wakeup_worker(struct work_struct *work)
 		/* wakeup aborted */
 		smux.pwr_wakeup_delay_us = 1;
 		spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
+<<<<<<< HEAD
 		SMUX_PWR("%s: wakeup aborted\n", __func__);
+=======
+		SMUX_PWR("smux: %s: wakeup aborted\n", __func__);
+>>>>>>> cm/cm-11.0
 		cancel_delayed_work(&smux_wakeup_delayed_work);
 	}
 }
@@ -2360,7 +3051,12 @@ static void smux_inactivity_worker(struct work_struct *work)
 				/* start power-down sequence */
 				pkt = smux_alloc_pkt();
 				if (pkt) {
+<<<<<<< HEAD
 					SMUX_PWR("%s: Power %d->%d\n", __func__,
+=======
+					SMUX_PWR(
+					"smux: %s: Power %d->%d\n", __func__,
+>>>>>>> cm/cm-11.0
 						smux.power_state,
 						SMUX_PWR_TURNING_OFF_FLUSH);
 					smux.power_state =
@@ -2374,7 +3070,11 @@ static void smux_inactivity_worker(struct work_struct *work)
 							&smux.power_queue);
 					queue_work(smux_tx_wq, &smux_tx_work);
 				} else {
+<<<<<<< HEAD
 					pr_err("%s: packet alloc failed\n",
+=======
+					SMUX_ERR("%s: packet alloc failed\n",
+>>>>>>> cm/cm-11.0
 							__func__);
 				}
 			}
@@ -2385,7 +3085,11 @@ static void smux_inactivity_worker(struct work_struct *work)
 
 	if (smux.power_state == SMUX_PWR_OFF_FLUSH) {
 		/* ready to power-down the UART */
+<<<<<<< HEAD
 		SMUX_PWR("%s: Power %d->%d\n", __func__,
+=======
+		SMUX_PWR("smux: %s: Power %d->%d\n", __func__,
+>>>>>>> cm/cm-11.0
 				smux.power_state, SMUX_PWR_OFF);
 		smux.power_state = SMUX_PWR_OFF;
 
@@ -2466,16 +3170,28 @@ static void smux_rx_worker(struct work_struct *work)
 	smux.rx_activity_flag = 1;
 	spin_unlock_irqrestore(&smux.rx_lock_lha1, flags);
 
+<<<<<<< HEAD
 	SMUX_DBG("%s: %p, len=%d, flag=%d\n", __func__, data, len, flag);
 	used = 0;
 	do {
 		if (smux.in_reset) {
 			SMUX_DBG("%s: abort RX due to reset\n", __func__);
+=======
+	SMUX_DBG("smux: %s: %p, len=%d, flag=%d\n", __func__, data, len, flag);
+	used = 0;
+	do {
+		if (smux.in_reset) {
+			SMUX_DBG("smux: %s: abort RX due to reset\n", __func__);
+>>>>>>> cm/cm-11.0
 			smux.rx_state = SMUX_RX_IDLE;
 			break;
 		}
 
+<<<<<<< HEAD
 		SMUX_DBG("%s: state %d; %d of %d\n",
+=======
+		SMUX_DBG("smux: %s: state %d; %d of %d\n",
+>>>>>>> cm/cm-11.0
 				__func__, smux.rx_state, used, len);
 		initial_rx_state = smux.rx_state;
 
@@ -2493,7 +3209,11 @@ static void smux_rx_worker(struct work_struct *work)
 			smux_rx_handle_pkt_payload(data, len, &used, flag);
 			break;
 		default:
+<<<<<<< HEAD
 			SMUX_DBG("%s: invalid state %d\n",
+=======
+			SMUX_DBG("smux: %s: invalid state %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, smux.rx_state);
 			smux.rx_state = SMUX_RX_IDLE;
 			break;
@@ -2534,7 +3254,11 @@ static void smux_rx_retry_worker(struct work_struct *work)
 	}
 
 	if (list_empty(&ch->rx_retry_queue)) {
+<<<<<<< HEAD
 		SMUX_DBG("%s: retry list empty for channel %d\n",
+=======
+		SMUX_DBG("smux: %s: retry list empty for channel %d\n",
+>>>>>>> cm/cm-11.0
 				__func__, ch->lcid);
 		spin_unlock_irqrestore(&ch->state_lock_lhb1, flags);
 		return;
@@ -2544,7 +3268,11 @@ static void smux_rx_retry_worker(struct work_struct *work)
 					rx_retry_list);
 	spin_unlock_irqrestore(&ch->state_lock_lhb1, flags);
 
+<<<<<<< HEAD
 	SMUX_DBG("%s: ch %d retrying rx pkt %p\n",
+=======
+	SMUX_DBG("smux: %s: ch %d retrying rx pkt %p\n",
+>>>>>>> cm/cm-11.0
 			__func__, ch->lcid, retry);
 	metadata.read.pkt_priv = 0;
 	metadata.read.buffer = 0;
@@ -2573,7 +3301,11 @@ static void smux_rx_retry_worker(struct work_struct *work)
 		retry->timeout_in_ms <<= 1;
 		if (retry->timeout_in_ms > SMUX_RX_RETRY_MAX_MS) {
 			/* timed out */
+<<<<<<< HEAD
 			pr_err("%s: ch %d RX retry client timeout\n",
+=======
+			SMUX_ERR("%s: ch %d RX retry client timeout\n",
+>>>>>>> cm/cm-11.0
 					__func__, ch->lcid);
 			spin_lock_irqsave(&ch->state_lock_lhb1, flags);
 			tx_ready = smux_remove_rx_retry(ch, retry);
@@ -2584,7 +3316,11 @@ static void smux_rx_retry_worker(struct work_struct *work)
 		}
 	} else {
 		/* client error - drop packet */
+<<<<<<< HEAD
 		pr_err("%s: ch %d RX retry client failed (%d)\n",
+=======
+		SMUX_ERR("%s: ch %d RX retry client failed (%d)\n",
+>>>>>>> cm/cm-11.0
 				__func__, ch->lcid, tmp);
 		spin_lock_irqsave(&ch->state_lock_lhb1, flags);
 		tx_ready = smux_remove_rx_retry(ch, retry);
@@ -2649,9 +3385,16 @@ static void smux_tx_worker(struct work_struct *work)
 			if (!list_empty(&smux.lch_tx_ready_list) ||
 			   !list_empty(&smux.power_queue)) {
 				/* data to transmit, do wakeup */
+<<<<<<< HEAD
 				SMUX_PWR("%s: Power %d->%d\n", __func__,
 						smux.power_state,
 						SMUX_PWR_TURNING_ON);
+=======
+				SMUX_PWR("smux: %s: Power %d->%d\n", __func__,
+						smux.power_state,
+						SMUX_PWR_TURNING_ON);
+				smux.local_initiated_wakeup_count++;
+>>>>>>> cm/cm-11.0
 				smux.power_state = SMUX_PWR_TURNING_ON;
 				spin_unlock_irqrestore(&smux.tx_lock_lha2,
 						flags);
@@ -2683,7 +3426,12 @@ static void smux_tx_worker(struct work_struct *work)
 					 * and we already received a remote
 					 * power-down request.
 					 */
+<<<<<<< HEAD
 					SMUX_PWR("%s: Power %d->%d\n", __func__,
+=======
+					SMUX_PWR(
+					"smux: %s: Power %d->%d\n", __func__,
+>>>>>>> cm/cm-11.0
 							smux.power_state,
 							SMUX_PWR_OFF_FLUSH);
 					smux.power_state = SMUX_PWR_OFF_FLUSH;
@@ -2692,7 +3440,12 @@ static void smux_tx_worker(struct work_struct *work)
 							&smux_inactivity_work);
 				} else {
 					/* sending local power-down request */
+<<<<<<< HEAD
 					SMUX_PWR("%s: Power %d->%d\n", __func__,
+=======
+					SMUX_PWR(
+					"smux: %s: Power %d->%d\n", __func__,
+>>>>>>> cm/cm-11.0
 							smux.power_state,
 							SMUX_PWR_TURNING_OFF);
 					smux.power_state = SMUX_PWR_TURNING_OFF;
@@ -2718,7 +3471,11 @@ static void smux_tx_worker(struct work_struct *work)
 		/* get the next ready channel */
 		if (list_empty(&smux.lch_tx_ready_list)) {
 			/* no ready channels */
+<<<<<<< HEAD
 			SMUX_DBG("%s: no more ready channels, exiting\n",
+=======
+			SMUX_DBG("smux: %s: no more ready channels, exiting\n",
+>>>>>>> cm/cm-11.0
 					__func__);
 			spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
 			break;
@@ -2727,7 +3484,11 @@ static void smux_tx_worker(struct work_struct *work)
 
 		if (smux.power_state != SMUX_PWR_ON) {
 			/* channel not ready to transmit */
+<<<<<<< HEAD
 			SMUX_DBG("%s: waiting for link up (state %d)\n",
+=======
+			SMUX_DBG("smux: %s: waiting for link up (state %d)\n",
+>>>>>>> cm/cm-11.0
 					__func__,
 					smux.power_state);
 			spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
@@ -2838,11 +3599,19 @@ static void smux_flush_workqueues(void)
 {
 	smux.in_reset = 1;
 
+<<<<<<< HEAD
 	SMUX_DBG("%s: flushing tx wq\n", __func__);
 	flush_workqueue(smux_tx_wq);
 	SMUX_DBG("%s: flushing rx wq\n", __func__);
 	flush_workqueue(smux_rx_wq);
 	SMUX_DBG("%s: flushing notify wq\n", __func__);
+=======
+	SMUX_DBG("smux: %s: flushing tx wq\n", __func__);
+	flush_workqueue(smux_tx_wq);
+	SMUX_DBG("smux: %s: flushing rx wq\n", __func__);
+	flush_workqueue(smux_rx_wq);
+	SMUX_DBG("smux: %s: flushing notify wq\n", __func__);
+>>>>>>> cm/cm-11.0
 	flush_workqueue(smux_notify_wq);
 }
 
@@ -2900,13 +3669,21 @@ int msm_smux_set_ch_option(uint8_t lcid, uint32_t set, uint32_t clear)
 
 	/* Auto RX Flow Control */
 	if (set & SMUX_CH_OPTION_AUTO_REMOTE_TX_STOP) {
+<<<<<<< HEAD
 		SMUX_DBG("%s: auto rx flow control option enabled\n",
+=======
+		SMUX_DBG("smux: %s: auto rx flow control option enabled\n",
+>>>>>>> cm/cm-11.0
 			__func__);
 		ch->options |= SMUX_CH_OPTION_AUTO_REMOTE_TX_STOP;
 	}
 
 	if (clear & SMUX_CH_OPTION_AUTO_REMOTE_TX_STOP) {
+<<<<<<< HEAD
 		SMUX_DBG("%s: auto rx flow control option disabled\n",
+=======
+		SMUX_DBG("smux: %s: auto rx flow control option disabled\n",
+>>>>>>> cm/cm-11.0
 			__func__);
 		ch->options &= ~SMUX_CH_OPTION_AUTO_REMOTE_TX_STOP;
 		ch->rx_flow_control_auto = 0;
@@ -2931,11 +3708,23 @@ int msm_smux_set_ch_option(uint8_t lcid, uint32_t set, uint32_t clear)
  *
  * @returns 0 for success, <0 otherwise
  *
+<<<<<<< HEAD
  * A channel must be fully closed (either not previously opened or
  * msm_smux_close() has been called and the SMUX_DISCONNECTED has been
  * received.
  *
  * One the remote side is opened, the client will receive a SMUX_CONNECTED
+=======
+ * The local channel state must be closed (either not previously
+ * opened or msm_smux_close() has been called and the SMUX_LOCAL_CLOSED
+ * notification has been received).
+ *
+ * If open is called before the SMUX_LOCAL_CLOSED has been received,
+ * then the function will return -EAGAIN and the client will need to
+ * retry the open later.
+ *
+ * Once the remote side is opened, the client will receive a SMUX_CONNECTED
+>>>>>>> cm/cm-11.0
  * event.
  */
 int msm_smux_open(uint8_t lcid, void *priv,
@@ -2961,13 +3750,21 @@ int msm_smux_open(uint8_t lcid, void *priv,
 	}
 
 	if (ch->local_state != SMUX_LCH_LOCAL_CLOSED) {
+<<<<<<< HEAD
 		pr_err("%s: open lcid %d local state %x invalid\n",
+=======
+		SMUX_ERR("%s: open lcid %d local state %x invalid\n",
+>>>>>>> cm/cm-11.0
 				__func__, lcid, ch->local_state);
 		ret = -EINVAL;
 		goto out;
 	}
 
+<<<<<<< HEAD
 	SMUX_DBG("lcid %d local state 0x%x -> 0x%x\n", lcid,
+=======
+	SMUX_DBG("smux: lcid %d local state 0x%x -> 0x%x\n", lcid,
+>>>>>>> cm/cm-11.0
 			ch->local_state,
 			SMUX_LCH_LOCAL_OPENING);
 
@@ -3012,7 +3809,12 @@ out:
  * @returns 0 for success, <0 otherwise
  *
  * Once the close event has been acknowledge by the remote side, the client
+<<<<<<< HEAD
  * will receive a SMUX_DISCONNECTED notification.
+=======
+ * will receive an SMUX_LOCAL_CLOSED notification.  If the remote side is also
+ * closed, then an SMUX_DISCONNECTED notification will also be sent.
+>>>>>>> cm/cm-11.0
  */
 int msm_smux_close(uint8_t lcid)
 {
@@ -3031,6 +3833,10 @@ int msm_smux_close(uint8_t lcid)
 	ch->remote_tiocm = 0x0;
 	ch->tx_pending_data_cnt = 0;
 	ch->notify_lwm = 0;
+<<<<<<< HEAD
+=======
+	ch->tx_flow_control = 0;
+>>>>>>> cm/cm-11.0
 
 	/* Purge TX queue */
 	spin_lock(&ch->tx_lock_lhb2);
@@ -3040,7 +3846,11 @@ int msm_smux_close(uint8_t lcid)
 	/* Send Close Command */
 	if (ch->local_state == SMUX_LCH_LOCAL_OPENED ||
 		ch->local_state == SMUX_LCH_LOCAL_OPENING) {
+<<<<<<< HEAD
 		SMUX_DBG("lcid %d local state 0x%x -> 0x%x\n", lcid,
+=======
+		SMUX_DBG("smux: lcid %d local state 0x%x -> 0x%x\n", lcid,
+>>>>>>> cm/cm-11.0
 				ch->local_state,
 				SMUX_LCH_LOCAL_CLOSING);
 
@@ -3055,7 +3865,11 @@ int msm_smux_close(uint8_t lcid)
 			smux_tx_queue(pkt, ch, 0);
 			tx_ready = 1;
 		} else {
+<<<<<<< HEAD
 			pr_err("%s: pkt allocation failed\n", __func__);
+=======
+			SMUX_ERR("%s: pkt allocation failed\n", __func__);
+>>>>>>> cm/cm-11.0
 			ret = -ENOMEM;
 		}
 
@@ -3105,14 +3919,22 @@ int msm_smux_write(uint8_t lcid, void *pkt_priv, const void *data, int len)
 
 	if (ch->local_state != SMUX_LCH_LOCAL_OPENED &&
 		ch->local_state != SMUX_LCH_LOCAL_OPENING) {
+<<<<<<< HEAD
 		pr_err("%s: hdr.invalid local state %d channel %d\n",
+=======
+		SMUX_ERR("%s: hdr.invalid local state %d channel %d\n",
+>>>>>>> cm/cm-11.0
 					__func__, ch->local_state, lcid);
 		ret = -EINVAL;
 		goto out;
 	}
 
 	if (len > SMUX_MAX_PKT_SIZE - sizeof(struct smux_hdr_t)) {
+<<<<<<< HEAD
 		pr_err("%s: payload %d too large\n",
+=======
+		SMUX_ERR("%s: payload %d too large\n",
+>>>>>>> cm/cm-11.0
 				__func__, len);
 		ret = -E2BIG;
 		goto out;
@@ -3134,10 +3956,17 @@ int msm_smux_write(uint8_t lcid, void *pkt_priv, const void *data, int len)
 
 	spin_lock(&ch->tx_lock_lhb2);
 	/* verify high watermark */
+<<<<<<< HEAD
 	SMUX_DBG("%s: pending %d", __func__, ch->tx_pending_data_cnt);
 
 	if (ch->tx_pending_data_cnt >= SMUX_TX_WM_HIGH) {
 		pr_err("%s: ch %d high watermark %d exceeded %d\n",
+=======
+	SMUX_DBG("smux: %s: pending %d", __func__, ch->tx_pending_data_cnt);
+
+	if (ch->tx_pending_data_cnt >= SMUX_TX_WM_HIGH) {
+		SMUX_ERR("%s: ch %d high watermark %d exceeded %d\n",
+>>>>>>> cm/cm-11.0
 				__func__, lcid, SMUX_TX_WM_HIGH,
 				ch->tx_pending_data_cnt);
 		ret = -EAGAIN;
@@ -3147,7 +3976,11 @@ int msm_smux_write(uint8_t lcid, void *pkt_priv, const void *data, int len)
 	/* queue packet for transmit */
 	if (++ch->tx_pending_data_cnt == SMUX_TX_WM_HIGH) {
 		ch->notify_lwm = 1;
+<<<<<<< HEAD
 		pr_err("%s: high watermark hit\n", __func__);
+=======
+		SMUX_ERR("%s: high watermark hit\n", __func__);
+>>>>>>> cm/cm-11.0
 		schedule_notify(lcid, SMUX_HIGH_WM_HIT, NULL);
 	}
 	list_add_tail(&pkt->list, &ch->tx_queue);
@@ -3265,7 +4098,11 @@ static int smux_send_status_cmd(struct smux_lch_t *ch)
  *
  * @returns TIOCM status
  */
+<<<<<<< HEAD
 static long msm_smux_tiocm_get_atomic(struct smux_lch_t *ch)
+=======
+long msm_smux_tiocm_get_atomic(struct smux_lch_t *ch)
+>>>>>>> cm/cm-11.0
 {
 	long status = 0x0;
 
@@ -3383,24 +4220,44 @@ static int ssr_notifier_cb(struct notifier_block *this,
 	int power_off_uart = 0;
 
 	if (code == SUBSYS_BEFORE_SHUTDOWN) {
+<<<<<<< HEAD
 		SMUX_DBG("%s: ssr - before shutdown\n", __func__);
 		mutex_lock(&smux.mutex_lha0);
 		smux.in_reset = 1;
+=======
+		SMUX_DBG("smux: %s: ssr - before shutdown\n", __func__);
+		mutex_lock(&smux.mutex_lha0);
+		smux.in_reset = 1;
+		smux.remote_is_alive = 0;
+>>>>>>> cm/cm-11.0
 		mutex_unlock(&smux.mutex_lha0);
 		return NOTIFY_DONE;
 	} else if (code == SUBSYS_AFTER_POWERUP) {
 		/* re-register platform devices */
+<<<<<<< HEAD
 		SMUX_DBG("%s: ssr - after power-up\n", __func__);
+=======
+		SMUX_DBG("smux: %s: ssr - after power-up\n", __func__);
+>>>>>>> cm/cm-11.0
 		mutex_lock(&smux.mutex_lha0);
 		if (smux.ld_open_count > 0
 				&& !smux.platform_devs_registered) {
 			for (i = 0; i < ARRAY_SIZE(smux_devs); ++i) {
+<<<<<<< HEAD
 				SMUX_DBG("%s: register pdev '%s'\n",
+=======
+				SMUX_DBG("smux: %s: register pdev '%s'\n",
+>>>>>>> cm/cm-11.0
 					__func__, smux_devs[i].name);
 				smux_devs[i].dev.release = smux_pdev_release;
 				tmp = platform_device_register(&smux_devs[i]);
 				if (tmp)
+<<<<<<< HEAD
 					pr_err("%s: error %d registering device %s\n",
+=======
+					SMUX_ERR(
+						"%s: error %d registering device %s\n",
+>>>>>>> cm/cm-11.0
 					   __func__, tmp, smux_devs[i].name);
 			}
 			smux.platform_devs_registered = 1;
@@ -3410,7 +4267,11 @@ static int ssr_notifier_cb(struct notifier_block *this,
 	} else if (code != SUBSYS_AFTER_SHUTDOWN) {
 		return NOTIFY_DONE;
 	}
+<<<<<<< HEAD
 	SMUX_DBG("%s: ssr - after shutdown\n", __func__);
+=======
+	SMUX_DBG("smux: %s: ssr - after shutdown\n", __func__);
+>>>>>>> cm/cm-11.0
 
 	/* Cleanup channels */
 	smux_flush_workqueues();
@@ -3423,7 +4284,11 @@ static int ssr_notifier_cb(struct notifier_block *this,
 		/* Unregister platform devices */
 		if (smux.platform_devs_registered) {
 			for (i = 0; i < ARRAY_SIZE(smux_devs); ++i) {
+<<<<<<< HEAD
 				SMUX_DBG("%s: unregister pdev '%s'\n",
+=======
+				SMUX_DBG("smux: %s: unregister pdev '%s'\n",
+>>>>>>> cm/cm-11.0
 						__func__, smux_devs[i].name);
 				platform_device_unregister(&smux_devs[i]);
 			}
@@ -3433,7 +4298,12 @@ static int ssr_notifier_cb(struct notifier_block *this,
 		/* Power-down UART */
 		spin_lock_irqsave(&smux.tx_lock_lha2, flags);
 		if (smux.power_state != SMUX_PWR_OFF) {
+<<<<<<< HEAD
 			SMUX_PWR("%s: SSR - turning off UART\n", __func__);
+=======
+			SMUX_PWR("smux: %s: SSR - turning off UART\n",
+							__func__);
+>>>>>>> cm/cm-11.0
 			smux.power_state = SMUX_PWR_OFF;
 			power_off_uart = 1;
 		}
@@ -3447,6 +4317,10 @@ static int ssr_notifier_cb(struct notifier_block *this,
 	smux.rx_activity_flag = 0;
 	smux.rx_state = SMUX_RX_IDLE;
 	smux.in_reset = 0;
+<<<<<<< HEAD
+=======
+	smux.remote_is_alive = 0;
+>>>>>>> cm/cm-11.0
 	mutex_unlock(&smux.mutex_lha0);
 
 	return NOTIFY_DONE;
@@ -3460,7 +4334,12 @@ static void smux_pdev_release(struct device *dev)
 	struct platform_device *pdev;
 
 	pdev = container_of(dev, struct platform_device, dev);
+<<<<<<< HEAD
 	SMUX_DBG("%s: releasing pdev %p '%s'\n", __func__, pdev, pdev->name);
+=======
+	SMUX_DBG("smux: %s: releasing pdev %p '%s'\n",
+			__func__, pdev, pdev->name);
+>>>>>>> cm/cm-11.0
 	memset(&pdev->dev, 0x0, sizeof(pdev->dev));
 }
 
@@ -3475,14 +4354,22 @@ static int smuxld_open(struct tty_struct *tty)
 
 	mutex_lock(&smux.mutex_lha0);
 	if (smux.ld_open_count) {
+<<<<<<< HEAD
 		pr_err("%s: %p multiple instances not supported\n",
+=======
+		SMUX_ERR("%s: %p multiple instances not supported\n",
+>>>>>>> cm/cm-11.0
 			__func__, tty);
 		mutex_unlock(&smux.mutex_lha0);
 		return -EEXIST;
 	}
 
 	if (tty->ops->write == NULL) {
+<<<<<<< HEAD
 		pr_err("%s: tty->ops->write already NULL\n", __func__);
+=======
+		SMUX_ERR("%s: tty->ops->write already NULL\n", __func__);
+>>>>>>> cm/cm-11.0
 		mutex_unlock(&smux.mutex_lha0);
 		return -EINVAL;
 	}
@@ -3498,7 +4385,11 @@ static int smuxld_open(struct tty_struct *tty)
 	/* power-down the UART if we are idle */
 	spin_lock_irqsave(&smux.tx_lock_lha2, flags);
 	if (smux.power_state == SMUX_PWR_OFF) {
+<<<<<<< HEAD
 		SMUX_PWR("%s: powering off uart\n", __func__);
+=======
+		SMUX_PWR("smux: %s: powering off uart\n", __func__);
+>>>>>>> cm/cm-11.0
 		smux.power_state = SMUX_PWR_OFF_FLUSH;
 		spin_unlock_irqrestore(&smux.tx_lock_lha2, flags);
 		queue_work(smux_tx_wq, &smux_inactivity_work);
@@ -3508,12 +4399,20 @@ static int smuxld_open(struct tty_struct *tty)
 
 	/* register platform devices */
 	for (i = 0; i < ARRAY_SIZE(smux_devs); ++i) {
+<<<<<<< HEAD
 		SMUX_DBG("%s: register pdev '%s'\n",
+=======
+		SMUX_DBG("smux: %s: register pdev '%s'\n",
+>>>>>>> cm/cm-11.0
 				__func__, smux_devs[i].name);
 		smux_devs[i].dev.release = smux_pdev_release;
 		tmp = platform_device_register(&smux_devs[i]);
 		if (tmp)
+<<<<<<< HEAD
 			pr_err("%s: error %d registering device %s\n",
+=======
+			SMUX_ERR("%s: error %d registering device %s\n",
+>>>>>>> cm/cm-11.0
 				   __func__, tmp, smux_devs[i].name);
 	}
 	smux.platform_devs_registered = 1;
@@ -3527,12 +4426,20 @@ static void smuxld_close(struct tty_struct *tty)
 	int power_up_uart = 0;
 	int i;
 
+<<<<<<< HEAD
 	SMUX_DBG("%s: ldisc unload\n", __func__);
+=======
+	SMUX_DBG("smux: %s: ldisc unload\n", __func__);
+>>>>>>> cm/cm-11.0
 	smux_flush_workqueues();
 
 	mutex_lock(&smux.mutex_lha0);
 	if (smux.ld_open_count <= 0) {
+<<<<<<< HEAD
 		pr_err("%s: invalid ld count %d\n", __func__,
+=======
+		SMUX_ERR("%s: invalid ld count %d\n", __func__,
+>>>>>>> cm/cm-11.0
 			smux.ld_open_count);
 		mutex_unlock(&smux.mutex_lha0);
 		return;
@@ -3545,7 +4452,11 @@ static void smuxld_close(struct tty_struct *tty)
 	/* Unregister platform devices */
 	if (smux.platform_devs_registered) {
 		for (i = 0; i < ARRAY_SIZE(smux_devs); ++i) {
+<<<<<<< HEAD
 			SMUX_DBG("%s: unregister pdev '%s'\n",
+=======
+			SMUX_DBG("smux: %s: unregister pdev '%s'\n",
+>>>>>>> cm/cm-11.0
 					__func__, smux_devs[i].name);
 			platform_device_unregister(&smux_devs[i]);
 		}
@@ -3569,8 +4480,14 @@ static void smuxld_close(struct tty_struct *tty)
 
 	/* Disconnect from TTY */
 	smux.tty = NULL;
+<<<<<<< HEAD
 	mutex_unlock(&smux.mutex_lha0);
 	SMUX_DBG("%s: ldisc complete\n", __func__);
+=======
+	smux.remote_is_alive = 0;
+	mutex_unlock(&smux.mutex_lha0);
+	SMUX_DBG("smux: %s: ldisc complete\n", __func__);
+>>>>>>> cm/cm-11.0
 }
 
 /**
@@ -3589,16 +4506,23 @@ void smuxld_receive_buf(struct tty_struct *tty, const unsigned char *cp,
 	const char *tty_name = NULL;
 	char *f;
 
+<<<<<<< HEAD
 	if (smux_debug_mask & MSM_SMUX_DEBUG)
 		print_hex_dump(KERN_INFO, "smux tty rx: ", DUMP_PREFIX_OFFSET,
 				     16, 1, cp, count, true);
 
+=======
+>>>>>>> cm/cm-11.0
 	/* verify error flags */
 	for (i = 0, f = fp; i < count; ++i, ++f) {
 		if (*f != TTY_NORMAL) {
 			if (tty)
 				tty_name = tty->name;
+<<<<<<< HEAD
 			pr_err("%s: TTY %s Error %d (%s)\n", __func__,
+=======
+			SMUX_ERR("%s: TTY %s Error %d (%s)\n", __func__,
+>>>>>>> cm/cm-11.0
 				   tty_name, *f, tty_flag_to_str(*f));
 
 			/* feed all previous valid data to the parser */
@@ -3617,46 +4541,74 @@ void smuxld_receive_buf(struct tty_struct *tty, const unsigned char *cp,
 
 static void smuxld_flush_buffer(struct tty_struct *tty)
 {
+<<<<<<< HEAD
 	pr_err("%s: not supported\n", __func__);
+=======
+	SMUX_ERR("%s: not supported\n", __func__);
+>>>>>>> cm/cm-11.0
 }
 
 static ssize_t	smuxld_chars_in_buffer(struct tty_struct *tty)
 {
+<<<<<<< HEAD
 	pr_err("%s: not supported\n", __func__);
+=======
+	SMUX_ERR("%s: not supported\n", __func__);
+>>>>>>> cm/cm-11.0
 	return -ENODEV;
 }
 
 static ssize_t	smuxld_read(struct tty_struct *tty, struct file *file,
 		unsigned char __user *buf, size_t nr)
 {
+<<<<<<< HEAD
 	pr_err("%s: not supported\n", __func__);
+=======
+	SMUX_ERR("%s: not supported\n", __func__);
+>>>>>>> cm/cm-11.0
 	return -ENODEV;
 }
 
 static ssize_t	smuxld_write(struct tty_struct *tty, struct file *file,
 		 const unsigned char *buf, size_t nr)
 {
+<<<<<<< HEAD
 	pr_err("%s: not supported\n", __func__);
+=======
+	SMUX_ERR("%s: not supported\n", __func__);
+>>>>>>> cm/cm-11.0
 	return -ENODEV;
 }
 
 static int	smuxld_ioctl(struct tty_struct *tty, struct file *file,
 		 unsigned int cmd, unsigned long arg)
 {
+<<<<<<< HEAD
 	pr_err("%s: not supported\n", __func__);
+=======
+	SMUX_ERR("%s: not supported\n", __func__);
+>>>>>>> cm/cm-11.0
 	return -ENODEV;
 }
 
 static unsigned int smuxld_poll(struct tty_struct *tty, struct file *file,
 			 struct poll_table_struct *tbl)
 {
+<<<<<<< HEAD
 	pr_err("%s: not supported\n", __func__);
+=======
+	SMUX_ERR("%s: not supported\n", __func__);
+>>>>>>> cm/cm-11.0
 	return -ENODEV;
 }
 
 static void smuxld_write_wakeup(struct tty_struct *tty)
 {
+<<<<<<< HEAD
 	pr_err("%s: not supported\n", __func__);
+=======
+	SMUX_ERR("%s: not supported\n", __func__);
+>>>>>>> cm/cm-11.0
 }
 
 static struct tty_ldisc_ops smux_ldisc_ops = {
@@ -3694,6 +4646,10 @@ static int __init smux_init(void)
 	smux.tty = NULL;
 	smux.ld_open_count = 0;
 	smux.in_reset = 0;
+<<<<<<< HEAD
+=======
+	smux.remote_is_alive = 0;
+>>>>>>> cm/cm-11.0
 	smux.is_initialized = 1;
 	smux.platform_devs_registered = 0;
 	smux_byte_loopback = 0;
@@ -3703,7 +4659,11 @@ static int __init smux_init(void)
 
 	ret	= tty_register_ldisc(N_SMUX, &smux_ldisc_ops);
 	if (ret != 0) {
+<<<<<<< HEAD
 		pr_err("%s: error %d registering line discipline\n",
+=======
+		SMUX_ERR("%s: error %d registering line discipline\n",
+>>>>>>> cm/cm-11.0
 				__func__, ret);
 		return ret;
 	}
@@ -3712,10 +4672,23 @@ static int __init smux_init(void)
 
 	ret = lch_init();
 	if (ret != 0) {
+<<<<<<< HEAD
 		pr_err("%s: lch_init failed\n", __func__);
 		return ret;
 	}
 
+=======
+		SMUX_ERR("%s: lch_init failed\n", __func__);
+		return ret;
+	}
+
+	log_ctx = ipc_log_context_create(1, "smux");
+	if (!log_ctx) {
+		SMUX_ERR("%s: unable to create log context\n", __func__);
+		disable_ipc_logging = 1;
+	}
+
+>>>>>>> cm/cm-11.0
 	return 0;
 }
 
@@ -3725,7 +4698,11 @@ static void __exit smux_exit(void)
 
 	ret	= tty_unregister_ldisc(N_SMUX);
 	if (ret != 0) {
+<<<<<<< HEAD
 		pr_err("%s error %d unregistering line discipline\n",
+=======
+		SMUX_ERR("%s error %d unregistering line discipline\n",
+>>>>>>> cm/cm-11.0
 				__func__, ret);
 		return;
 	}

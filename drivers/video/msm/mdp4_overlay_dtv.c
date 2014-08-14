@@ -31,7 +31,10 @@
 #include "msm_fb.h"
 #include "hdmi_msm.h"
 #include "mdp4.h"
+<<<<<<< HEAD
 #include "hdmi_msm.h"
+=======
+>>>>>>> cm/cm-11.0
 
 #define DTV_BASE	0xD0000
 
@@ -232,7 +235,11 @@ int mdp4_dtv_pipe_commit(int cndx, int wait)
 * (vp->update_cnt == 0) to unstage pipes after
 * overlay_unset
 */
+<<<<<<< HEAD
 
+=======
+	xlog(__func__, wait, vp->update_cnt, 0, 0, 0);
+>>>>>>> cm/cm-11.0
 	vctrl->update_ndx++;
 	vctrl->update_ndx &= 0x01;
 	vp->update_cnt = 0;	/* reset */
@@ -280,7 +287,10 @@ int mdp4_dtv_pipe_commit(int cndx, int wait)
 			pipe->pipe_used = 0; /* clear */
 		}
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 	pipe = vctrl->base_pipe;
 	spin_lock_irqsave(&vctrl->spin_lock, flags);
 	if (pipe->ov_blt_addr) {
@@ -302,7 +312,11 @@ int mdp4_dtv_pipe_commit(int cndx, int wait)
 
 	if (wait)
 		mdp4_dtv_wait4dmae(0);
+<<<<<<< HEAD
 
+=======
+	xlog(__func__, 0x9999, 0, 0, 0, 0);
+>>>>>>> cm/cm-11.0
 	return cnt;
 }
 
@@ -350,6 +364,10 @@ void mdp4_dtv_vsync_ctrl(struct fb_info *info, int enable)
 	vctrl->vsync_irq_enabled = enable;
 
 	mdp4_dtv_vsync_irq_ctrl(cndx, enable);
+<<<<<<< HEAD
+=======
+
+>>>>>>> cm/cm-11.0
 }
 
 void mdp4_dtv_wait4vsync(int cndx)
@@ -368,7 +386,11 @@ void mdp4_dtv_wait4vsync(int cndx)
 
 	if (atomic_read(&vctrl->suspend) > 0)
 		return;
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> cm/cm-11.0
 	mdp4_dtv_vsync_irq_ctrl(cndx, 1);
 
 	ret = wait_event_interruptible_timeout(vctrl->wait_queue, 1,
@@ -378,7 +400,10 @@ void mdp4_dtv_wait4vsync(int cndx)
 
 	mdp4_dtv_vsync_irq_ctrl(cndx, 0);
 	mdp4_stat.wait4vsync1++;
+<<<<<<< HEAD
 	
+=======
+>>>>>>> cm/cm-11.0
 }
 
 static void mdp4_dtv_wait4dmae(int cndx)
@@ -422,7 +447,10 @@ ssize_t mdp4_dtv_show_event(struct device *dev,
 	buf[strlen(buf) + 1] = '\0';
 	return ret;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> cm/cm-11.0
 void mdp4_dtv_vsync_init(int cndx)
 {
 	struct vsycn_ctrl *vctrl;
@@ -848,8 +876,13 @@ static void mdp4_overlay_dtv_alloc_pipe(struct msm_fb_data_type *mfd,
 
 	mdp4_overlay_mdp_pipe_req(pipe, mfd);
 	mdp4_calc_blt_mdp_bw(mfd, pipe);
+<<<<<<< HEAD
 	mdp4_overlay_mdp_perf_req(mfd);
 	mdp4_overlay_mdp_perf_upd(mfd, 1);
+=======
+//	mdp4_overlay_mdp_perf_req(mfd, pipe);//need_check
+//	mdp4_overlay_mdp_perf_upd(mfd, 1);
+>>>>>>> cm/cm-11.0
 
 	ret = mdp4_overlay_format2pipe(pipe);
 	if (ret < 0)

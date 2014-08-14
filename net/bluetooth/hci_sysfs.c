@@ -166,7 +166,12 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
 {
 	BT_DBG("conn %p", conn);
 
+<<<<<<< HEAD
 	queue_work(conn->hdev->workqueue, &conn->work_del);
+=======
+	if (conn->hdev)
+		queue_work(conn->hdev->workqueue, &conn->work_del);
+>>>>>>> cm/cm-11.0
 }
 
 static inline char *host_bustostr(int bus)

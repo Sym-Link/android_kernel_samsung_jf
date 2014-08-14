@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+=======
+/* Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -23,6 +27,10 @@
 #include <linux/suspend.h>
 #include <linux/percpu.h>
 #include <linux/interrupt.h>
+<<<<<<< HEAD
+=======
+#include <linux/reboot.h>
+>>>>>>> cm/cm-11.0
 #include <asm/fiq.h>
 #include <asm/hardware/gic.h>
 #include <mach/msm_iomap.h>
@@ -64,6 +72,15 @@ static int enable = 1;
 module_param(enable, int, 0);
 
 /*
+<<<<<<< HEAD
+=======
+ * Watchdog bark reboot timeout in seconds.
+ * Can be specified in kernel command line.
+ */
+static int reboot_bark_timeout = 22;
+module_param(reboot_bark_timeout, int, 0644);
+/*
+>>>>>>> cm/cm-11.0
  * If the watchdog is enabled at bootup (enable=1),
  * the runtime_disable sysfs node at
  * /sys/module/msm_watchdog/runtime_disable
@@ -158,6 +175,30 @@ static struct notifier_block panic_blk = {
 	.notifier_call	= panic_wdog_handler,
 };
 
+<<<<<<< HEAD
+=======
+#define get_sclk_hz(t_ms) ((t_ms / 1000) * WDT_HZ)
+#define get_reboot_bark_timeout(t_s) ((t_s * MSEC_PER_SEC) < bark_time ? \
+		get_sclk_hz(bark_time) : get_sclk_hz(t_s * MSEC_PER_SEC))
+
+static int msm_watchdog_reboot_notifier(struct notifier_block *this,
+		unsigned long code, void *unused)
+{
+
+	u64 timeout = get_reboot_bark_timeout(reboot_bark_timeout);
+	__raw_writel(timeout, msm_wdt_base + WDT_BARK_TIME);
+	__raw_writel(timeout + 3 * WDT_HZ,
+			msm_wdt_base + WDT_BITE_TIME);
+	__raw_writel(1, msm_wdt_base + WDT_RST);
+
+	return NOTIFY_DONE;
+}
+
+static struct notifier_block msm_reboot_notifier = {
+	.notifier_call = msm_watchdog_reboot_notifier,
+};
+
+>>>>>>> cm/cm-11.0
 struct wdog_disable_work_data {
 	struct work_struct work;
 	struct completion complete;
@@ -181,6 +222,10 @@ static void wdog_disable_work(struct work_struct *work)
 	}
 	enable = 0;
 	atomic_notifier_chain_unregister(&panic_notifier_list, &panic_blk);
+<<<<<<< HEAD
+=======
+	unregister_reboot_notifier(&msm_reboot_notifier);
+>>>>>>> cm/cm-11.0
 	cancel_delayed_work(&dogwork_struct);
 	/* may be suspended after the first write above */
 	__raw_writel(0, msm_wdt_base + WDT_EN);
@@ -405,6 +450,13 @@ static void init_watchdog_work(struct work_struct *work)
 	atomic_notifier_chain_register(&panic_notifier_list,
 				       &panic_blk);
 
+<<<<<<< HEAD
+=======
+	ret = register_reboot_notifier(&msm_reboot_notifier);
+	if (ret)
+		pr_err("Failed to register reboot notifier\n");
+
+>>>>>>> cm/cm-11.0
 	__raw_writel(1, msm_wdt_base + WDT_EN);
 	__raw_writel(1, msm_wdt_base + WDT_RST);
 	last_pet = sched_clock();
@@ -427,6 +479,14 @@ static int msm_watchdog_probe(struct platform_device *pdev)
 	}
 
 	bark_time = pdata->bark_time;
+<<<<<<< HEAD
+=======
+	/* reboot_bark_timeout (in seconds) might have been supplied as
+	 * module parameter.
+	 */
+	if ((reboot_bark_timeout * MSEC_PER_SEC) < bark_time)
+		reboot_bark_timeout = (bark_time / MSEC_PER_SEC);
+>>>>>>> cm/cm-11.0
 	has_vic = pdata->has_vic;
 	if (!pdata->has_secure) {
 		appsbark = 1;

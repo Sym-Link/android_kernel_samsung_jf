@@ -1195,6 +1195,13 @@ static int snd_pcm_dev_disconnect(struct snd_device *device)
 			break;
 		}
 		snd_unregister_device(devtype, pcm->card, pcm->device);
+<<<<<<< HEAD
+=======
+		if (pcm->streams[cidx].vol_kctl) {
+			snd_ctl_remove(pcm->card, pcm->streams[cidx].vol_kctl);
+			pcm->streams[cidx].vol_kctl = NULL;
+		}
+>>>>>>> cm/cm-11.0
 	}
  unlock:
 	mutex_unlock(&register_mutex);

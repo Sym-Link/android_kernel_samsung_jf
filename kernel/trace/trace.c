@@ -591,12 +591,18 @@ int trace_get_user(struct trace_parser *parser, const char __user *ubuf,
 	if (isspace(ch)) {
 		parser->buffer[parser->idx] = 0;
 		parser->cont = false;
+<<<<<<< HEAD
 	} else if (parser->idx < parser->size - 1) {
 		parser->cont = true;
 		parser->buffer[parser->idx++] = ch;
 	} else {
 		ret = -EINVAL;
 		goto out;
+=======
+	} else {
+		parser->cont = true;
+		parser->buffer[parser->idx++] = ch;
+>>>>>>> cm/cm-11.0
 	}
 
 	*ppos += read;
@@ -1633,7 +1639,11 @@ int trace_array_vprintk(struct trace_array *tr,
 	memcpy(&entry->buf, trace_buf, len);
 	entry->buf[len] = '\0';
 	if (!filter_check_discard(call, entry, buffer, event)) {
+<<<<<<< HEAD
 		stm_log(OST_ENTITY_TRACE_PRINTK, event, size);
+=======
+		stm_log(OST_ENTITY_TRACE_PRINTK, entry->buf, len + 1);
+>>>>>>> cm/cm-11.0
 		ring_buffer_unlock_commit(buffer, event);
 		ftrace_trace_stack(buffer, irq_flags, 6, pc);
 	}
@@ -3828,10 +3838,18 @@ tracing_mark_write(struct file *filp, const char __user *ubuf,
 	if (entry->buf[cnt - 1] != '\n') {
 		entry->buf[cnt] = '\n';
 		entry->buf[cnt + 1] = '\0';
+<<<<<<< HEAD
 	} else
 		entry->buf[cnt] = '\0';
 
 	stm_log(OST_ENTITY_TRACE_MARKER, event, size);
+=======
+		stm_log(OST_ENTITY_TRACE_MARKER, entry->buf, cnt + 2);
+	} else {
+		entry->buf[cnt] = '\0';
+		stm_log(OST_ENTITY_TRACE_MARKER, entry->buf, cnt + 1);
+	}
+>>>>>>> cm/cm-11.0
 	ring_buffer_unlock_commit(buffer, event);
 
 	written = cnt;

@@ -145,6 +145,15 @@ static void free_fib_info_rcu(struct rcu_head *head)
 {
 	struct fib_info *fi = container_of(head, struct fib_info, rcu);
 
+<<<<<<< HEAD
+=======
+	change_nexthops(fi) {
+		if (nexthop_nh->nh_dev)
+			dev_put(nexthop_nh->nh_dev);
+	} endfor_nexthops(fi);
+
+	release_net(fi->fib_net);
+>>>>>>> cm/cm-11.0
 	if (fi->fib_metrics != (u32 *) dst_default_metrics)
 		kfree(fi->fib_metrics);
 	kfree(fi);
@@ -156,6 +165,7 @@ void free_fib_info(struct fib_info *fi)
 		pr_warn("Freeing alive fib_info %p\n", fi);
 		return;
 	}
+<<<<<<< HEAD
 	change_nexthops(fi) {
 		if (nexthop_nh->nh_dev)
 			dev_put(nexthop_nh->nh_dev);
@@ -163,6 +173,9 @@ void free_fib_info(struct fib_info *fi)
 	} endfor_nexthops(fi);
 	fib_info_cnt--;
 	release_net(fi->fib_net);
+=======
+	fib_info_cnt--;
+>>>>>>> cm/cm-11.0
 	call_rcu(&fi->rcu, free_fib_info_rcu);
 }
 

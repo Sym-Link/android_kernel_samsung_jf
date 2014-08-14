@@ -1,6 +1,11 @@
 /*
    BlueZ - Bluetooth protocol stack for Linux
+<<<<<<< HEAD
    Copyright (c) 2000-2001, 2010-2012, The Linux Foundation. All rights reserved.
+=======
+   Copyright (c) 2000-2001, The Linux Foundation. All rights reserved.
+   Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
+>>>>>>> cm/cm-11.0
 
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
@@ -356,6 +361,10 @@ struct hci_conn {
 	void		*smp_conn;
 	struct timer_list smp_timer;
 	__u8		conn_valid;
+<<<<<<< HEAD
+=======
+	__u8		hidp_session_valid;
+>>>>>>> cm/cm-11.0
 
 
 	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
@@ -383,7 +392,11 @@ extern rwlock_t hci_cb_list_lock;
 
 /* ----- Inquiry cache ----- */
 #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
+<<<<<<< HEAD
 #define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   /* 60 seconds */
+=======
+#define INQUIRY_ENTRY_AGE_MAX   (HZ*60*60)   /* 1 Hour */
+>>>>>>> cm/cm-11.0
 
 #define inquiry_cache_lock(c)		spin_lock(&c->lock)
 #define inquiry_cache_unlock(c)		spin_unlock(&c->lock)
